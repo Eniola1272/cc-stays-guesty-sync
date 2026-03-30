@@ -1,0 +1,23 @@
+{
+  "name": "cc-stays-guesty-sync",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "wp-scripts start src/index.jsx",
+    "build": "wp-scripts build src/index.jsx"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "description": "",
+  "devDependencies": {
+    "@wordpress/scripts": "^31.7.0"
+  },
+  "dependencies": {
+    "date-fns": "^4.1.0",
+    "react": "^18.3.1",
+    "react-datepicker": "^9.1.0",
+    "react-dom": "^18.3.1"
+  }
+}
