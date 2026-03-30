@@ -150,6 +150,24 @@ const BookingWidget = () => {
   if (!listingId)
     return <div className="cc-booking-widget">Error: Missing Property ID</div>;
 
+  const handleReserveClick = () => {
+    // Format the dates securely
+    const formatedCheckIn = startDate.toISOString().split("T")[0];
+    const formatedCheckOut = endDate.toISOString().split("T")[0];
+
+    // Build the URL parameters
+    const params = new URLSearchParams({
+      listingId: listingId,
+      checkIn: formatedCheckIn,
+      checkOut: formatedCheckOut,
+      guests: guests,
+      price: quote.totalPrice,
+    });
+
+    // Redirect the browser to the new checkout page
+    window.location.href = `/checkout?${params.toString()}`;
+  };
+
   return (
     <div className="cc-booking-widget">
       <div className="cc-booking-header">
@@ -255,7 +273,11 @@ const BookingWidget = () => {
             <span>Total</span>
             <strong>${quote.totalPrice}</strong>
           </div>
-          <button className="cc-btn-primary" style={{ marginTop: "10px" }}>
+          <button
+            onClick={handleReserveClick}
+            className="cc-btn-primary"
+            style={{ marginTop: "10px" }}
+          >
             Reserve Now
           </button>
         </div>
