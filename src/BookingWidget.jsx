@@ -260,28 +260,6 @@ const BookingWidget = () => {
           </button>
         </div>
       )}
-
-      {/* DEBUG PANEL - Remove after debugging */}
-      {quote && quote.debug && (
-        <div
-          style={{
-            marginTop: "15px",
-            padding: "12px",
-            background: "#f8f8f0",
-            border: "1px solid #ddd",
-            borderRadius: "4px",
-            fontSize: "11px",
-            fontFamily: "monospace",
-            whiteSpace: "pre-wrap",
-            wordBreak: "break-all",
-            maxHeight: "300px",
-            overflow: "auto",
-          }}
-        >
-          <strong>🐛 Debug Info (remove later):</strong>
-          <pre>{JSON.stringify(quote.debug, null, 2)}</pre>
-        </div>
-      )}
     </div>
   );
 };

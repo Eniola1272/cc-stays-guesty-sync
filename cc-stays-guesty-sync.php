@@ -249,13 +249,14 @@ class CC_Stays_Guesty_Sync
         // Build the payload we're sending to Guesty
         $guesty_payload = [
             'listingId' => sanitize_text_field($params['listingId']),
-            'checkIn' => sanitize_text_field($params['checkIn']),
-            'checkOut' => sanitize_text_field($params['checkOut']),
-            'guestsCount' => isset($params['guests']) ? intval($params['guests']) : 1
+            'checkInDateLocalized' => sanitize_text_field($params['checkIn']),
+            'checkOutDateLocalized' => sanitize_text_field($params['checkOut']),
+            'guestsCount' => isset($params['guests']) ? intval($params['guests']) : 1,
+            'source' => 'website'
         ];
 
         // Ping Guesty's quoting endpoint
-        $response = wp_remote_post($this->api_base . '/v1/reservations/quotes', [
+        $response = wp_remote_post($this->api_base . '/v1/quotes', [
             'headers' => [
                 'Authorization' => 'Bearer ' . $token,
                 'Content-Type' => 'application/json',
@@ -280,8 +281,8 @@ class CC_Stays_Guesty_Sync
         $raw_body = wp_remote_retrieve_body($response);
         $body = json_decode($raw_body, true);
 
-        // DEBUG: If Guesty returns anything other than 200, pass the full response back
-        if ($http_code !== 200) {
+        // If Guesty returns an error code (anything outside the 200-299 success range)
+        if ($http_code < 200 || $http_code >= 300) {
             return new WP_REST_Response([
                 'available' => false,
                 'message' => isset($body['error']['message']) ? $body['error']['message'] : 'Guesty returned HTTP ' . $http_code,
@@ -290,32 +291,29 @@ class CC_Stays_Guesty_Sync
                     'guesty_response' => $body,
                     'payload_sent' => $guesty_payload
                 ]
-            ], 200); // Return 200 to our frontend so React can read the JSON
+            ], 200); // Return 200 to our frontend so React can gracefully read the JSON error
         }
 
-        // If Guesty returns an error key even on 200
-        if (isset($body['error'])) {
-            return new WP_REST_Response([
-                'available' => false,
-                'message' => $body['error']['message'],
-                'debug' => [
-                    'guesty_http_code' => $http_code,
-                    'guesty_response' => $body,
-                    'payload_sent' => $guesty_payload
-                ]
-            ], 200);
-        }
+        // Drill down into Guesty's nested quoting structure to find the price
+        $rate_plan = isset($body['rates']['ratePlans'][0]) ? $body['rates']['ratePlans'][0] : null;
+        $money_data = isset($rate_plan['money']['money']) ? $rate_plan['money']['money'] : null;
+
+        $total_price = isset($money_data['subTotalPrice']) ? $money_data['subTotalPrice'] : null;
+        $currency = isset($money_data['currency']) ? $money_data['currency'] : 'USD';
+        
+        // Grab the breakdown (Nightly Rate vs Cleaning Fees)
+        $breakdown = isset($money_data['invoiceItems']) ? $money_data['invoiceItems'] : null;
 
         // If successful, pass the pricing breakdown back to React
         return new WP_REST_Response([
             'available' => true,
-            'totalPrice' => isset($body['prices']['totalPrice']) ? $body['prices']['totalPrice'] : null,
-            'currency' => isset($body['currency']) ? $body['currency'] : 'USD',
-            'breakdown' => isset($body['prices']) ? $body['prices'] : null,
+            'totalPrice' => $total_price,
+            'currency' => $currency,
+            'breakdown' => $breakdown,
             'debug' => [
                 'guesty_http_code' => $http_code,
                 'payload_sent' => $guesty_payload,
-                'raw_guesty_response' => $body
+                'raw_guesty_response' => $body 
             ]
         ], 200);
     }
