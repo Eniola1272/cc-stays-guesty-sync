@@ -246,6 +246,14 @@ class CC_Stays_Guesty_Sync
             return new WP_Error('auth_failed', 'Could not authenticate with booking server.', ['status' => 500]);
         }
 
+        // Build the payload we're sending to Guesty
+        $guesty_payload = [
+            'listingId' => sanitize_text_field($params['listingId']),
+            'checkIn' => sanitize_text_field($params['checkIn']),
+            'checkOut' => sanitize_text_field($params['checkOut']),
+            'guestsCount' => isset($params['guests']) ? intval($params['guests']) : 1
+        ];
+
         // Ping Guesty's quoting endpoint
         $response = wp_remote_post($this->api_base . '/v1/reservations/quotes', [
             'headers' => [
@@ -253,32 +261,62 @@ class CC_Stays_Guesty_Sync
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
             ],
-            'body' => wp_json_encode([
-                'listingId' => sanitize_text_field($params['listingId']),
-                'checkIn' => sanitize_text_field($params['checkIn']),
-                'checkOut' => sanitize_text_field($params['checkOut']),
-                'guestsCount' => isset($params['guests']) ? intval($params['guests']) : 1
-            ]),
+            'body' => wp_json_encode($guesty_payload),
             'timeout' => 15
         ]);
 
         if (is_wp_error($response)) {
-            return new WP_Error('api_error', 'Failed to connect to Guesty API.', ['status' => 500]);
+            return new WP_REST_Response([
+                'available' => false,
+                'message' => 'Failed to connect to Guesty API.',
+                'debug' => [
+                    'wp_error' => $response->get_error_message(),
+                    'payload_sent' => $guesty_payload
+                ]
+            ], 500);
         }
 
-        $body = json_decode(wp_remote_retrieve_body($response), true);
+        $http_code = wp_remote_retrieve_response_code($response);
+        $raw_body = wp_remote_retrieve_body($response);
+        $body = json_decode($raw_body, true);
 
-        // If Guesty returns an error (like "Dates not available")
+        // DEBUG: If Guesty returns anything other than 200, pass the full response back
+        if ($http_code !== 200) {
+            return new WP_REST_Response([
+                'available' => false,
+                'message' => isset($body['error']['message']) ? $body['error']['message'] : 'Guesty returned HTTP ' . $http_code,
+                'debug' => [
+                    'guesty_http_code' => $http_code,
+                    'guesty_response' => $body,
+                    'payload_sent' => $guesty_payload
+                ]
+            ], 200); // Return 200 to our frontend so React can read the JSON
+        }
+
+        // If Guesty returns an error key even on 200
         if (isset($body['error'])) {
-            return new WP_REST_Response(['available' => false, 'message' => $body['error']['message']], 400);
+            return new WP_REST_Response([
+                'available' => false,
+                'message' => $body['error']['message'],
+                'debug' => [
+                    'guesty_http_code' => $http_code,
+                    'guesty_response' => $body,
+                    'payload_sent' => $guesty_payload
+                ]
+            ], 200);
         }
 
         // If successful, pass the pricing breakdown back to React
         return new WP_REST_Response([
             'available' => true,
-            'totalPrice' => $body['prices']['totalPrice'],
-            'currency' => $body['currency'],
-            'breakdown' => $body['prices'] // Includes taxes, cleaning fees, etc.
+            'totalPrice' => isset($body['prices']['totalPrice']) ? $body['prices']['totalPrice'] : null,
+            'currency' => isset($body['currency']) ? $body['currency'] : 'USD',
+            'breakdown' => isset($body['prices']) ? $body['prices'] : null,
+            'debug' => [
+                'guesty_http_code' => $http_code,
+                'payload_sent' => $guesty_payload,
+                'raw_guesty_response' => $body
+            ]
         ], 200);
     }
 

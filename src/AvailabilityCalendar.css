@@ -3,8 +3,8 @@
   --cc-text-dark: #2c2c2c;
   --cc-text-light: #a0a0a0;
   --cc-border-light: #e0e0e0;
-  --cc-font-primary: 'Montserrat', 'Inter', sans-serif;
-  --cc-font-serif: 'Playfair Display', 'Georgia', serif;
+  --cc-font-primary: "Montserrat", "Inter", sans-serif;
+  --cc-font-serif: "Playfair Display", "Georgia", serif;
 }
 
 .cc-availability-container {
@@ -75,7 +75,7 @@
 .cc-calendar-wrapper {
   position: relative;
   /* Push slightly up so arrows flank the months */
-  margin-top: -50px; 
+  margin-top: -50px;
 }
 
 /* Hide default datepicker arrows since we made custom ones */
@@ -161,7 +161,9 @@
   font-size: 14px;
   font-family: var(--cc-font-primary);
   cursor: pointer;
-  transition: background 0.2s, color 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s;
 }
 
 .cc-show-more-btn:hover {
