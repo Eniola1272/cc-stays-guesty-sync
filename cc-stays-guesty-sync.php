@@ -29,6 +29,9 @@ class CC_Stays_Guesty_Sync
         // Register the Elementor shortcode
         add_shortcode('cc_stays_booking', [$this, 'render_booking_widget']);
 
+        // Register the Availability Calendar shortcode
+        add_shortcode('cc_stays_availability', [$this, 'render_availability_widget']);
+
         // Enqueue the compiled React app
         add_action('wp_enqueue_scripts', [$this, 'enqueue_react_app']);
     }
@@ -127,8 +130,7 @@ class CC_Stays_Guesty_Sync
                 $post_id = $existing_posts[0]->ID;
                 $post_data['ID'] = $post_id;
                 wp_update_post($post_data);
-            }
-            else {
+            } else {
                 // Create new property
                 $post_id = wp_insert_post($post_data);
             }
@@ -151,45 +153,40 @@ class CC_Stays_Guesty_Sync
                     update_post_meta($post_id, 'location_city', $listing['address']['city']);
                 }
 
-                // Get the first image from the Guesty pictures array
-                if (!empty($listing['pictures']) && is_array($listing['pictures'])) {
-                    $first_image = $listing['pictures'][0];
-                    // Guesty usually stores the best quality under 'original' or 'large'
-                    $image_url = isset($first_image['original']) ? $first_image['original'] : (isset($first_image['large']) ? $first_image['large'] : false);
-
-                    if ($image_url) {
-                        $this->sideload_featured_image($post_id, $image_url);
-                    }
-                }
             }
         }
     }
 
     /**
-     * Step 4: Sideload Image to WordPress Media Library
+     * Step 4: Sideload Images to WordPress Media Library and return the ID
      */
-    private function sideload_featured_image($post_id, $image_url)
+    private function sideload_property_image($post_id, $image_url, $is_featured = false)
     {
-        // Prevent re-downloading the exact same image on every sync
-        $synced_image_url = get_post_meta($post_id, '_guesty_synced_image', true);
-        if ($synced_image_url === $image_url) {
-            return;
+        // Create a unique meta key for each image URL to prevent duplicate downloads
+        $hash = md5($image_url);
+        $existing_id = get_post_meta($post_id, '_guesty_img_' . $hash, true);
+
+        if ($existing_id) {
+            return $existing_id; // Already downloaded!
         }
 
-        // Require necessary WordPress core files for handling media
         require_once(ABSPATH . 'wp-admin/includes/media.php');
         require_once(ABSPATH . 'wp-admin/includes/file.php');
         require_once(ABSPATH . 'wp-admin/includes/image.php');
 
-        // Download the image and return the new Media Library ID
         $attachment_id = media_sideload_image($image_url, $post_id, null, 'id');
 
         if (!is_wp_error($attachment_id)) {
-            // Set it as the Elementor Featured Image
-            set_post_thumbnail($post_id, $attachment_id);
-            // Save the Guesty URL in the database so we know it's already done
-            update_post_meta($post_id, '_guesty_synced_image', $image_url);
+            // Remember that we downloaded this specific URL
+            update_post_meta($post_id, '_guesty_img_' . $hash, $attachment_id);
+
+            if ($is_featured) {
+                set_post_thumbnail($post_id, $attachment_id);
+            }
+            return $attachment_id;
         }
+
+        return false;
     }
 
     /**
@@ -222,6 +219,13 @@ class CC_Stays_Guesty_Sync
             'methods' => 'POST',
             'callback' => [$this, 'get_guesty_quote'],
             'permission_callback' => '__return_true' // Open to public for booking
+        ]);
+
+        // Availability calendar endpoint (GET)
+        register_rest_route('cc-stays/v1', '/availability', [
+            'methods' => 'GET',
+            'callback' => [$this, 'get_guesty_availability'],
+            'permission_callback' => '__return_true'
         ]);
     }
 
@@ -279,6 +283,56 @@ class CC_Stays_Guesty_Sync
     }
 
     /**
+     * Fetch blocked/unavailable dates from Guesty's Calendar API
+     */
+    public function get_guesty_availability($request)
+    {
+        $listing_id = sanitize_text_field($request->get_param('listingId'));
+
+        if (empty($listing_id)) {
+            return new WP_Error('missing_data', 'Listing ID is required.', ['status' => 400]);
+        }
+
+        $token = $this->get_access_token();
+        if (!$token) {
+            return new WP_Error('auth_failed', 'Could not authenticate with booking server.', ['status' => 500]);
+        }
+
+        // Fetch 12 months of calendar data from Guesty
+        $today = date('Y-m-d');
+        $end_date = date('Y-m-d', strtotime('+12 months'));
+
+        $response = wp_remote_get(
+            $this->api_base . '/v1/availability-pricing/api/calendar/listings/' . $listing_id . '?startDate=' . $today . '&endDate=' . $end_date,
+            [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $token,
+                    'Accept' => 'application/json',
+                ],
+                'timeout' => 15
+            ]
+        );
+
+        if (is_wp_error($response)) {
+            return new WP_Error('api_error', 'Failed to connect to Guesty Calendar API.', ['status' => 500]);
+        }
+
+        $body = json_decode(wp_remote_retrieve_body($response), true);
+
+        // Filter out the unavailable dates
+        $blocked_dates = [];
+        if (isset($body['data']['days']) && is_array($body['data']['days'])) {
+            foreach ($body['data']['days'] as $day) {
+                if (isset($day['status']) && $day['status'] !== 'available') {
+                    $blocked_dates[] = $day['date']; // "YYYY-MM-DD"
+                }
+            }
+        }
+
+        return new WP_REST_Response(['blockedDates' => $blocked_dates], 200);
+    }
+
+    /**
      * Render the React mount point via Shortcode
      */
     public function render_booking_widget()
@@ -295,6 +349,23 @@ class CC_Stays_Guesty_Sync
 
         // Output the div for React to mount to, passing the Guesty ID
         return '<div id="cc-stays-react-booking" data-listing-id="' . esc_attr($guesty_id) . '"></div>';
+    }
+
+    /**
+     * Render the React mount point for the Availability Calendar via Shortcode
+     */
+    public function render_availability_widget()
+    {
+        if (!is_singular('properties'))
+            return '';
+
+        $post_id = get_the_ID();
+        $guesty_id = get_post_meta($post_id, 'guesty_listing_id', true);
+
+        if (!$guesty_id)
+            return '';
+
+        return '<div id="cc-stays-react-availability" data-listing-id="' . esc_attr($guesty_id) . '"></div>';
     }
 
     /**
@@ -328,7 +399,7 @@ class CC_Stays_Guesty_Sync
             wp_enqueue_style(
                 'cc-stays-react-datepicker-css',
                 $plugin_url . 'build/index.jsx.css',
-            [],
+                [],
                 $assets['version']
             );
         }
