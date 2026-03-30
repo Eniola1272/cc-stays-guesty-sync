@@ -233,9 +233,9 @@ class CC_Stays_Guesty_Sync
 
         // Checkout/Booking endpoint (POST)
         register_rest_route('cc-stays/v1', '/book', [
-            'methods'  => 'POST',
+            'methods' => 'POST',
             'callback' => [$this, 'create_guesty_reservation'],
-            'permission_callback' => '__return_true' 
+            'permission_callback' => '__return_true'
         ]);
     }
 
@@ -310,7 +310,7 @@ class CC_Stays_Guesty_Sync
 
         $total_price = isset($money_data['subTotalPrice']) ? $money_data['subTotalPrice'] : null;
         $currency = isset($money_data['currency']) ? $money_data['currency'] : 'USD';
-        
+
         // Grab the breakdown (Nightly Rate vs Cleaning Fees)
         $breakdown = isset($money_data['invoiceItems']) ? $money_data['invoiceItems'] : null;
 
@@ -323,7 +323,7 @@ class CC_Stays_Guesty_Sync
             'debug' => [
                 'guesty_http_code' => $http_code,
                 'payload_sent' => $guesty_payload,
-                'raw_guesty_response' => $body 
+                'raw_guesty_response' => $body
             ]
         ], 200);
     }
@@ -419,9 +419,10 @@ class CC_Stays_Guesty_Sync
      */
     public function enqueue_react_app()
     {
-        // Only load this heavy JS if we are on a single property page
-        if (!is_singular('properties'))
+        // Only load this heavy JS if we are on a single property page OR the checkout page
+        if (!is_singular('properties') && !is_page('checkout')) {
             return;
+        }
 
         $plugin_dir = plugin_dir_path(__FILE__);
         $plugin_url = plugin_dir_url(__FILE__);
@@ -454,7 +455,8 @@ class CC_Stays_Guesty_Sync
     /**
      * Handle the request from React and create the reservation in Guesty
      */
-    public function create_guesty_reservation($request) {
+    public function create_guesty_reservation($request)
+    {
         $params = $request->get_json_params();
 
         // Validate that we received the guest data
@@ -469,18 +471,22 @@ class CC_Stays_Guesty_Sync
 
         $guest_data = $params['guest'];
 
+        $check_in_date = sanitize_text_field($params['checkIn']);
+        $check_out_date = sanitize_text_field($params['checkOut']);
+
         // Build the final reservation payload for Guesty
         $guesty_payload = [
-            'listingId'             => sanitize_text_field($params['listingId']),
-            'checkInDateLocalized'  => sanitize_text_field($params['checkIn']),
-            'checkOutDateLocalized' => sanitize_text_field($params['checkOut']),
-            'guestsCount'           => isset($params['guests']) ? intval($params['guests']) : 1,
-            'source'                => 'website',
-            'guest'                 => [
+            'listingId' => sanitize_text_field($params['listingId']),
+            'checkInDateLocalized' => $check_in_date, // Guesty specifically requested this key
+            'checkOutDateLocalized' => $check_out_date, // Guesty specifically requested this key
+            'status' => 'reserved', // Keep this so Guesty locks the calendar only temporarily!
+            'guestsCount' => isset($params['guests']) ? intval($params['guests']) : 1,
+            'source' => 'website',
+            'guest' => [
                 'firstName' => sanitize_text_field($guest_data['firstName']),
-                'lastName'  => sanitize_text_field($guest_data['lastName']),
-                'email'     => sanitize_email($guest_data['email']),
-                'phone'     => sanitize_text_field($guest_data['phone']),
+                'lastName' => sanitize_text_field($guest_data['lastName']),
+                'email' => sanitize_email($guest_data['email']),
+                'phone' => sanitize_text_field($guest_data['phone']),
             ]
         ];
 
@@ -488,8 +494,8 @@ class CC_Stays_Guesty_Sync
         $response = wp_remote_post($this->api_base . '/v1/reservations', [
             'headers' => [
                 'Authorization' => 'Bearer ' . $token,
-                'Content-Type'  => 'application/json',
-                'Accept'        => 'application/json',
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
             ],
             'body' => wp_json_encode($guesty_payload),
             'timeout' => 20
@@ -503,14 +509,19 @@ class CC_Stays_Guesty_Sync
         }
 
         $http_code = wp_remote_retrieve_response_code($response);
-        $body = json_decode(wp_remote_retrieve_body($response), true);
+        $raw_body = wp_remote_retrieve_body($response); // Grab the raw text before decoding!
+        $body = json_decode($raw_body, true);
 
         // Handle errors from Guesty (like if the dates got booked by someone else while they were checking out)
         if ($http_code < 200 || $http_code >= 300) {
             return new WP_REST_Response([
                 'success' => false,
                 'message' => isset($body['error']['message']) ? $body['error']['message'] : 'Failed to create reservation.',
-                'debug'   => $body
+                'debug' => [
+                    'http_code' => $http_code,
+                    'raw_response' => $raw_body, // This will expose the exact Guesty error
+                    'payload_sent' => $guesty_payload
+                ]
             ], 400);
         }
 
@@ -519,15 +530,15 @@ class CC_Stays_Guesty_Sync
             'success' => true,
             'message' => 'Reservation created successfully.',
             'reservationId' => isset($body['_id']) ? $body['_id'] : null,
-            // If Guesty generates a direct payment portal link, we capture it here:
-            'paymentUrl' => isset($body['paymentUrl']) ? $body['paymentUrl'] : null 
+            'paymentUrl' => isset($body['paymentUrl']) ? $body['paymentUrl'] : null
         ], 200);
     }
 
     /**
      * Render the React mount point for the Checkout Page
      */
-    public function render_checkout_widget() {
+    public function render_checkout_widget()
+    {
         // This shortcode can be placed anywhere, it doesn't need to be on a single property page
         return '<div id="cc-stays-react-checkout"></div>';
     }
