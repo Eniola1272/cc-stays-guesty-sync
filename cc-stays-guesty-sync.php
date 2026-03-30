@@ -32,6 +32,9 @@ class CC_Stays_Guesty_Sync
         // Register the Availability Calendar shortcode
         add_shortcode('cc_stays_availability', [$this, 'render_availability_widget']);
 
+        // Register the Checkout shortcode
+        add_shortcode('cc_stays_checkout', [$this, 'render_checkout_widget']);
+
         // Enqueue the compiled React app
         add_action('wp_enqueue_scripts', [$this, 'enqueue_react_app']);
     }
@@ -226,6 +229,13 @@ class CC_Stays_Guesty_Sync
             'methods' => 'GET',
             'callback' => [$this, 'get_guesty_availability'],
             'permission_callback' => '__return_true'
+        ]);
+
+        // Checkout/Booking endpoint (POST)
+        register_rest_route('cc-stays/v1', '/book', [
+            'methods'  => 'POST',
+            'callback' => [$this, 'create_guesty_reservation'],
+            'permission_callback' => '__return_true' 
         ]);
     }
 
@@ -439,6 +449,87 @@ class CC_Stays_Guesty_Sync
                 $assets['version']
             );
         }
+    }
+
+    /**
+     * Handle the request from React and create the reservation in Guesty
+     */
+    public function create_guesty_reservation($request) {
+        $params = $request->get_json_params();
+
+        // Validate that we received the guest data
+        if (empty($params['listingId']) || empty($params['checkIn']) || empty($params['checkOut']) || empty($params['guest'])) {
+            return new WP_Error('missing_data', 'Missing required booking data.', ['status' => 400]);
+        }
+
+        $token = $this->get_access_token();
+        if (!$token) {
+            return new WP_Error('auth_failed', 'Could not authenticate with booking server.', ['status' => 500]);
+        }
+
+        $guest_data = $params['guest'];
+
+        // Build the final reservation payload for Guesty
+        $guesty_payload = [
+            'listingId'             => sanitize_text_field($params['listingId']),
+            'checkInDateLocalized'  => sanitize_text_field($params['checkIn']),
+            'checkOutDateLocalized' => sanitize_text_field($params['checkOut']),
+            'guestsCount'           => isset($params['guests']) ? intval($params['guests']) : 1,
+            'source'                => 'website',
+            'guest'                 => [
+                'firstName' => sanitize_text_field($guest_data['firstName']),
+                'lastName'  => sanitize_text_field($guest_data['lastName']),
+                'email'     => sanitize_email($guest_data['email']),
+                'phone'     => sanitize_text_field($guest_data['phone']),
+            ]
+        ];
+
+        // Ping Guesty's Reservation Creation Endpoint
+        $response = wp_remote_post($this->api_base . '/v1/reservations', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $token,
+                'Content-Type'  => 'application/json',
+                'Accept'        => 'application/json',
+            ],
+            'body' => wp_json_encode($guesty_payload),
+            'timeout' => 20
+        ]);
+
+        if (is_wp_error($response)) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => 'Failed to connect to Guesty API.'
+            ], 500);
+        }
+
+        $http_code = wp_remote_retrieve_response_code($response);
+        $body = json_decode(wp_remote_retrieve_body($response), true);
+
+        // Handle errors from Guesty (like if the dates got booked by someone else while they were checking out)
+        if ($http_code < 200 || $http_code >= 300) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => isset($body['error']['message']) ? $body['error']['message'] : 'Failed to create reservation.',
+                'debug'   => $body
+            ], 400);
+        }
+
+        // Success! Pass the confirmation back to React
+        return new WP_REST_Response([
+            'success' => true,
+            'message' => 'Reservation created successfully.',
+            'reservationId' => isset($body['_id']) ? $body['_id'] : null,
+            // If Guesty generates a direct payment portal link, we capture it here:
+            'paymentUrl' => isset($body['paymentUrl']) ? $body['paymentUrl'] : null 
+        ], 200);
+    }
+
+    /**
+     * Render the React mount point for the Checkout Page
+     */
+    public function render_checkout_widget() {
+        // This shortcode can be placed anywhere, it doesn't need to be on a single property page
+        return '<div id="cc-stays-react-checkout"></div>';
     }
 }
 
