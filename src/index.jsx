@@ -4,6 +4,7 @@ import BookingWidget from "./BookingWidget";
 import AvailabilityCalendar from "./AvailabilityCalendar";
 import CheckoutForm from "./CheckoutForm";
 import SearchBar from "./SearchBar";
+import StaysPage from "./StaysPage";
 
 // Wait for the DOM to load
 document.addEventListener("DOMContentLoaded", () => {
@@ -35,5 +36,12 @@ document.addEventListener("DOMContentLoaded", () => {
   if (searchBarMount) {
       const searchRoot = createRoot(searchBarMount);
       searchRoot.render(<SearchBar />);
+  }
+
+  // 5. Mount Stays Archive Page
+  const staysMount = document.getElementById('cc-stays-react-archive');
+  if (staysMount) {
+      const staysRoot = createRoot(staysMount);
+      staysRoot.render(<StaysPage />);
   }
 });
