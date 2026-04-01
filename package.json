@@ -15,9 +15,13 @@
     "@wordpress/scripts": "^31.7.0"
   },
   "dependencies": {
+    "@stripe/react-stripe-js": "^6.1.0",
+    "@stripe/stripe-js": "^9.0.1",
     "date-fns": "^4.1.0",
+    "leaflet": "^1.9.4",
     "react": "^18.3.1",
     "react-datepicker": "^9.1.0",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-leaflet": "^4.2.1"
   }
 }

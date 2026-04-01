@@ -35,6 +35,14 @@ class CC_Stays_Guesty_Sync
         // Register the Checkout shortcode
         add_shortcode('cc_stays_checkout', [$this, 'render_checkout_widget']);
 
+        add_shortcode('cc_stays_dynamic_map', [$this, 'render_dynamic_leaflet_map']);
+
+        // Register the Global Search Bar shortcode
+        add_shortcode('cc_stays_search_bar', [$this, 'render_search_bar_widget']);
+
+        // Register the Stays Archive App shortcode
+        add_shortcode('cc_stays_archive', function() { return '<div id="cc-stays-react-archive"></div>'; });
+
         // Enqueue the compiled React app
         add_action('wp_enqueue_scripts', [$this, 'enqueue_react_app']);
     }
@@ -142,6 +150,17 @@ class CC_Stays_Guesty_Sync
             if ($post_id && !is_wp_error($post_id)) {
                 update_post_meta($post_id, 'guesty_listing_id', $guesty_id);
 
+                // Add the Leaflet GPS Coordinates!
+                if (isset($listing['address']['lat'])) {
+                    update_post_meta($post_id, 'latitude', $listing['address']['lat']);
+                }
+                if (isset($listing['address']['lng'])) {
+                    update_post_meta($post_id, 'longitude', $listing['address']['lng']);
+                }
+                if (isset($listing['address']['full'])) {
+                    update_post_meta($post_id, 'address_full', $listing['address']['full']);
+                }
+
                 // Example ACF updates:
                 if (isset($listing['prices']['basePrice'])) {
                     update_post_meta($post_id, 'nightly_rate', $listing['prices']['basePrice']);
@@ -235,6 +254,13 @@ class CC_Stays_Guesty_Sync
         register_rest_route('cc-stays/v1', '/book', [
             'methods' => 'POST',
             'callback' => [$this, 'create_guesty_reservation'],
+            'permission_callback' => '__return_true'
+        ]);
+
+        // Stays Archive Master Data endpoint (GET)
+        register_rest_route('cc-stays/v1', '/search-stays', [
+            'methods' => 'GET',
+            'callback' => [$this, 'get_stays_archive_data'],
             'permission_callback' => '__return_true'
         ]);
     }
@@ -419,8 +445,8 @@ class CC_Stays_Guesty_Sync
      */
     public function enqueue_react_app()
     {
-        // Only load this heavy JS if we are on a single property page OR the checkout page
-        if (!is_singular('properties') && !is_page('checkout')) {
+        // Load React on single properties, checkout, the homepage, AND the unified Stays/Properties catalog
+        if (!is_singular('properties') && !is_page('checkout') && !is_front_page() && !is_page(['stays', 'properties'])) {
             return;
         }
 
@@ -541,6 +567,65 @@ class CC_Stays_Guesty_Sync
     {
         // This shortcode can be placed anywhere, it doesn't need to be on a single property page
         return '<div id="cc-stays-react-checkout"></div>';
+    }
+
+    /**
+     * Bridge function to feed Guesty coordinates into the 'Leaflet Map' plugin
+     */
+    public function render_dynamic_leaflet_map() {
+        // Only run on single property pages
+        if (!is_singular('properties')) return '';
+
+        $post_id = get_the_ID();
+        
+        // Grab the coordinates we synced from Guesty
+        $lat = get_post_meta($post_id, 'latitude', true);
+        $lng = get_post_meta($post_id, 'longitude', true);
+
+        if (empty($lat) || empty($lng)) {
+            return '<p>Map location currently unavailable.</p>';
+        }
+
+        // Build the shortcodes required by the 'Leaflet Map' plugin
+        $map_shortcode = sprintf('[leaflet-map lat="%s" lng="%s" zoom="14" height="400"]', $lat, $lng);
+        $marker_shortcode = sprintf('[leaflet-marker lat="%s" lng="%s"]', $lat, $lng);
+
+        // Tell WordPress to execute the plugin's shortcodes
+        return do_shortcode($map_shortcode . $marker_shortcode);
+    }
+
+    public function render_search_bar_widget() {
+        return '<div id="cc-stays-react-search-bar"></div>';
+    }
+
+    public function get_stays_archive_data() {
+        $properties = get_posts([
+            'post_type'      => 'properties',
+            'posts_per_page' => -1,
+            'post_status'    => 'publish'
+        ]);
+
+        $results = [];
+        foreach ($properties as $prop) {
+            $post_id = $prop->ID;
+            $image_url = get_the_post_thumbnail_url($post_id, 'large');
+            
+            $results[] = [
+                'id'        => $post_id,
+                'title'     => $prop->post_title,
+                'url'       => get_permalink($post_id),
+                'image'     => $image_url ? $image_url : 'https://via.placeholder.com/400x250?text=No+Image',
+                'city'      => get_post_meta($post_id, 'location_city', true) ?: 'Florida',
+                'guests'    => get_post_meta($post_id, 'guests', true) ?: 2,
+                'bedrooms'  => get_post_meta($post_id, 'bedrooms', true) ?: 1,
+                'bathrooms' => get_post_meta($post_id, 'bathrooms', true) ?: 1,
+                'price'     => get_post_meta($post_id, 'nightly_rate', true) ?: 0,
+                'lat'       => floatval(get_post_meta($post_id, 'latitude', true)),
+                'lng'       => floatval(get_post_meta($post_id, 'longitude', true)),
+            ];
+        }
+
+        return new WP_REST_Response($results, 200);
     }
 }
 

@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import BookingWidget from "./BookingWidget";
 import AvailabilityCalendar from "./AvailabilityCalendar";
 import CheckoutForm from "./CheckoutForm";
+import SearchBar from "./SearchBar";
 
 // Wait for the DOM to load
 document.addEventListener("DOMContentLoaded", () => {
@@ -27,5 +28,12 @@ document.addEventListener("DOMContentLoaded", () => {
   if (checkoutElement) {
     const checkoutRoot = createRoot(checkoutElement);
     checkoutRoot.render(<CheckoutForm />);
+  }
+
+  // 4. Mount Search Bar
+  const searchBarMount = document.getElementById('cc-stays-react-search-bar');
+  if (searchBarMount) {
+      const searchRoot = createRoot(searchBarMount);
+      searchRoot.render(<SearchBar />);
   }
 });
