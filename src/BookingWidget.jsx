@@ -59,6 +59,12 @@ const BookingWidget = () => {
   const listingId = mountNode
     ? mountNode.getAttribute("data-listing-id")
     : null;
+  const nightlyRate = mountNode
+    ? mountNode.getAttribute("data-nightly-rate")
+    : null;
+  const minNights = mountNode
+    ? mountNode.getAttribute("data-min-nights")
+    : "2";
 
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -171,8 +177,10 @@ const BookingWidget = () => {
   return (
     <div className="cc-booking-widget">
       <div className="cc-booking-header">
-        <h2 className="cc-booking-price-line">From $450 avg / night</h2>
-        <p className="cc-booking-min-stay">Minimum stay: 2 nights</p>
+        <h2 className="cc-booking-price-line">
+          {nightlyRate ? `From $${nightlyRate} avg / night` : "Check availability"}
+        </h2>
+        <p className="cc-booking-min-stay">Minimum stay: {minNights} night{minNights !== "1" ? "s" : ""}</p>
       </div>
 
       <div className="cc-booking-inputs">

@@ -419,8 +419,12 @@ class CC_Stays_Guesty_Sync
         if (!$guesty_id)
             return '<p>Booking unavailable (No Guesty ID found).</p>';
 
-        // Output the div for React to mount to, passing the Guesty ID
-        return '<div id="cc-stays-react-booking" data-listing-id="' . esc_attr($guesty_id) . '"></div>';
+        // Fetch the property's nightly rate and min stay from post meta
+        $nightly_rate = get_post_meta($post_id, 'nightly_rate', true) ?: '';
+        $min_nights = get_post_meta($post_id, 'min_nights', true) ?: '2';
+
+        // Output the div for React to mount to, passing the Guesty ID and pricing data
+        return '<div id="cc-stays-react-booking" data-listing-id="' . esc_attr($guesty_id) . '" data-nightly-rate="' . esc_attr($nightly_rate) . '" data-min-nights="' . esc_attr($min_nights) . '"></div>';
     }
 
     /**

@@ -5,11 +5,24 @@ import "react-datepicker/dist/react-datepicker.css";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
-// Leaflet icon fix for Webpack
-import markerIcon from "leaflet/dist/images/marker-icon.png";
-import markerShadow from "leaflet/dist/images/marker-shadow.png";
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({ iconUrl: markerIcon, shadowUrl: markerShadow });
+// Price pill icon for the map
+const createPriceIcon = (price) => L.divIcon({
+  className: "",
+  html: `<div style="
+    background: #3b5240;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: bold;
+    white-space: nowrap;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    border: 2px solid #fff;
+    cursor: pointer;
+  ">$${price}</div>`,
+  iconAnchor: [28, 16],
+  popupAnchor: [0, -20],
+});
 
 // --- CC STAYS ICON TOOLKIT ---
 
@@ -70,13 +83,14 @@ const StaysPage = () => {
   const [loading, setLoading] = useState(true);
   const [showMap, setShowMap] = useState(true);
 
-  // Search State
+  // Filter State
+  const [locationFilter, setLocationFilter] = useState("");
   const [dateRange, setDateRange] = useState([null, null]);
   const [startDate, endDate] = dateRange;
-  const [guests, setGuests] = useState(2);
+  const [guests, setGuests] = useState(0);
+  const [pets, setPets] = useState(0);
 
   useEffect(() => {
-    // Fetch the property data from our new PHP endpoint
     const fetchProperties = async () => {
       try {
         const res = await fetch("/wp-json/cc-stays/v1/search-stays");
@@ -89,7 +103,31 @@ const StaysPage = () => {
       }
     };
     fetchProperties();
+
+    // Pre-populate filters from URL params (passed from home page search bar)
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("location")) setLocationFilter(params.get("location"));
+    if (params.get("guests")) setGuests(parseInt(params.get("guests"), 10));
+    if (params.get("pets")) setPets(parseInt(params.get("pets"), 10));
+    if (params.get("checkIn") && params.get("checkOut")) {
+      setDateRange([new Date(params.get("checkIn")), new Date(params.get("checkOut"))]);
+    }
   }, []);
+
+  // Derived filtered list
+  const filteredProperties = properties.filter((prop) => {
+    if (locationFilter && !prop.city.toLowerCase().includes(locationFilter.toLowerCase())) return false;
+    if (guests > 0 && prop.guests < guests) return false;
+    return true;
+  });
+
+  const handleReset = () => {
+    setLocationFilter("");
+    setDateRange([null, null]);
+    setGuests(0);
+    setPets(0);
+    window.history.replaceState({}, "", window.location.pathname);
+  };
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -105,8 +143,8 @@ const StaysPage = () => {
     );
 
   const mapCenter =
-    properties.length > 0
-      ? [properties[0].lat, properties[0].lng]
+    filteredProperties.length > 0
+      ? [filteredProperties[0].lat, filteredProperties[0].lng]
       : [26.1224, -80.1373];
 
   return (
@@ -151,7 +189,7 @@ const StaysPage = () => {
                   }}
                 >
                   <span style={{ marginRight: "10px", display: "flex", alignItems: "center", gap: "8px", fontSize: "14px" }}>
-                    <CalendarIcon /> Check Availability
+                    <CalendarIcon /> Availability
                   </span>
                   <DatePicker
                     selectsRange={true}
@@ -162,21 +200,20 @@ const StaysPage = () => {
                     style={{ background: "transparent", border: "none", outline: "none", width: "100%", fontSize: "14px" }}
                   />
                 </div>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    padding: "0 15px",
-                    width: "100px",
-                  }}
-                >
-                  <PersonIcon />
-                  <input
-                    type="number"
-                    value={guests}
-                    onChange={(e) => setGuests(e.target.value)}
-                    style={{ background: "transparent", width: "100%", border: "none", outline: "none", marginLeft: "10px", fontSize: "14px" }}
-                  />
+                <div style={{ display: "flex", alignItems: "center", padding: "0 12px", gap: "16px", borderLeft: "1px solid #d4d1ca" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <PersonIcon />
+                    <span style={{ fontSize: "13px", color: "#555" }}>Guests</span>
+                    <button type="button" onClick={() => setGuests(Math.max(0, guests - 1))} style={{ width: "24px", height: "24px", borderRadius: "50%", border: "1px solid #ccc", background: "#fff", cursor: "pointer", fontSize: "16px", display: "flex", alignItems: "center", justifyContent: "center", opacity: guests === 0 ? 0.3 : 1 }}>−</button>
+                    <span style={{ fontSize: "13px", minWidth: "20px", textAlign: "center" }}>{guests === 0 ? "Any" : guests}</span>
+                    <button type="button" onClick={() => setGuests(guests + 1)} style={{ width: "24px", height: "24px", borderRadius: "50%", border: "1px solid #ccc", background: "#fff", cursor: "pointer", fontSize: "16px", display: "flex", alignItems: "center", justifyContent: "center" }}>+</button>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <span style={{ fontSize: "13px", color: "#555" }}>🐾 Pets</span>
+                    <button type="button" onClick={() => setPets(Math.max(0, pets - 1))} style={{ width: "24px", height: "24px", borderRadius: "50%", border: "1px solid #ccc", background: "#fff", cursor: "pointer", fontSize: "16px", display: "flex", alignItems: "center", justifyContent: "center", opacity: pets === 0 ? 0.3 : 1 }}>−</button>
+                    <span style={{ fontSize: "13px", minWidth: "20px", textAlign: "center" }}>{pets === 0 ? "Any" : pets}</span>
+                    <button type="button" onClick={() => setPets(pets + 1)} style={{ width: "24px", height: "24px", borderRadius: "50%", border: "1px solid #ccc", background: "#fff", cursor: "pointer", fontSize: "16px", display: "flex", alignItems: "center", justifyContent: "center" }}>+</button>
+                  </div>
                 </div>
               </div>
               
@@ -213,6 +250,7 @@ const StaysPage = () => {
               }}
             >
               <button
+                onClick={handleReset}
                 style={{
                   flex: 1,
                   display: "flex",
@@ -247,7 +285,7 @@ const StaysPage = () => {
                   letterSpacing: "0.5px"
                 }}
               >
-                <HouseIcon /> {properties.length} Properties
+                <HouseIcon /> {filteredProperties.length} Properties
               </div>
               <button
                 onClick={() => setShowMap(!showMap)}
@@ -281,7 +319,7 @@ const StaysPage = () => {
               gap: "20px",
             }}
           >
-            {properties.map((prop) => (
+            {filteredProperties.map((prop) => (
               <div
                 key={prop.id}
                 style={{
@@ -367,11 +405,21 @@ const StaysPage = () => {
               style={{ height: "100%", width: "100%" }}
             >
               <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-              {properties.map((prop) => (
-                <Marker key={prop.id} position={[prop.lat, prop.lng]}>
-                  <Popup>
-                    <strong>{prop.title}</strong>
-                    <br />${prop.price} / night
+              {filteredProperties.map((prop) => (
+                <Marker key={prop.id} position={[prop.lat, prop.lng]} icon={createPriceIcon(prop.price)}>
+                  <Popup minWidth={220}>
+                    <div style={{ fontFamily: "sans-serif" }}>
+                      <img src={prop.image} alt={prop.title} style={{ width: "100%", height: "130px", objectFit: "cover", borderRadius: "4px", marginBottom: "10px" }} />
+                      <strong style={{ fontSize: "15px", display: "block", marginBottom: "4px" }}>{prop.title}</strong>
+                      <span style={{ fontSize: "13px", color: "#666" }}>📍 {prop.city}</span>
+                      <div style={{ display: "flex", gap: "12px", fontSize: "12px", color: "#444", margin: "8px 0" }}>
+                        <span>🛏️ {prop.bedrooms} bed</span>
+                        <span>🛁 {prop.bathrooms} bath</span>
+                        <span>👥 {prop.guests} guests</span>
+                      </div>
+                      <div style={{ fontSize: "14px", fontWeight: "bold", marginBottom: "10px" }}>${prop.price} <span style={{ fontWeight: "normal", color: "#888" }}>/ night</span></div>
+                      <a href={prop.url} style={{ display: "block", textAlign: "center", background: "#3b5240", color: "#fff", padding: "8px", borderRadius: "4px", textDecoration: "none", fontSize: "13px", fontWeight: "bold" }}>View Stay →</a>
+                    </div>
                   </Popup>
                 </Marker>
               ))}

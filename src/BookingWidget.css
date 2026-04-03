@@ -265,3 +265,87 @@
     padding: 0 !important;
     box-shadow: none !important;
 }
+
+/* Two-month inline calendar in the search bar dropdown */
+.cc-search-calendar {
+    border: none !important;
+    font-family: var(--cc-font-primary) !important;
+}
+
+.cc-search-calendar .react-datepicker__month-container {
+    float: left;
+    padding: 0 12px;
+}
+
+.cc-search-calendar .react-datepicker__month-container + .react-datepicker__month-container {
+    border-left: 1px solid #eee;
+}
+
+.cc-search-calendar .react-datepicker__header {
+    background: #fff !important;
+    border-bottom: 1px solid #f0f0f0 !important;
+    padding-top: 12px !important;
+}
+
+.cc-search-calendar .react-datepicker__current-month {
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    color: #222 !important;
+    margin-bottom: 8px !important;
+}
+
+.cc-search-calendar .react-datepicker__day-name {
+    color: #888 !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    width: 38px !important;
+    line-height: 38px !important;
+}
+
+.cc-search-calendar .react-datepicker__day {
+    width: 38px !important;
+    height: 38px !important;
+    line-height: 38px !important;
+    font-size: 13px !important;
+    border-radius: 50% !important;
+    color: #222 !important;
+}
+
+.cc-search-calendar .react-datepicker__day:hover {
+    background: #f0f0f0 !important;
+    border-radius: 50% !important;
+}
+
+.cc-search-calendar .react-datepicker__day--selected,
+.cc-search-calendar .react-datepicker__day--range-start,
+.cc-search-calendar .react-datepicker__day--range-end {
+    background-color: #222 !important;
+    color: #fff !important;
+    border-radius: 50% !important;
+}
+
+.cc-search-calendar .react-datepicker__day--in-range,
+.cc-search-calendar .react-datepicker__day--in-selecting-range {
+    background-color: #f0f0f0 !important;
+    color: #222 !important;
+    border-radius: 0 !important;
+}
+
+.cc-search-calendar .react-datepicker__day--range-start,
+.cc-search-calendar .react-datepicker__day--selecting-range-start {
+    border-radius: 50% 0 0 50% !important;
+}
+
+.cc-search-calendar .react-datepicker__day--range-end,
+.cc-search-calendar .react-datepicker__day--selecting-range-end {
+    border-radius: 0 50% 50% 0 !important;
+}
+
+.cc-search-calendar .react-datepicker__day--disabled {
+    color: #ccc !important;
+    cursor: not-allowed !important;
+}
+
+.cc-search-calendar .react-datepicker__navigation {
+    top: 14px !important;
+}
