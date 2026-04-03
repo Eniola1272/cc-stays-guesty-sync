@@ -1,100 +1,249 @@
-import React, { useState } from 'react';
-import DatePicker from 'react-datepicker'; // You already have this from the booking widget!
-import 'react-datepicker/dist/react-datepicker.css';
-import './BookingWidget.css'; // Reusing your existing styles
+import React, { useState } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import "./BookingWidget.css";
+
+// Reusing the Search Icon from the HTML provided
+const SearchIcon = () => (
+  <svg
+    aria-hidden="true"
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M20.25 20.25L16.1265 16.1265M16.1265 16.1265C17.4385 14.8145 18.25 13.002 18.25 11C18.25 6.99594 15.0041 3.75 11 3.75C6.99594 3.75 3.75 6.99594 3.75 11C3.75 15.0041 6.99594 18.25 11 18.25C13.002 18.25 14.8145 17.4385 16.1265 16.1265Z"></path>
+  </svg>
+);
 
 const SearchBar = () => {
-    const [dateRange, setDateRange] = useState([null, null]);
-    const [startDate, endDate] = dateRange;
-    const [guests, setGuests] = useState(1);
+  const [location, setLocation] = useState("");
+  const [dateRange, setDateRange] = useState([null, null]);
+  const [startDate, endDate] = dateRange;
+  const [guests, setGuests] = useState(1);
 
-    const handleSearch = (e) => {
-        e.preventDefault();
-        
-        // Format dates to YYYY-MM-DD for the URL
-        const checkIn = startDate ? startDate.toISOString().split('T')[0] : '';
-        const checkOut = endDate ? endDate.toISOString().split('T')[0] : '';
-        
-        // Build the URL search parameters
-        const searchParams = new URLSearchParams();
-        if (checkIn) searchParams.append('checkIn', checkIn);
-        if (checkOut) searchParams.append('checkOut', checkOut);
-        searchParams.append('guests', guests);
+  const handleSearch = (e) => {
+    e.preventDefault();
 
-        // Redirect to your main properties page with the filters applied
-        window.location.href = `/properties?${searchParams.toString()}`;
-    };
+    const checkIn = startDate ? startDate.toISOString().split("T")[0] : "";
+    const checkOut = endDate ? endDate.toISOString().split("T")[0] : "";
 
-    return (
-        <div className="cc-global-search-container" style={{ 
-            background: '#fff', 
-            padding: '10px 20px', 
-            borderRadius: '50px', 
-            boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
-            display: 'inline-block',
-            width: '100%',
-            maxWidth: '900px'
-        }}>
-            <form onSubmit={handleSearch} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '15px' }}>
-                
-                {/* 1. WHEN (Dates) */}
-                <div style={{ display: 'flex', flexDirection: 'column', flex: '2', minWidth: '250px', borderRight: '1px solid #eee', paddingRight: '15px' }}>
-                    <label style={{ fontSize: '12px', fontWeight: 'bold', textTransform: 'uppercase', color: 'var(--cc-text-dark)', marginBottom: '5px' }}>
-                        When
-                    </label>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
-                            <path d="M 2,3 2,17 18,17 18,3 2,3 Z M 17,16 3,16 3,8 17,8 17,16 Z M 17,7 3,7 3,4 17,4 17,7 Z"></path>
-                            <rect width="1" height="3" x="6" y="2"></rect><rect width="1" height="3" x="13" y="2"></rect>
-                        </svg>
-                        <DatePicker
-                            selectsRange={true}
-                            startDate={startDate}
-                            endDate={endDate}
-                            onChange={(update) => setDateRange(update)}
-                            minDate={new Date()}
-                            placeholderText="Add dates"
-                            className="cc-search-input"
-                            style={{ border: 'none', outline: 'none', width: '100%', cursor: 'pointer' }}
-                        />
-                    </div>
-                </div>
+    const searchParams = new URLSearchParams();
+    if (location) searchParams.append("location", location);
+    if (checkIn) searchParams.append("checkIn", checkIn);
+    if (checkOut) searchParams.append("checkOut", checkOut);
+    searchParams.append("guests", guests);
 
-                {/* 2. WHO (Guests) */}
-                <div style={{ display: 'flex', flexDirection: 'column', flex: '1', minWidth: '150px' }}>
-                    <label style={{ fontSize: '12px', fontWeight: 'bold', textTransform: 'uppercase', color: 'var(--cc-text-dark)', marginBottom: '5px' }}>
-                        Guests
-                    </label>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
-                            <circle cx="9.9" cy="6.4" r="4.4"></circle>
-                            <path d="M1.5,19 C2.3,14.5 5.8,11.2 10,11.2 C14.2,11.2 17.7,14.6 18.5,19.2"></path>
-                        </svg>
-                        <input 
-                            type="number" 
-                            min="1" 
-                            max="20" 
-                            value={guests} 
-                            onChange={(e) => setGuests(e.target.value)}
-                            style={{ border: 'none', outline: 'none', width: '100%', fontSize: '16px' }}
-                        />
-                    </div>
-                </div>
+    // Route directly to the Stays archive
+    window.location.href = `/stays?${searchParams.toString()}`;
+  };
 
-                {/* 3. SUBMIT BUTTON */}
-                <div style={{ flex: '0' }}>
-                    <button type="submit" className="cc-btn-primary" style={{ borderRadius: '50px', padding: '15px 30px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                        </svg>
-                        Search
-                    </button>
-                </div>
-
-            </form>
+  return (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        width: "100%",
+        padding: "20px 0",
+      }}
+    >
+      <form
+        onSubmit={handleSearch}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          background: "#ffffff",
+          borderRadius: "50px",
+          boxShadow: "0 8px 24px rgba(0,0,0,0.1)",
+          border: "1px solid #ebebeb",
+          height: "66px",
+          width: "100%",
+          maxWidth: "850px",
+          position: "relative",
+        }}
+      >
+        {/* 1. WHERE */}
+        <div
+          style={{
+            flex: "1.2",
+            display: "flex",
+            alignItems: "center",
+            paddingLeft: "30px",
+            cursor: "pointer",
+            position: "relative",
+          }}
+        >
+          <div
+            style={{ display: "flex", flexDirection: "column", width: "100%" }}
+          >
+            <label
+              style={{
+                fontSize: "12px",
+                fontWeight: "bold",
+                color: "#222",
+                marginBottom: "2px",
+              }}
+            >
+              Where
+            </label>
+            <select
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              style={{
+                border: "none",
+                outline: "none",
+                background: "transparent",
+                color: "#717171",
+                fontSize: "14px",
+                width: "90%",
+                cursor: "pointer",
+                appearance: "none",
+              }}
+            >
+              <option value="">Search destinations</option>
+              <option value="Fort Lauderdale">Fort Lauderdale, FL</option>
+              <option value="Wilton Manors">Wilton Manors, FL</option>
+              <option value="Blue Ridge">Blue Ridge, GA</option>
+            </select>
+          </div>
         </div>
-    );
+
+        {/* DIVIDER */}
+        <div
+          style={{
+            height: "32px",
+            width: "1px",
+            backgroundColor: "#ddd",
+            margin: "0 10px",
+          }}
+        ></div>
+
+        {/* 2. WHEN */}
+        <div
+          style={{
+            flex: "1.5",
+            display: "flex",
+            alignItems: "center",
+            paddingLeft: "20px",
+            cursor: "pointer",
+          }}
+        >
+          <div
+            style={{ display: "flex", flexDirection: "column", width: "100%" }}
+          >
+            <label
+              style={{
+                fontSize: "12px",
+                fontWeight: "bold",
+                color: "#222",
+                marginBottom: "2px",
+              }}
+            >
+              When
+            </label>
+            <DatePicker
+              selectsRange={true}
+              startDate={startDate}
+              endDate={endDate}
+              onChange={(update) => setDateRange(update)}
+              minDate={new Date()}
+              placeholderText="Add dates"
+              style={{
+                border: "none",
+                outline: "none",
+                background: "transparent",
+                width: "100%",
+                cursor: "pointer",
+              }}
+              className="cc-minimal-datepicker"
+            />
+          </div>
+        </div>
+
+        {/* DIVIDER */}
+        <div
+          style={{
+            height: "32px",
+            width: "1px",
+            backgroundColor: "#ddd",
+            margin: "0 10px",
+          }}
+        ></div>
+
+        {/* 3. WHO */}
+        <div
+          style={{
+            flex: "1",
+            display: "flex",
+            alignItems: "center",
+            paddingLeft: "20px",
+            paddingRight: "120px",
+            cursor: "pointer",
+          }}
+        >
+          <div
+            style={{ display: "flex", flexDirection: "column", width: "100%" }}
+          >
+            <label
+              style={{
+                fontSize: "12px",
+                fontWeight: "bold",
+                color: "#222",
+                marginBottom: "2px",
+              }}
+            >
+              Who
+            </label>
+            <input
+              type="number"
+              min="1"
+              max="20"
+              value={guests}
+              onChange={(e) => setGuests(e.target.value)}
+              style={{
+                border: "none",
+                outline: "none",
+                background: "transparent",
+                color: "#717171",
+                fontSize: "14px",
+                width: "100%",
+              }}
+            />
+          </div>
+        </div>
+
+        {/* SEARCH BUTTON (Absolute positioned to the right to match HTML) */}
+        <button
+          type="submit"
+          style={{
+            position: "absolute",
+            right: "8px",
+            height: "50px",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            background: "#3b5240" /* Matching the CC Stays Green */,
+            color: "#fff",
+            border: "none",
+            borderRadius: "50px",
+            padding: "0 24px",
+            fontWeight: "bold",
+            cursor: "pointer",
+            transition: "background 0.2s ease",
+          }}
+          onMouseOver={(e) => (e.currentTarget.style.background = "#2c3e30")}
+          onMouseOut={(e) => (e.currentTarget.style.background = "#3b5240")}
+        >
+          <SearchIcon />
+          Search
+        </button>
+      </form>
+    </div>
+  );
 };
 
 export default SearchBar;
