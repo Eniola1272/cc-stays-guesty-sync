@@ -3,38 +3,84 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./BookingWidget.css";
 
+const CalendarIcon = () => (
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.6"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+    <line x1="16" y1="2" x2="16" y2="6" />
+    <line x1="8" y1="2" x2="8" y2="6" />
+    <line x1="3" y1="10" x2="21" y2="10" />
+  </svg>
+);
+
 const UserIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.6"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
     <circle cx="12" cy="7" r="4"></circle>
   </svg>
 );
 
 const ChevronsIcon = () => (
-  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    width="12"
+    height="12"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <polyline points="7 15 12 20 17 15"></polyline>
     <polyline points="7 9 12 4 17 9"></polyline>
   </svg>
 );
 
 const fmtDate = (d) =>
-  d ? d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : null;
+  d
+    ? d.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    : null;
 
 const BookingWidget = () => {
   const mountNode = document.getElementById("cc-stays-react-booking");
-  const listingId   = mountNode ? mountNode.getAttribute("data-listing-id")   : null;
-  const nightlyRate = mountNode ? mountNode.getAttribute("data-nightly-rate") : null;
-  const minNights   = mountNode ? mountNode.getAttribute("data-min-nights")   : "2";
+  const listingId = mountNode
+    ? mountNode.getAttribute("data-listing-id")
+    : null;
+  const nightlyRate = mountNode
+    ? mountNode.getAttribute("data-nightly-rate")
+    : null;
+  const minNights = mountNode ? mountNode.getAttribute("data-min-nights") : "2";
 
-  const [dateRange, setDateRange]   = useState([null, null]);
-  const [startDate, endDate]        = dateRange;
-  const [guests, setGuests]         = useState(null);
+  const [dateRange, setDateRange] = useState([null, null]);
+  const [startDate, endDate] = dateRange;
+  const [guests, setGuests] = useState(null);
   const [isGuestOpen, setIsGuestOpen] = useState(false);
   const [blockedDates, setBlockedDates] = useState([]);
 
-  const [quote, setQuote]   = useState(null);
+  const [quote, setQuote] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError]   = useState(null);
+  const [error, setError] = useState(null);
 
   const guestRef = useRef(null);
 
@@ -50,7 +96,7 @@ const BookingWidget = () => {
             data.blockedDates.map((s) => {
               const [y, m, d] = s.split("-").map(Number);
               return new Date(y, m - 1, d);
-            })
+            }),
           );
         }
       })
@@ -78,7 +124,7 @@ const BookingWidget = () => {
 
     const payload = {
       listingId,
-      checkIn:  startDate.toISOString().split("T")[0],
+      checkIn: startDate.toISOString().split("T")[0],
       checkOut: endDate.toISOString().split("T")[0],
       guests,
     };
@@ -90,8 +136,15 @@ const BookingWidget = () => {
         body: JSON.stringify(payload),
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message || "These dates are currently unavailable.");
-      if (data.available === false) { setError(data.message || "These dates are not available."); setQuote(data); return; }
+      if (!response.ok)
+        throw new Error(
+          data.message || "These dates are currently unavailable.",
+        );
+      if (data.available === false) {
+        setError(data.message || "These dates are not available.");
+        setQuote(data);
+        return;
+      }
       setQuote(data);
     } catch (err) {
       setError(err.message);
@@ -103,7 +156,7 @@ const BookingWidget = () => {
   const handleReserveClick = () => {
     const params = new URLSearchParams({
       listingId,
-      checkIn:  startDate.toISOString().split("T")[0],
+      checkIn: startDate.toISOString().split("T")[0],
       checkOut: endDate.toISOString().split("T")[0],
       guests,
       price: quote.totalPrice,
@@ -111,35 +164,44 @@ const BookingWidget = () => {
     window.location.href = `/checkout?${params.toString()}`;
   };
 
-  if (!listingId) return <div className="cc-booking-widget">Error: Missing Property ID</div>;
+  if (!listingId)
+    return <div className="cc-booking-widget">Error: Missing Property ID</div>;
 
   return (
     <div className="cc-booking-widget">
-      {/* Header */}
+      {/* ── Header ── */}
       <div className="cc-booking-header">
         <h2 className="cc-booking-price-line">
-          {nightlyRate ? `From $${nightlyRate} avg / night` : "Check availability"}
+          {nightlyRate
+            ? `From $${nightlyRate} avg / night`
+            : "Check availability"}
         </h2>
         <p className="cc-booking-min-stay">
           Minimum stay: {minNights} night{minNights !== "1" ? "s" : ""}
         </p>
       </div>
 
-      {/* Inline range calendar */}
-      <div className="cc-calendar-wrapper">
-        {/* Date summary labels */}
-        <div className="cc-date-labels">
-          <div className="cc-date-label-item">
-            <span className="cc-date-label-title">Check-in</span>
-            <span className="cc-date-label-value">{fmtDate(startDate) || "—"}</span>
-          </div>
-          <div className="cc-date-label-divider" />
-          <div className="cc-date-label-item">
-            <span className="cc-date-label-title">Check-out</span>
-            <span className="cc-date-label-value">{fmtDate(endDate) || "—"}</span>
+      {/* ── Check-in / Check-out Boxes ── */}
+      {/* <div className="cc-date-labels">
+        <div className="cc-date-label-item">
+          <span className="cc-date-label-title">Check-in</span>
+          <div className="cc-date-label-value-row">
+            <span className="cc-date-label-icon"><CalendarIcon /></span>
+            <span className="cc-date-label-value">{fmtDate(startDate) || "Add date"}</span>
           </div>
         </div>
+        <div className="cc-date-label-divider" />
+        <div className="cc-date-label-item">
+          <span className="cc-date-label-title">Check-out</span>
+          <div className="cc-date-label-value-row">
+            <span className="cc-date-label-icon"><CalendarIcon /></span>
+            <span className="cc-date-label-value">{fmtDate(endDate) || "- - -"}</span>
+          </div>
+        </div>
+      </div> */}
 
+      {/* ── Inline Calendar ── */}
+      <div className="cc-calendar-wrapper">
         <DatePicker
           selectsRange
           inline
@@ -155,34 +217,48 @@ const BookingWidget = () => {
           excludeDates={blockedDates}
           calendarClassName="cc-search-calendar cc-widget-calendar"
         />
-
         {(startDate || endDate) && (
           <button
             type="button"
             className="cc-clear-dates"
-            onClick={() => { setDateRange([null, null]); setQuote(null); setError(null); }}
+            onClick={() => {
+              setDateRange([null, null]);
+              setQuote(null);
+              setError(null);
+            }}
           >
             Clear dates
           </button>
         )}
       </div>
 
-      {/* Guest selector */}
+      {/* ── Guest Selector ── */}
       <div className="cc-guest-select-container" ref={guestRef}>
         <div
           className="cc-guest-select-wrapper"
           onClick={() => setIsGuestOpen(!isGuestOpen)}
         >
-          <span className="cc-input-icon"><UserIcon /></span>
+          <span className="cc-input-icon">
+            <UserIcon />
+          </span>
           <div className={`cc-guest-select-value ${guests ? "selected" : ""}`}>
-            {guests ? `${guests} Guest${guests > 1 ? "s" : ""}` : "Guests"}
+            {guests ? `${guests} Guest${guests > 1 ? "s" : ""}` : "Guest"}
           </div>
-          <span className="cc-guest-select-arrows"><ChevronsIcon /></span>
+          <span className="cc-guest-select-arrows">
+            <ChevronsIcon />
+          </span>
         </div>
         {isGuestOpen && (
           <div className="cc-dropdown-menu">
             {[1, 2, 3, 4, 5, 6].map((num) => (
-              <div key={num} className="cc-dropdown-item" onClick={() => { setGuests(num); setIsGuestOpen(false); }}>
+              <div
+                key={num}
+                className="cc-dropdown-item"
+                onClick={() => {
+                  setGuests(num);
+                  setIsGuestOpen(false);
+                }}
+              >
                 {num} {num === 1 ? "Guest" : "Guests"}
               </div>
             ))}
@@ -190,23 +266,31 @@ const BookingWidget = () => {
         )}
       </div>
 
-      {/* CTA */}
-      <button className="cc-btn-primary" onClick={fetchQuote} disabled={loading}>
+      {/* ── CTA ── */}
+      <button
+        className="cc-btn-primary"
+        onClick={fetchQuote}
+        disabled={loading}
+      >
         {loading ? "Checking..." : "Check Availability"}
       </button>
 
+      {/* ── Messages ── */}
       <div className="cc-message-area">
         {error && <div className="cc-error-message">{error}</div>}
-        {loading && !error && <div className="cc-loading-message">Calculating your stay...</div>}
+        {loading && !error && (
+          <div className="cc-loading-message">Calculating your stay...</div>
+        )}
       </div>
 
+      {/* ── Quote Result ── */}
       {quote && quote.available && !error && !loading && (
         <div className="cc-quote-summary">
           <div className="cc-price-row">
             <span>Total</span>
             <strong>${quote.totalPrice}</strong>
           </div>
-          <button onClick={handleReserveClick} className="cc-btn-primary" style={{ marginTop: "10px" }}>
+          <button onClick={handleReserveClick} className="cc-btn-reserve">
             Reserve Now
           </button>
         </div>

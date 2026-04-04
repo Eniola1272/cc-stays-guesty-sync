@@ -614,18 +614,23 @@ class CC_Stays_Guesty_Sync
             $post_id = $prop->ID;
             $image_url = get_the_post_thumbnail_url($post_id, 'large');
             
+            $raw_content  = get_post_field('post_content', $post_id);
+            $description  = wp_trim_words(strip_tags($raw_content), 20, '...');
+
             $results[] = [
-                'id'        => $post_id,
-                'title'     => $prop->post_title,
-                'url'       => get_permalink($post_id),
-                'image'     => $image_url ? $image_url : 'https://via.placeholder.com/400x250?text=No+Image',
-                'city'      => get_post_meta($post_id, 'location_city', true) ?: 'Florida',
-                'guests'    => get_post_meta($post_id, 'guests', true) ?: 2,
-                'bedrooms'  => get_post_meta($post_id, 'bedrooms', true) ?: 1,
-                'bathrooms' => get_post_meta($post_id, 'bathrooms', true) ?: 1,
-                'price'     => get_post_meta($post_id, 'nightly_rate', true) ?: 0,
-                'lat'       => floatval(get_post_meta($post_id, 'latitude', true)),
-                'lng'       => floatval(get_post_meta($post_id, 'longitude', true)),
+                'id'          => $post_id,
+                'title'       => $prop->post_title,
+                'url'         => get_permalink($post_id),
+                'image'       => $image_url ? $image_url : 'https://via.placeholder.com/400x250?text=No+Image',
+                'city'        => get_post_meta($post_id, 'location_city', true) ?: 'Florida',
+                'guests'      => (int) (get_post_meta($post_id, 'guests', true) ?: 2),
+                'bedrooms'    => (int) (get_post_meta($post_id, 'bedrooms', true) ?: 1),
+                'bathrooms'   => (int) (get_post_meta($post_id, 'bathrooms', true) ?: 1),
+                'pets'        => (int) get_post_meta($post_id, 'pets_allowed', true),
+                'price'       => get_post_meta($post_id, 'nightly_rate', true) ?: 0,
+                'description' => $description ?: '',
+                'lat'         => floatval(get_post_meta($post_id, 'latitude', true)),
+                'lng'         => floatval(get_post_meta($post_id, 'longitude', true)),
             ];
         }
 

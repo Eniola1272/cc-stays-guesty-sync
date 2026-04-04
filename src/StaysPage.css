@@ -1,4 +1,16 @@
-/* ── StaysPage Layout ── */
+/* ═══════════════════════════════════════════
+   STAYS PAGE — Layout
+═══════════════════════════════════════════ */
+.stays-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: var(--cc-font-sans);
+  box-sizing: border-box;
+  /* Relative so the mobile sticky search bar is scoped to this section */
+  position: relative;
+}
+
 .stays-layout {
   display: flex;
   gap: 20px;
@@ -7,16 +19,113 @@
 
 .stays-left {
   min-width: 0;
+  flex: 1;
 }
 
 /* ── Search Form ── */
 .stays-search-form {
   display: flex;
   gap: 10px;
+  margin-bottom: 15px;
   height: 48px;
 }
 
-/* ── Property Grid ── */
+/* ── Sub-bar (Start Over / Count / Map toggle) ── */
+.stays-subbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 10px;
+  height: 40px;
+}
+
+/* ═══════════════════════════════════════════
+   PROPERTY CARDS
+═══════════════════════════════════════════ */
+.stays-card {
+  border: 1px solid #eee;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+}
+
+.stays-card-img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  display: block;
+}
+
+.stays-card-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.stays-card-title {
+  margin: 0 0 6px 0;
+  font-size: 17px;
+  font-family: var(--cc-font-serif);
+  line-height: 1.3;
+  color: #1a1a1a;
+}
+
+.stays-card-location {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0 0 8px 0;
+  color: #666;
+  font-size: 13px;
+}
+
+.stays-card-desc {
+  margin: 0 0 12px 0;
+  color: #777;
+  font-size: 13px;
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.stays-card-stats {
+  display: flex;
+  gap: 14px;
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 16px;
+}
+
+.stays-card-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #3b5240;
+  color: #3b5240;
+  padding: 9px 18px;
+  text-decoration: none;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-radius: 2px;
+  align-self: flex-start;
+  margin-top: auto;
+  transition: background 0.15s, color 0.15s;
+}
+
+.stays-card-btn:hover {
+  background: #3b5240;
+  color: #fff;
+}
+
+/* ── Grid ── */
 .stays-grid {
   display: grid;
   gap: 20px;
@@ -30,7 +139,7 @@
   grid-template-columns: repeat(3, 1fr);
 }
 
-/* ── Map ── */
+/* ── Sticky Map ── */
 .stays-map {
   flex: 0 0 40%;
   height: 800px;
@@ -40,9 +149,14 @@
   overflow: hidden;
 }
 
-/* ─────────────────────────────────────────
+/* ── Mobile search bar wrapper — this is the sticky container ── */
+.stays-mobile-search {
+  display: none;
+}
+
+/* ═══════════════════════════════════════════
    Tablet  ≤ 1024px
-───────────────────────────────────────── */
+═══════════════════════════════════════════ */
 @media (max-width: 1024px) {
   .stays-grid--with-map {
     grid-template-columns: repeat(1, 1fr);
@@ -53,15 +167,22 @@
   }
 
   .stays-map {
-    flex: 0 0 35%;
+    flex: 0 0 36%;
     height: 600px;
   }
 }
 
-/* ─────────────────────────────────────────
+/* ═══════════════════════════════════════════
    Mobile  ≤ 768px
-───────────────────────────────────────── */
+═══════════════════════════════════════════ */
 @media (max-width: 768px) {
+  .stays-page {
+    padding: 12px;
+    /* Extra bottom padding so content isn't hidden behind the sticky bar */
+    padding-bottom: 100px;
+  }
+
+  /* Stack layout — no side-by-side map */
   .stays-layout {
     flex-direction: column;
   }
@@ -70,49 +191,176 @@
     width: 100%;
   }
 
-  .stays-map {
-    width: 100%;
-    height: 320px;
-    position: static;
-    flex: none;
-  }
-
+  /* ── Desktop search bar hidden on mobile ── */
   .stays-search-form {
+    display: none !important;
+  }
+
+  /* ── Mobile sticky search bar ── */
+  .stays-mobile-search {
+    display: block;
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 900;
+    background: #fff;
+    border-top: 1px solid #ddd;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
+    padding: 10px 12px;
+    box-sizing: border-box;
+  }
+
+  .stays-mobile-search-inner {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .stays-mobile-search-fields {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .stays-mobile-search-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .stays-mobile-search-input {
+    flex: 1;
+    height: 38px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 0 12px;
+    font-size: 13px;
+    outline: none;
+    background: #f9f9f9;
+    color: #222;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .stays-mobile-search-input:focus {
+    border-color: #3b5240;
+    background: #fff;
+  }
+
+  .stays-mobile-search-btn {
+    height: 38px;
+    padding: 0 16px;
+    border-radius: 8px;
+    border: none;
+    background: #3b5240;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .stays-mobile-guest-picker {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #555;
+  }
+
+  .stays-mobile-guest-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+    background: #fff;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    color: #333;
+    flex-shrink: 0;
+  }
+
+  /* Hide the map entirely on mobile (user can toggle via button) */
+  .stays-map {
+    display: none;
+  }
+
+  /* ── Sub-bar ── */
+  .stays-subbar {
     flex-wrap: wrap;
     height: auto;
+    gap: 8px;
   }
 
-  /* The beige inner container — stack date+guest sections */
-  .stays-search-form > div:first-child {
-    flex-wrap: wrap;
-    height: auto;
-  }
-
-  /* Each inner section (Where / When / Who) */
-  .stays-search-form > div:first-child > div {
-    flex: 1 1 100% !important;
-    border-right: none !important;
-    border-left: none !important;
-    border-bottom: 1px solid #d4d1ca;
-    padding: 10px 15px !important;
-    min-height: 44px;
-  }
-
-  .stays-search-form > div:first-child > div:last-child {
-    border-bottom: none;
-  }
-
+  /* ── Cards — single column ── */
   .stays-grid--with-map,
   .stays-grid--full {
-    grid-template-columns: repeat(1, 1fr);
+    grid-template-columns: 1fr;
+  }
+
+  .stays-card-img {
+    height: 220px;
+  }
+
+  .stays-card-body {
+    padding: 14px;
+  }
+
+  .stays-card-title {
+    font-size: 16px;
+  }
+
+  .stays-card-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 12px 18px;
+    border-radius: 6px;
   }
 }
 
-/* ─────────────────────────────────────────
+/* ═══════════════════════════════════════════
    Small mobile  ≤ 480px
-───────────────────────────────────────── */
+═══════════════════════════════════════════ */
 @media (max-width: 480px) {
   .stays-page {
-    padding: 12px;
+    padding: 8px;
+    padding-bottom: 110px;
+  }
+
+  .stays-card-img {
+    height: 200px;
+  }
+
+  .stays-card-stats {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .stays-subbar {
+    gap: 6px;
+  }
+
+  .stays-subbar > button,
+  .stays-subbar > div {
+    font-size: 10px !important;
+    padding: 6px !important;
+    gap: 4px !important;
+  }
+
+  .stays-subbar svg {
+    width: 14px;
+    height: 14px;
   }
 }
