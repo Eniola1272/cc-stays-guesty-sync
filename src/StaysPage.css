@@ -1,0 +1,118 @@
+/* ── StaysPage Layout ── */
+.stays-layout {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.stays-left {
+  min-width: 0;
+}
+
+/* ── Search Form ── */
+.stays-search-form {
+  display: flex;
+  gap: 10px;
+  height: 48px;
+}
+
+/* ── Property Grid ── */
+.stays-grid {
+  display: grid;
+  gap: 20px;
+}
+
+.stays-grid--with-map {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.stays-grid--full {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* ── Map ── */
+.stays-map {
+  flex: 0 0 40%;
+  height: 800px;
+  position: sticky;
+  top: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* ─────────────────────────────────────────
+   Tablet  ≤ 1024px
+───────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .stays-grid--with-map {
+    grid-template-columns: repeat(1, 1fr);
+  }
+
+  .stays-grid--full {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .stays-map {
+    flex: 0 0 35%;
+    height: 600px;
+  }
+}
+
+/* ─────────────────────────────────────────
+   Mobile  ≤ 768px
+───────────────────────────────────────── */
+@media (max-width: 768px) {
+  .stays-layout {
+    flex-direction: column;
+  }
+
+  .stays-left {
+    width: 100%;
+  }
+
+  .stays-map {
+    width: 100%;
+    height: 320px;
+    position: static;
+    flex: none;
+  }
+
+  .stays-search-form {
+    flex-wrap: wrap;
+    height: auto;
+  }
+
+  /* The beige inner container — stack date+guest sections */
+  .stays-search-form > div:first-child {
+    flex-wrap: wrap;
+    height: auto;
+  }
+
+  /* Each inner section (Where / When / Who) */
+  .stays-search-form > div:first-child > div {
+    flex: 1 1 100% !important;
+    border-right: none !important;
+    border-left: none !important;
+    border-bottom: 1px solid #d4d1ca;
+    padding: 10px 15px !important;
+    min-height: 44px;
+  }
+
+  .stays-search-form > div:first-child > div:last-child {
+    border-bottom: none;
+  }
+
+  .stays-grid--with-map,
+  .stays-grid--full {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+/* ─────────────────────────────────────────
+   Small mobile  ≤ 480px
+───────────────────────────────────────── */
+@media (max-width: 480px) {
+  .stays-page {
+    padding: 12px;
+  }
+}

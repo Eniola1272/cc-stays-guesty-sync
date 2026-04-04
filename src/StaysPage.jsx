@@ -3,12 +3,14 @@ import DatePicker from "react-datepicker";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "react-datepicker/dist/react-datepicker.css";
 import "leaflet/dist/leaflet.css";
+import "./StaysPage.css";
 import L from "leaflet";
 
 // Price pill icon for the map
-const createPriceIcon = (price) => L.divIcon({
-  className: "",
-  html: `<div style="
+const createPriceIcon = (price) =>
+  L.divIcon({
+    className: "",
+    html: `<div style="
     background: #3b5240;
     color: #fff;
     padding: 5px 10px;
@@ -20,62 +22,116 @@ const createPriceIcon = (price) => L.divIcon({
     border: 2px solid #fff;
     cursor: pointer;
   ">$${price}</div>`,
-  iconAnchor: [28, 16],
-  popupAnchor: [0, -20],
-});
+    iconAnchor: [28, 16],
+    popupAnchor: [0, -20],
+  });
 
 // --- CC STAYS ICON TOOLKIT ---
 
 const CalendarIcon = () => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-        <line x1="16" y1="2" x2="16" y2="6"></line>
-        <line x1="8" y1="2" x2="8" y2="6"></line>
-        <line x1="3" y1="10" x2="21" y2="10"></line>
-    </svg>
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+    <line x1="16" y1="2" x2="16" y2="6"></line>
+    <line x1="8" y1="2" x2="8" y2="6"></line>
+    <line x1="3" y1="10" x2="21" y2="10"></line>
+  </svg>
 );
 
 const PersonIcon = () => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-        <circle cx="12" cy="7" r="4"></circle>
-    </svg>
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+    <circle cx="12" cy="7" r="4"></circle>
+  </svg>
 );
 
 const FilterIcon = () => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <line x1="4" y1="21" x2="4" y2="14"></line>
-        <line x1="4" y1="10" x2="4" y2="3"></line>
-        <line x1="12" y1="21" x2="12" y2="12"></line>
-        <line x1="12" y1="8" x2="12" y2="3"></line>
-        <line x1="20" y1="21" x2="20" y2="16"></line>
-        <line x1="20" y1="12" x2="20" y2="3"></line>
-        <line x1="1" y1="14" x2="7" y2="14"></line>
-        <line x1="9" y1="8" x2="15" y2="8"></line>
-        <line x1="17" y1="16" x2="23" y2="16"></line>
-    </svg>
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <line x1="4" y1="21" x2="4" y2="14"></line>
+    <line x1="4" y1="10" x2="4" y2="3"></line>
+    <line x1="12" y1="21" x2="12" y2="12"></line>
+    <line x1="12" y1="8" x2="12" y2="3"></line>
+    <line x1="20" y1="21" x2="20" y2="16"></line>
+    <line x1="20" y1="12" x2="20" y2="3"></line>
+    <line x1="1" y1="14" x2="7" y2="14"></line>
+    <line x1="9" y1="8" x2="15" y2="8"></line>
+    <line x1="17" y1="16" x2="23" y2="16"></line>
+  </svg>
 );
 
 const GlobeIcon = () => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="10"></circle>
-        <line x1="2" y1="12" x2="22" y2="12"></line>
-        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-    </svg>
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <circle cx="12" cy="12" r="10"></circle>
+    <line x1="2" y1="12" x2="22" y2="12"></line>
+    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+  </svg>
 );
 
 const HouseIcon = () => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-        <polyline points="9 22 9 12 15 12 15 22"></polyline>
-    </svg>
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+  </svg>
 );
 
 const StartOverIcon = () => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <polyline points="1 4 1 10 7 10"></polyline>
-        <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
-    </svg>
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <polyline points="1 4 1 10 7 10"></polyline>
+    <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+  </svg>
 );
 
 const StaysPage = () => {
@@ -110,14 +166,19 @@ const StaysPage = () => {
     if (params.get("guests")) setGuests(parseInt(params.get("guests"), 10));
     if (params.get("pets")) setPets(parseInt(params.get("pets"), 10));
     if (params.get("checkIn") && params.get("checkOut")) {
-      setDateRange([new Date(params.get("checkIn")), new Date(params.get("checkOut"))]);
+      setDateRange([
+        new Date(params.get("checkIn")),
+        new Date(params.get("checkOut")),
+      ]);
     }
   }, []);
 
-  // Derived filtered list
+  // Derived filtered list — client-side filter on top of whatever the API returned
   const filteredProperties = properties.filter((prop) => {
-    if (locationFilter && !prop.city.toLowerCase().includes(locationFilter.toLowerCase())) return false;
+    if (locationFilter && !prop.city.toLowerCase().includes(locationFilter.toLowerCase()))
+      return false;
     if (guests > 0 && prop.guests < guests) return false;
+    if (pets > 0 && prop.pets !== undefined && prop.pets < pets) return false;
     return true;
   });
 
@@ -127,12 +188,27 @@ const StaysPage = () => {
     setGuests(0);
     setPets(0);
     window.history.replaceState({}, "", window.location.pathname);
+    // Re-fetch all properties without filters
+    fetch("/wp-json/cc-stays/v1/search-stays")
+      .then((r) => r.json())
+      .then(setProperties)
+      .catch((err) => console.error("Error reloading stays:", err));
   };
 
   const handleSearch = (e) => {
     e.preventDefault();
-    // In the future, you can wire this to Guesty's availability API to filter the 'properties' array!
-    alert("Search triggered! Ready to connect to filtering logic.");
+    const params = new URLSearchParams();
+    if (locationFilter) params.append("location", locationFilter);
+    if (startDate) params.append("checkIn", startDate.toISOString().split("T")[0]);
+    if (endDate) params.append("checkOut", endDate.toISOString().split("T")[0]);
+    if (guests > 0) params.append("guests", guests);
+    if (pets > 0) params.append("pets", pets);
+
+    setLoading(true);
+    fetch(`/wp-json/cc-stays/v1/search-stays?${params.toString()}`)
+      .then((r) => r.json())
+      .then((data) => { setProperties(data); setLoading(false); })
+      .catch((err) => { console.error("Error searching stays:", err); setLoading(false); });
   };
 
   if (loading)
@@ -149,6 +225,7 @@ const StaysPage = () => {
 
   return (
     <div
+      className="stays-page"
       style={{
         maxWidth: "1400px",
         margin: "0 auto",
@@ -157,18 +234,19 @@ const StaysPage = () => {
       }}
     >
       {/* MAIN CONTENT: Split Grid & Map */}
-      <div style={{ display: "flex", gap: "20px", alignItems: "flex-start" }}>
+      <div className="stays-layout" style={{ display: "flex", gap: "20px", alignItems: "flex-start" }}>
         {/* LEFT: Property Grid */}
-        <div>
+        <div className="stays-left">
           {/* TOP BAR: Search & Filters */}
           <div style={{ marginBottom: "30px" }}>
             <form
               onSubmit={handleSearch}
+              className="stays-search-form"
               style={{
                 display: "flex",
                 gap: "10px",
                 marginBottom: "15px",
-                height: "48px"
+                height: "48px",
               }}
             >
               <div
@@ -177,8 +255,40 @@ const StaysPage = () => {
                   display: "flex",
                   background: "#EFECE5",
                   borderRadius: "4px",
+                  overflow: "hidden",
                 }}
               >
+                {/* WHERE */}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    padding: "0 15px",
+                    borderRight: "1px solid #d4d1ca",
+                    minWidth: 0,
+                    flex: "1.2",
+                  }}
+                >
+                  <span style={{ marginRight: "8px", display: "flex", alignItems: "center", flexShrink: 0, color: "#2a2725" }}>
+                    <GlobeIcon />
+                  </span>
+                  <input
+                    type="text"
+                    value={locationFilter}
+                    onChange={(e) => setLocationFilter(e.target.value)}
+                    placeholder="Where"
+                    style={{
+                      border: "none",
+                      background: "transparent",
+                      outline: "none",
+                      fontSize: "14px",
+                      color: "#2a2725",
+                      width: "100%",
+                      minWidth: 0,
+                    }}
+                  />
+                </div>
+                {/* WHEN */}
                 <div
                   style={{
                     flex: 1,
@@ -188,8 +298,18 @@ const StaysPage = () => {
                     borderRight: "1px solid #d4d1ca",
                   }}
                 >
-                  <span style={{ marginRight: "10px", display: "flex", alignItems: "center", gap: "8px", fontSize: "14px" }}>
-                    <CalendarIcon /> Availability
+                  <span
+                    style={{
+                      marginRight: "10px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      fontSize: "14px",
+                      whiteSpace: "nowrap",
+                      color: "#2a2725",
+                    }}
+                  >
+                    <CalendarIcon /> When
                   </span>
                   <DatePicker
                     selectsRange={true}
@@ -197,30 +317,94 @@ const StaysPage = () => {
                     endDate={endDate}
                     onChange={setDateRange}
                     placeholderText="Add dates"
-                    style={{ background: "transparent", border: "none", outline: "none", width: "100%", fontSize: "14px" }}
+                    className="cc-minimal-datepicker"
+                    calendarClassName="cc-search-calendar"
+                    monthsShown={2}
                   />
                 </div>
-                <div style={{ display: "flex", alignItems: "center", padding: "0 12px", gap: "16px", borderLeft: "1px solid #d4d1ca" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                    <PersonIcon />
-                    <span style={{ fontSize: "13px", color: "#555" }}>Guests</span>
-                    <button type="button" onClick={() => setGuests(Math.max(0, guests - 1))} style={{ width: "24px", height: "24px", borderRadius: "50%", border: "1px solid #ccc", background: "#fff", cursor: "pointer", fontSize: "16px", display: "flex", alignItems: "center", justifyContent: "center", opacity: guests === 0 ? 0.3 : 1 }}>−</button>
-                    <span style={{ fontSize: "13px", minWidth: "20px", textAlign: "center" }}>{guests === 0 ? "Any" : guests}</span>
-                    <button type="button" onClick={() => setGuests(guests + 1)} style={{ width: "24px", height: "24px", borderRadius: "50%", border: "1px solid #ccc", background: "#fff", cursor: "pointer", fontSize: "16px", display: "flex", alignItems: "center", justifyContent: "center" }}>+</button>
-                  </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                    <span style={{ fontSize: "13px", color: "#555" }}>🐾 Pets</span>
-                    <button type="button" onClick={() => setPets(Math.max(0, pets - 1))} style={{ width: "24px", height: "24px", borderRadius: "50%", border: "1px solid #ccc", background: "#fff", cursor: "pointer", fontSize: "16px", display: "flex", alignItems: "center", justifyContent: "center", opacity: pets === 0 ? 0.3 : 1 }}>−</button>
-                    <span style={{ fontSize: "13px", minWidth: "20px", textAlign: "center" }}>{pets === 0 ? "Any" : pets}</span>
-                    <button type="button" onClick={() => setPets(pets + 1)} style={{ width: "24px", height: "24px", borderRadius: "50%", border: "1px solid #ccc", background: "#fff", cursor: "pointer", fontSize: "16px", display: "flex", alignItems: "center", justifyContent: "center" }}>+</button>
-                  </div>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    padding: "0 14px",
+                    gap: "20px",
+                    borderLeft: "1px solid #d4d1ca",
+                  }}
+                >
+                  {[
+                    {
+                      label: "Who",
+                      icon: <PersonIcon />,
+                      value: guests,
+                      set: setGuests,
+                    },
+                    { label: "🐾 Pets", icon: null, value: pets, set: setPets },
+                  ].map(({ label, icon, value, set }) => (
+                    <div
+                      key={label}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "7px",
+                      }}
+                    >
+                      {icon}
+                      <span
+                        style={{
+                          fontSize: "13px",
+                          color: "#2a2725",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {label}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => set(Math.max(0, value - 1))}
+                        style={{
+                          width: "26px", height: "26px", aspectRatio: "1 / 1",
+                          flexShrink: 0, borderRadius: "50%", border: "1px solid #aaa",
+                          background: "#fff", color: "#333", padding: 0,
+                          cursor: value === 0 ? "default" : "pointer",
+                          fontSize: "15px", lineHeight: 1,
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          opacity: value === 0 ? 0.3 : 1,
+                        }}
+                      >−</button>
+                      <span style={{ fontSize: "13px", color: "#2a2725", minWidth: "24px", textAlign: "center" }}>
+                        {value}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => set(value + 1)}
+                        style={{
+                          width: "26px", height: "26px", aspectRatio: "1 / 1",
+                          flexShrink: 0, borderRadius: "50%", border: "1px solid #aaa",
+                          background: "#fff", color: "#333", padding: 0,
+                          cursor: "pointer", fontSize: "15px", lineHeight: 1,
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                        }}
+                      >+</button>
+                    </div>
+                  ))}
                 </div>
               </div>
-              
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 20px', cursor: 'pointer', background: '#2a2725', color: '#fff', borderRadius: '4px' }}>
-                  <FilterIcon /> 
+
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "0 20px",
+                  cursor: "pointer",
+                  background: "#2a2725",
+                  color: "#fff",
+                  borderRadius: "4px",
+                }}
+              >
+                <FilterIcon />
               </div>
-              
+
               <button
                 type="submit"
                 style={{
@@ -231,7 +415,7 @@ const StaysPage = () => {
                   borderRadius: "4px",
                   cursor: "pointer",
                   letterSpacing: "1px",
-                  fontSize: "13px"
+                  fontSize: "13px",
                 }}
               >
                 SEARCH
@@ -264,12 +448,12 @@ const StaysPage = () => {
                   fontSize: "12px",
                   fontWeight: "bold",
                   cursor: "pointer",
-                  letterSpacing: "0.5px"
+                  letterSpacing: "0.5px",
                 }}
               >
                 <StartOverIcon /> START OVER
               </button>
-              <div 
+              <div
                 style={{
                   flex: 1,
                   display: "flex",
@@ -282,7 +466,7 @@ const StaysPage = () => {
                   borderRadius: "2px",
                   fontSize: "12px",
                   fontWeight: "bold",
-                  letterSpacing: "0.5px"
+                  letterSpacing: "0.5px",
                 }}
               >
                 <HouseIcon /> {filteredProperties.length} Properties
@@ -302,7 +486,7 @@ const StaysPage = () => {
                   fontSize: "12px",
                   fontWeight: "bold",
                   cursor: "pointer",
-                  letterSpacing: "0.5px"
+                  letterSpacing: "0.5px",
                 }}
               >
                 <GlobeIcon /> {showMap ? "HIDE MAP" : "SHOW MAP"}
@@ -310,6 +494,7 @@ const StaysPage = () => {
             </div>
           </div>
           <div
+            className={showMap ? "stays-grid stays-grid--with-map" : "stays-grid stays-grid--full"}
             style={{
               flex: showMap ? "0 0 60%" : "1",
               display: "grid",
@@ -390,6 +575,7 @@ const StaysPage = () => {
         {/* RIGHT: Sticky Map */}
         {showMap && (
           <div
+            className="stays-map"
             style={{
               flex: "0 0 40%",
               height: "800px",
@@ -406,19 +592,77 @@ const StaysPage = () => {
             >
               <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
               {filteredProperties.map((prop) => (
-                <Marker key={prop.id} position={[prop.lat, prop.lng]} icon={createPriceIcon(prop.price)}>
+                <Marker
+                  key={prop.id}
+                  position={[prop.lat, prop.lng]}
+                  icon={createPriceIcon(prop.price)}
+                >
                   <Popup minWidth={220}>
                     <div style={{ fontFamily: "sans-serif" }}>
-                      <img src={prop.image} alt={prop.title} style={{ width: "100%", height: "130px", objectFit: "cover", borderRadius: "4px", marginBottom: "10px" }} />
-                      <strong style={{ fontSize: "15px", display: "block", marginBottom: "4px" }}>{prop.title}</strong>
-                      <span style={{ fontSize: "13px", color: "#666" }}>📍 {prop.city}</span>
-                      <div style={{ display: "flex", gap: "12px", fontSize: "12px", color: "#444", margin: "8px 0" }}>
+                      <img
+                        src={prop.image}
+                        alt={prop.title}
+                        style={{
+                          width: "100%",
+                          height: "130px",
+                          objectFit: "cover",
+                          borderRadius: "4px",
+                          marginBottom: "10px",
+                        }}
+                      />
+                      <strong
+                        style={{
+                          fontSize: "15px",
+                          display: "block",
+                          marginBottom: "4px",
+                        }}
+                      >
+                        {prop.title}
+                      </strong>
+                      <span style={{ fontSize: "13px", color: "#666" }}>
+                        📍 {prop.city}
+                      </span>
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "12px",
+                          fontSize: "12px",
+                          color: "#444",
+                          margin: "8px 0",
+                        }}
+                      >
                         <span>🛏️ {prop.bedrooms} bed</span>
                         <span>🛁 {prop.bathrooms} bath</span>
                         <span>👥 {prop.guests} guests</span>
                       </div>
-                      <div style={{ fontSize: "14px", fontWeight: "bold", marginBottom: "10px" }}>${prop.price} <span style={{ fontWeight: "normal", color: "#888" }}>/ night</span></div>
-                      <a href={prop.url} style={{ display: "block", textAlign: "center", background: "#3b5240", color: "#fff", padding: "8px", borderRadius: "4px", textDecoration: "none", fontSize: "13px", fontWeight: "bold" }}>View Stay →</a>
+                      <div
+                        style={{
+                          fontSize: "14px",
+                          fontWeight: "bold",
+                          marginBottom: "10px",
+                        }}
+                      >
+                        ${prop.price}{" "}
+                        <span style={{ fontWeight: "normal", color: "#888" }}>
+                          / night
+                        </span>
+                      </div>
+                      <a
+                        href={prop.url}
+                        style={{
+                          display: "block",
+                          textAlign: "center",
+                          background: "#3b5240",
+                          color: "#fff",
+                          padding: "8px",
+                          borderRadius: "4px",
+                          textDecoration: "none",
+                          fontSize: "13px",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        View Stay →
+                      </a>
                     </div>
                   </Popup>
                 </Marker>
