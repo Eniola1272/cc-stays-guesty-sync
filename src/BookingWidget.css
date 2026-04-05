@@ -620,82 +620,23 @@
   z-index: 200;
 }
 
+/* Hide "Where" / "When" / "Who" labels when a value is filled — all sizes */
+.cc-pill-label.filled {
+  display: none;
+}
+
 /* ─────────────────────────────────────────
-   SearchBar — Mobile  ≤ 768px
+   SearchBar — Mobile: icon-only search button
 ───────────────────────────────────────── */
 @media (max-width: 768px) {
-
-  /* Pill becomes a white stacked card */
-  .cc-searchbar-pill {
-    height: auto !important;
-    flex-direction: column;
-    background: #fff !important;
-    border: 1px solid #ddd !important;
-    border-radius: 12px !important;
-    padding: 0 !important;
-    gap: 0;
-    align-items: stretch;
-  }
-
-  /* Hide the thin vertical dividers */
-  .cc-searchbar-divider {
+  .cc-searchbar-submit-text {
     display: none;
   }
 
-  /* Each section becomes a full-width row */
-  .cc-searchbar-section {
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    background: transparent !important;
-    padding: 14px 18px !important;
-    border-bottom: 1px solid #ebebeb !important;
-    flex: none !important;
-    width: 100%;
-    box-sizing: border-box;
-    user-select: none;
-  }
-
-  /* No border under the last section (WHO) */
-  .cc-searchbar-section:last-of-type {
-    border-bottom: none !important;
-  }
-
-  /* Search button — full-width, dark green */
   .cc-searchbar-submit {
-    width: 100% !important;
-    border-radius: 8px !important;
-    border-radius: 0 0 12px 12px !important;
-    justify-content: center;
-    padding: 16px !important;
-    margin-top: 0 !important;
-    background: #3b5240 !important;
-    font-size: 13px !important;
-    letter-spacing: 1px;
-    flex-shrink: 0;
-  }
-
-  /* Dropdowns — full-width below the pill */
-  .cc-searchbar-dropdown {
-    left: 0 !important;
-    right: 0 !important;
-    transform: none !important;
-    min-width: unset !important;
-    width: 100%;
-    box-sizing: border-box;
-    border-radius: 12px;
-  }
-
-  /* Calendar: hide second month */
-  .cc-search-calendar .react-datepicker__month-container + .react-datepicker__month-container {
-    display: none;
-  }
-
-  /* Shrink day cells to fit mobile width */
-  .cc-search-calendar .react-datepicker__day,
-  .cc-search-calendar .react-datepicker__day-name {
-    width: 34px !important;
-    height: 34px !important;
-    line-height: 34px !important;
+    padding: 12px !important;
+    border-radius: 50% !important;
+    gap: 0 !important;
   }
 }
 

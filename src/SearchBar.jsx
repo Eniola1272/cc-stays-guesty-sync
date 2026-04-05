@@ -66,16 +66,30 @@ const Counter = ({ value, onChange }) => (
     <button
       type="button"
       onClick={() => onChange(Math.max(0, value - 1))}
-      style={circleBtn({ cursor: value === 0 ? "default" : "pointer", opacity: value === 0 ? 0.3 : 1 })}
-    >−</button>
-    <span style={{ fontSize: "14px", minWidth: "28px", textAlign: "center", color: "#222" }}>
+      style={circleBtn({
+        cursor: value === 0 ? "default" : "pointer",
+        opacity: value === 0 ? 0.3 : 1,
+      })}
+    >
+      −
+    </button>
+    <span
+      style={{
+        fontSize: "14px",
+        minWidth: "28px",
+        textAlign: "center",
+        color: "#222",
+      }}
+    >
       {value}
     </span>
     <button
       type="button"
       onClick={() => onChange(value + 1)}
       style={circleBtn()}
-    >+</button>
+    >
+      +
+    </button>
   </div>
 );
 
@@ -175,12 +189,15 @@ const SearchBar = () => {
             <SearchIcon />
             <div>
               <div
+                className={`cc-pill-label${location ? " filled" : ""}`}
                 style={{ fontSize: "11px", fontWeight: "700", color: "#222" }}
               >
                 Where
               </div>
               {location && (
-                <div style={{ fontSize: "12px", color: "#555", marginTop: "1px" }}>
+                <div
+                  style={{ fontSize: "12px", color: "#555", marginTop: "1px" }}
+                >
                   {location}
                 </div>
               )}
@@ -192,16 +209,21 @@ const SearchBar = () => {
           {/* WHEN */}
           <div
             className="cc-searchbar-section"
-            style={{ ...pillSection("when"), flex: "1.2" }}
+            style={{ ...pillSection("when"), flex: "2.0" }}
             onClick={() =>
               setActiveSection(activeSection === "when" ? null : "when")
             }
           >
-            <div style={{ fontSize: "11px", fontWeight: "700", color: "#222" }}>
+            <div
+              className={`cc-pill-label${dateLabel ? " filled" : ""}`}
+              style={{ fontSize: "11px", fontWeight: "700", color: "#222" }}
+            >
               When
             </div>
             {dateLabel && (
-              <div style={{ fontSize: "12px", color: "#555", marginTop: "1px" }}>
+              <div
+                style={{ fontSize: "12px", color: "#555", marginTop: "1px" }}
+              >
                 {dateLabel}
               </div>
             )}
@@ -217,11 +239,16 @@ const SearchBar = () => {
               setActiveSection(activeSection === "who" ? null : "who")
             }
           >
-            <div style={{ fontSize: "11px", fontWeight: "700", color: "#222" }}>
+            <div
+              className={`cc-pill-label${whoLabel ? " filled" : ""}`}
+              style={{ fontSize: "11px", fontWeight: "700", color: "#222" }}
+            >
               Who
             </div>
             {whoLabel && (
-              <div style={{ fontSize: "12px", color: "#555", marginTop: "1px" }}>
+              <div
+                style={{ fontSize: "12px", color: "#555", marginTop: "1px" }}
+              >
                 {whoLabel}
               </div>
             )}
@@ -249,7 +276,7 @@ const SearchBar = () => {
             onMouseOut={(e) => (e.currentTarget.style.background = "#111")}
           >
             <SearchIcon />
-            Search
+            <span className="cc-searchbar-submit-text">Search</span>
           </button>
         </div>
 
