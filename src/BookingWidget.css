@@ -751,14 +751,47 @@
 }
 
 /* ─────────────────────────────────────────
+   Desktop widget — hide on mobile
+───────────────────────────────────────── */
+.cc-booking-widget--desktop {
+  display: block;
+}
+
+/* ─────────────────────────────────────────
+   Mobile bottom bar — hidden on desktop
+───────────────────────────────────────── */
+.cc-mobile-bar {
+  display: none;
+}
+
+/* ─────────────────────────────────────────
+   Mobile drawer — hidden on desktop
+───────────────────────────────────────── */
+.cc-drawer-backdrop,
+.cc-mobile-drawer {
+  display: none;
+}
+
+/* ─────────────────────────────────────────
+   Inline calendar (inside drawer — no dropdown)
+───────────────────────────────────────── */
+.cc-calendar-inline {
+  margin-top: 8px;
+  margin-bottom: 4px;
+}
+
+.cc-calendar-inline .react-datepicker {
+  width: 100%;
+}
+
+/* ─────────────────────────────────────────
    BookingWidget & CheckoutForm — Mobile ≤ 768px
 ───────────────────────────────────────── */
 @media (max-width: 768px) {
-  .cc-booking-widget {
-    max-width: 100% !important;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+
+  /* Hide desktop card on mobile */
+  .cc-booking-widget--desktop {
+    display: none !important;
   }
 
   /* Sticky widget column should not stick on mobile */
@@ -766,53 +799,166 @@
     position: static !important;
   }
 
-  .cc-booking-price-line {
-    font-size: 20px;
+  /* ── Fixed bottom bar ── */
+  .cc-mobile-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 1000;
+    background: #fff;
+    border-top: 1px solid #e8e8e8;
+    padding: 14px 20px max(14px, env(safe-area-inset-bottom, 14px));
+    gap: 16px;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
   }
 
-  .cc-btn-primary,
-  .cc-btn-reserve {
-    padding: 16px;
-    font-size: 15px;
-    border-radius: 6px;
-  }
-
-  /* Calendar dropdown full-width on mobile */
-  .cc-calendar-dropdown {
-    left: 0;
-    right: 0;
-    min-width: unset;
-    padding: 12px 12px 6px;
-  }
-
-  /* Calendar day cells — slightly smaller on mobile */
-  .cc-widget-calendar .react-datepicker__day {
-    height: 32px !important;
-    line-height: 32px !important;
-    font-size: 12px !important;
-  }
-
-  .cc-widget-calendar .react-datepicker__day-name {
-    line-height: 28px !important;
-    font-size: 10px !important;
-  }
-
-  .cc-widget-calendar .react-datepicker__current-month {
-    font-size: 16px !important;
-  }
-
-  /* Checkout form — full width on mobile */
-  .cc-booking-widget[style*="max-width: 500px"] {
-    max-width: 100% !important;
-  }
-
-  /* Stack the first/last name fields on mobile */
-  .cc-date-row {
+  .cc-mobile-bar-info {
+    display: flex;
     flex-direction: column;
+    gap: 3px;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    flex: 1;
+    min-width: 0;
   }
 
-  /* Quote summary reset margins for smaller padding */
-  .cc-quote-summary {
+  .cc-mobile-bar-label {
+    font-size: 15px;
+    font-weight: 600;
+    color: #222;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .cc-mobile-bar-sub {
+    font-size: 13px;
+    color: #717171;
+    font-weight: 400;
+  }
+
+  .cc-mobile-bar-btn {
+    flex-shrink: 0;
+    background: #222;
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 13px 22px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: var(--cc-font-primary);
+    white-space: nowrap;
+    transition: background 0.15s;
+  }
+
+  .cc-mobile-bar-btn:hover {
+    background: #000;
+  }
+
+  /* ── Backdrop ── */
+  .cc-drawer-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1001;
+    animation: cc-fade-in 0.2s ease;
+  }
+
+  /* ── Slide-up drawer ── */
+  .cc-mobile-drawer {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 1002;
+    background: #fff;
+    border-radius: 20px 20px 0 0;
+    max-height: 92vh;
+    transform: translateY(100%);
+    transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  .cc-mobile-drawer--open {
+    transform: translateY(0);
+  }
+
+  .cc-drawer-handle-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 16px 4px;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .cc-drawer-handle {
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    background: #ddd;
+  }
+
+  .cc-drawer-close {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #f2f2f2;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #444;
+    padding: 0;
+    transition: background 0.15s;
+  }
+
+  .cc-drawer-close:hover {
+    background: #e8e8e8;
+  }
+
+  .cc-drawer-header {
+    padding: 6px 20px 14px;
+    flex-shrink: 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .cc-drawer-title {
+    display: block;
+    font-size: 17px;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 3px;
+  }
+
+  .cc-drawer-sub {
+    font-size: 13px;
+    color: #717171;
+    margin: 0;
+  }
+
+  .cc-drawer-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 20px max(20px, env(safe-area-inset-bottom, 20px));
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Quote summary inside drawer — flush to drawer edges */
+  .cc-drawer-body .cc-quote-summary {
     margin-left: -20px;
     margin-right: -20px;
     margin-bottom: -20px;
@@ -820,38 +966,45 @@
     padding-right: 20px;
     padding-bottom: 20px;
   }
+
+  /* Date fields in drawer sit relative (not absolute dropdown) */
+  .cc-date-fields--drawer {
+    overflow: visible;
+  }
+
+  /* Stack the first/last name fields on mobile */
+  .cc-date-row {
+    flex-direction: column;
+  }
+}
+
+@keyframes cc-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 /* ─────────────────────────────────────────
    Small mobile  ≤ 480px
 ───────────────────────────────────────── */
 @media (max-width: 480px) {
-  .cc-booking-widget {
-    padding: 16px;
+  .cc-mobile-bar {
+    padding: 12px 16px max(12px, env(safe-area-inset-bottom, 12px));
   }
 
-  .cc-booking-price-line {
-    font-size: 18px;
+  .cc-mobile-bar-label {
+    font-size: 14px;
   }
 
-  .cc-booking-min-stay {
-    font-size: 12px;
+  .cc-mobile-bar-btn {
+    padding: 11px 18px;
+    font-size: 14px;
   }
 
-  .cc-date-label-item {
-    padding: 8px 10px;
+  .cc-drawer-body {
+    padding: 14px 16px max(16px, env(safe-area-inset-bottom, 16px));
   }
 
-  .cc-date-label-value {
-    font-size: 13px;
-  }
-
-  .cc-date-label-icon svg {
-    width: 14px;
-    height: 14px;
-  }
-
-  .cc-quote-summary {
+  .cc-drawer-body .cc-quote-summary {
     margin-left: -16px;
     margin-right: -16px;
     margin-bottom: -16px;
