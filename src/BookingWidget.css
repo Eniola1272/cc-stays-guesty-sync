@@ -30,7 +30,7 @@
 .cc-date-fields {
   position: relative;
   display: flex;
-  align-items: stretch;
+  flex-direction: column;
   border: 1px solid #ddd;
   border-radius: 8px;
   overflow: visible;
@@ -40,6 +40,12 @@
 
 .cc-date-fields:has(.cc-date-field.active) {
   border-color: #999;
+}
+
+/* Row containing the two field buttons */
+.cc-date-fields-row {
+  display: flex;
+  align-items: stretch;
 }
 
 .cc-date-field {
@@ -433,7 +439,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: border-color 0.15s, opacity 0.15s;
+  transition:
+    border-color 0.15s,
+    opacity 0.15s;
   padding: 0;
 }
 
@@ -773,22 +781,24 @@
 }
 
 /* ─────────────────────────────────────────
-   Inline calendar (inside drawer — no dropdown)
+   Inline calendar (inside drawer — below fields)
 ───────────────────────────────────────── */
 .cc-calendar-inline {
-  margin-top: 8px;
-  margin-bottom: 4px;
+  width: 100%;
+  border-top: 1px solid #f0f0f0;
+  padding: 8px 0 4px;
 }
 
 .cc-calendar-inline .react-datepicker {
   width: 100%;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 /* ─────────────────────────────────────────
    BookingWidget & CheckoutForm — Mobile ≤ 768px
 ───────────────────────────────────────── */
 @media (max-width: 768px) {
-
   /* Hide desktop card on mobile */
   .cc-booking-widget--desktop {
     display: none !important;
@@ -810,7 +820,7 @@
     z-index: 1000;
     background: #fff;
     border-top: 1px solid #e8e8e8;
-    padding: 14px 20px max(14px, env(safe-area-inset-bottom, 14px));
+    padding: 20px 20px max(20px, env(safe-area-inset-bottom, 20px));
     gap: 16px;
     box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
   }
@@ -845,10 +855,10 @@
 
   .cc-mobile-bar-btn {
     flex-shrink: 0;
-    background: #222;
+    background: var(--cc-green-dark);
     color: #fff;
     border: none;
-    border-radius: 50px;
+    border-radius: 6px;
     padding: 13px 22px;
     font-size: 15px;
     font-weight: 600;
@@ -859,7 +869,7 @@
   }
 
   .cc-mobile-bar-btn:hover {
-    background: #000;
+    background: #2e4233;
   }
 
   /* ── Backdrop ── */
@@ -967,11 +977,6 @@
     padding-bottom: 20px;
   }
 
-  /* Date fields in drawer sit relative (not absolute dropdown) */
-  .cc-date-fields--drawer {
-    overflow: visible;
-  }
-
   /* Stack the first/last name fields on mobile */
   .cc-date-row {
     flex-direction: column;
@@ -979,8 +984,12 @@
 }
 
 @keyframes cc-fade-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* ─────────────────────────────────────────
@@ -998,6 +1007,7 @@
   .cc-mobile-bar-btn {
     padding: 11px 18px;
     font-size: 14px;
+    border-radius: 6px;
   }
 
   .cc-drawer-body {

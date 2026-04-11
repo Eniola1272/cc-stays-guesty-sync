@@ -81,33 +81,36 @@ const BookingFormContent = ({
 
       {/* ── Check-in / Check-out Fields ── */}
       <div className={`cc-date-fields ${mobileDrawer ? "cc-date-fields--drawer" : ""}`} ref={calendarRef}>
-        <div
-          className={`cc-date-field ${isCalendarOpen ? "active" : ""}`}
-          onClick={() => { setIsGuestOpen(false); setIsCalendarOpen(!isCalendarOpen); }}
-        >
-          <span className="cc-date-field-label">CHECK-IN</span>
-          <div className="cc-date-field-value">
-            <CalendarIcon />
-            <span className={startDate ? "filled" : "placeholder"}>
-              {fmtDate(startDate) || "Add date"}
-            </span>
+        {/* Fields row — always a horizontal pair */}
+        <div className="cc-date-fields-row">
+          <div
+            className={`cc-date-field ${isCalendarOpen ? "active" : ""}`}
+            onClick={() => { setIsGuestOpen(false); setIsCalendarOpen(!isCalendarOpen); }}
+          >
+            <span className="cc-date-field-label">CHECK-IN</span>
+            <div className="cc-date-field-value">
+              <CalendarIcon />
+              <span className={startDate ? "filled" : "placeholder"}>
+                {fmtDate(startDate) || "Add date"}
+              </span>
+            </div>
           </div>
-        </div>
-        <div className="cc-date-field-divider" />
-        <div
-          className={`cc-date-field ${isCalendarOpen ? "active" : ""}`}
-          onClick={() => { setIsGuestOpen(false); setIsCalendarOpen(!isCalendarOpen); }}
-        >
-          <span className="cc-date-field-label">CHECK-OUT</span>
-          <div className="cc-date-field-value">
-            <CalendarIcon />
-            <span className={endDate ? "filled" : "placeholder"}>
-              {fmtDate(endDate) || "Add date"}
-            </span>
+          <div className="cc-date-field-divider" />
+          <div
+            className={`cc-date-field ${isCalendarOpen ? "active" : ""}`}
+            onClick={() => { setIsGuestOpen(false); setIsCalendarOpen(!isCalendarOpen); }}
+          >
+            <span className="cc-date-field-label">CHECK-OUT</span>
+            <div className="cc-date-field-value">
+              <CalendarIcon />
+              <span className={endDate ? "filled" : "placeholder"}>
+                {fmtDate(endDate) || "Add date"}
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Calendar: dropdown on desktop, inline in drawer on mobile */}
+        {/* Calendar: dropdown on desktop, full-width block below fields on mobile */}
         {isCalendarOpen && (
           <div className={mobileDrawer ? "cc-calendar-inline" : "cc-calendar-dropdown"}>
             <DatePicker
