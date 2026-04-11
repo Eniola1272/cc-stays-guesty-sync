@@ -37,10 +37,10 @@ const UserIcon = () => (
   </svg>
 );
 
-const ChevronsIcon = () => (
+const ChevronDownIcon = () => (
   <svg
-    width="12"
-    height="12"
+    width="14"
+    height="14"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
@@ -48,8 +48,7 @@ const ChevronsIcon = () => (
     strokeLinecap="round"
     strokeLinejoin="round"
   >
-    <polyline points="7 15 12 20 17 15"></polyline>
-    <polyline points="7 9 12 4 17 9"></polyline>
+    <polyline points="6 9 12 15 18 9"></polyline>
   </svg>
 );
 
@@ -74,7 +73,8 @@ const BookingWidget = () => {
 
   const [dateRange, setDateRange] = useState([null, null]);
   const [startDate, endDate] = dateRange;
-  const [guests, setGuests] = useState(null);
+  const [guests, setGuests] = useState(0);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [isGuestOpen, setIsGuestOpen] = useState(false);
   const [blockedDates, setBlockedDates] = useState([]);
 
@@ -82,6 +82,7 @@ const BookingWidget = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const calendarRef = useRef(null);
   const guestRef = useRef(null);
 
   // Fetch blocked/booked dates from Guesty via the existing WP endpoint
@@ -91,7 +92,6 @@ const BookingWidget = () => {
       .then((r) => r.json())
       .then((data) => {
         if (data.blockedDates) {
-          // Convert "YYYY-MM-DD" strings → Date objects for DatePicker's excludeDates
           setBlockedDates(
             data.blockedDates.map((s) => {
               const [y, m, d] = s.split("-").map(Number);
@@ -100,18 +100,28 @@ const BookingWidget = () => {
           );
         }
       })
-      .catch(() => {}); // silently fail — calendar still works without block data
+      .catch(() => {});
   }, [listingId]);
 
-  // Close guest dropdown on outside click
+  // Close dropdowns on outside click
   useEffect(() => {
     const handleOutside = (e) => {
+      if (calendarRef.current && !calendarRef.current.contains(e.target))
+        setIsCalendarOpen(false);
       if (guestRef.current && !guestRef.current.contains(e.target))
         setIsGuestOpen(false);
     };
     document.addEventListener("mousedown", handleOutside);
     return () => document.removeEventListener("mousedown", handleOutside);
   }, []);
+
+  const handleDateChange = (update) => {
+    setDateRange(update);
+    setQuote(null);
+    setError(null);
+    // Auto-close once both dates are picked
+    if (update[0] && update[1]) setIsCalendarOpen(false);
+  };
 
   const fetchQuote = async () => {
     if (!startDate || !endDate || !guests) {
@@ -181,87 +191,123 @@ const BookingWidget = () => {
         </p>
       </div>
 
-      {/* ── Check-in / Check-out Boxes ── */}
-      {/* <div className="cc-date-labels">
-        <div className="cc-date-label-item">
-          <span className="cc-date-label-title">Check-in</span>
-          <div className="cc-date-label-value-row">
-            <span className="cc-date-label-icon"><CalendarIcon /></span>
-            <span className="cc-date-label-value">{fmtDate(startDate) || "Add date"}</span>
-          </div>
-        </div>
-        <div className="cc-date-label-divider" />
-        <div className="cc-date-label-item">
-          <span className="cc-date-label-title">Check-out</span>
-          <div className="cc-date-label-value-row">
-            <span className="cc-date-label-icon"><CalendarIcon /></span>
-            <span className="cc-date-label-value">{fmtDate(endDate) || "- - -"}</span>
-          </div>
-        </div>
-      </div> */}
-
-      {/* ── Inline Calendar ── */}
-      <div className="cc-calendar-wrapper">
-        <DatePicker
-          selectsRange
-          inline
-          startDate={startDate}
-          endDate={endDate}
-          onChange={(update) => {
-            setDateRange(update);
-            // Clear previous quote when dates change
-            setQuote(null);
-            setError(null);
+      {/* ── Check-in / Check-out Fields ── */}
+      <div className="cc-date-fields" ref={calendarRef}>
+        <div
+          className={`cc-date-field ${isCalendarOpen ? "active" : ""}`}
+          onClick={() => {
+            setIsGuestOpen(false);
+            setIsCalendarOpen(!isCalendarOpen);
           }}
-          minDate={new Date()}
-          excludeDates={blockedDates}
-          calendarClassName="cc-search-calendar cc-widget-calendar"
-        />
-        {(startDate || endDate) && (
-          <button
-            type="button"
-            className="cc-clear-dates"
-            onClick={() => {
-              setDateRange([null, null]);
-              setQuote(null);
-              setError(null);
-            }}
-          >
-            Clear dates
-          </button>
+        >
+          <span className="cc-date-field-label">CHECK-IN</span>
+          <div className="cc-date-field-value">
+            <CalendarIcon />
+            <span className={startDate ? "filled" : "placeholder"}>
+              {fmtDate(startDate) || "Add date"}
+            </span>
+          </div>
+        </div>
+        <div className="cc-date-field-divider" />
+        <div
+          className={`cc-date-field ${isCalendarOpen ? "active" : ""}`}
+          onClick={() => {
+            setIsGuestOpen(false);
+            setIsCalendarOpen(!isCalendarOpen);
+          }}
+        >
+          <span className="cc-date-field-label">CHECK-OUT</span>
+          <div className="cc-date-field-value">
+            <CalendarIcon />
+            <span className={endDate ? "filled" : "placeholder"}>
+              {fmtDate(endDate) || "Add date"}
+            </span>
+          </div>
+        </div>
+
+        {/* ── Calendar Dropdown ── */}
+        {isCalendarOpen && (
+          <div className="cc-calendar-dropdown">
+            <DatePicker
+              selectsRange
+              inline
+              startDate={startDate}
+              endDate={endDate}
+              onChange={handleDateChange}
+              minDate={new Date()}
+              excludeDates={blockedDates}
+              calendarClassName="cc-search-calendar cc-widget-calendar"
+            />
+            {(startDate || endDate) && (
+              <button
+                type="button"
+                className="cc-clear-dates"
+                onClick={() => {
+                  setDateRange([null, null]);
+                  setQuote(null);
+                  setError(null);
+                }}
+              >
+                Clear dates
+              </button>
+            )}
+          </div>
         )}
       </div>
 
       {/* ── Guest Selector ── */}
       <div className="cc-guest-select-container" ref={guestRef}>
         <div
-          className="cc-guest-select-wrapper"
-          onClick={() => setIsGuestOpen(!isGuestOpen)}
+          className={`cc-guest-select-wrapper ${isGuestOpen ? "active" : ""}`}
+          onClick={() => {
+            setIsCalendarOpen(false);
+            setIsGuestOpen(!isGuestOpen);
+          }}
         >
           <span className="cc-input-icon">
             <UserIcon />
           </span>
-          <div className={`cc-guest-select-value ${guests ? "selected" : ""}`}>
-            {guests ? `${guests} Guest${guests > 1 ? "s" : ""}` : "Guest"}
+          <div className={`cc-guest-select-value ${guests > 0 ? "selected" : ""}`}>
+            {guests > 0 ? `${guests} Guest${guests > 1 ? "s" : ""}` : "Guests"}
           </div>
-          <span className="cc-guest-select-arrows">
-            <ChevronsIcon />
+          <span className={`cc-guest-chevron ${isGuestOpen ? "open" : ""}`}>
+            <ChevronDownIcon />
           </span>
         </div>
+
         {isGuestOpen && (
-          <div className="cc-dropdown-menu">
-            {[1, 2, 3, 4, 5, 6].map((num) => (
-              <div
-                key={num}
-                className="cc-dropdown-item"
-                onClick={() => {
-                  setGuests(num);
-                  setIsGuestOpen(false);
-                }}
-              >
-                {num} {num === 1 ? "Guest" : "Guests"}
+          <div className="cc-dropdown-menu cc-guest-stepper-menu">
+            <div className="cc-guest-stepper-row">
+              <div className="cc-guest-stepper-info">
+                <span className="cc-guest-stepper-title">Guests</span>
+                <span className="cc-guest-stepper-sub">Adults &amp; children</span>
               </div>
-            ))}
+              <div className="cc-guest-stepper-controls">
+                <button
+                  type="button"
+                  className="cc-stepper-btn"
+                  onClick={() => setGuests(Math.max(1, guests - 1))}
+                  disabled={guests <= 1}
+                >
+                  −
+                </button>
+                <span className="cc-stepper-count">{guests || 0}</span>
+                <button
+                  type="button"
+                  className="cc-stepper-btn"
+                  onClick={() => setGuests((guests || 0) + 1)}
+                >
+                  +
+                </button>
+              </div>
+            </div>
+            <button
+              type="button"
+              className="cc-guest-stepper-done"
+              onClick={() => setIsGuestOpen(false)}
+            >
+              Done
+            </button>
           </div>
         )}
       </div>
