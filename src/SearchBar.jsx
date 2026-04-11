@@ -180,7 +180,7 @@ const SearchBar = () => {
               display: "flex",
               alignItems: "center",
               gap: "10px",
-              flex: "1.4",
+              flex: "2.0",
             }}
             onClick={() =>
               setActiveSection(activeSection === "where" ? null : "where")
@@ -234,7 +234,7 @@ const SearchBar = () => {
           {/* WHO */}
           <div
             className="cc-searchbar-section"
-            style={{ ...pillSection("who"), flex: "1" }}
+            style={{ ...pillSection("who"), flex: "2.0" }}
             onClick={() =>
               setActiveSection(activeSection === "who" ? null : "who")
             }
@@ -262,7 +262,7 @@ const SearchBar = () => {
               display: "flex",
               alignItems: "center",
               gap: "8px",
-              background: "#111",
+              background: "#34533a",
               color: "#fff",
               border: "none",
               borderRadius: "50px",
@@ -272,8 +272,10 @@ const SearchBar = () => {
               fontSize: "14px",
               flexShrink: 0,
             }}
-            onMouseOver={(e) => (e.currentTarget.style.background = "#333")}
-            onMouseOut={(e) => (e.currentTarget.style.background = "#111")}
+            onMouseOver={(e) =>
+              (e.currentTarget.style.background = "#34533a90")
+            }
+            onMouseOut={(e) => (e.currentTarget.style.background = "#34533a")}
           >
             <SearchIcon />
             <span className="cc-searchbar-submit-text">Search</span>
@@ -424,20 +426,6 @@ const SearchBar = () => {
                   }}
                 >
                   Dates
-                </button>
-                <button
-                  type="button"
-                  style={{
-                    padding: "6px 16px",
-                    borderRadius: "20px",
-                    border: "1px solid #ddd",
-                    background: "#f2f2f2",
-                    color: "#666",
-                    fontSize: "13px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Flexible
                 </button>
               </div>
               {(startDate || endDate) && (
