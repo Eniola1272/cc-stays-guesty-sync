@@ -437,8 +437,8 @@
   /* Map hidden on mobile */
   .stays-map { display: none; }
 
-  /* Sub-bar */
-  .stays-subbar { flex-wrap: wrap; height: auto; gap: 8px; margin-bottom: 16px; }
+  /* Sub-bar — hidden on mobile */
+  .stays-subbar { display: none; }
 
   /* Cards — single column */
   .stays-grid--with-map,
@@ -657,11 +657,6 @@
   .stays-page { padding: 8px; padding-bottom: 110px; }
   .stays-card-img { height: 200px; }
   .stays-card-stats { flex-wrap: wrap; gap: 8px; }
-  .stays-subbar { gap: 6px; }
-  .stays-subbar-btn,
-  .stays-subbar-count { font-size: 10px !important; padding: 6px !important; gap: 4px !important; }
-  .stays-subbar-btn svg,
-  .stays-subbar-count svg { width: 14px; height: 14px; }
   .stays-mobile-bar { padding: 12px 16px max(12px, env(safe-area-inset-bottom, 12px)); }
 }
 
