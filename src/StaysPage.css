@@ -387,6 +387,51 @@
 
 .stays-card-btn:hover { background: var(--cc-green-dark); color: #fff; }
 
+/* ── Empty state ── */
+.stays-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 64px 24px;
+  gap: 16px;
+}
+
+.stays-empty-title {
+  font-family: var(--cc-font-serif);
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--cc-text-dark);
+  margin: 0;
+}
+
+.stays-empty-desc {
+  font-size: 14px;
+  color: var(--cc-text-light);
+  max-width: 380px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.stays-empty-reset {
+  margin-top: 8px;
+  background: transparent;
+  border: 1px solid var(--cc-green-dark);
+  color: var(--cc-green-dark);
+  border-radius: 6px;
+  padding: 11px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--cc-font-primary);
+  transition: background 0.15s, color 0.15s;
+}
+
+.stays-empty-reset:hover {
+  background: var(--cc-green-dark);
+  color: #fff;
+}
+
 .stays-grid { display: grid; gap: 20px; }
 .stays-grid--with-map { grid-template-columns: repeat(2, 1fr); }
 .stays-grid--full     { grid-template-columns: repeat(3, 1fr); }

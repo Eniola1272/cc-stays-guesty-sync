@@ -339,6 +339,18 @@ const StaysPage = () => {
         <div className="stays-layout">
           {/* LEFT: Property Grid */}
           <div className="stays-left">
+            {filteredProperties.length === 0 ? (
+              <div className="stays-empty-state">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" />
+                </svg>
+                <h3 className="stays-empty-title">No properties found</h3>
+                <p className="stays-empty-desc">Try adjusting your filters — different dates, location, or fewer guests may show more results.</p>
+                <button className="stays-empty-reset" onClick={handleReset}>
+                  Clear all filters
+                </button>
+              </div>
+            ) : (
             <div
               className={showMap ? "stays-grid stays-grid--with-map" : "stays-grid stays-grid--full"}
               style={{
@@ -374,6 +386,7 @@ const StaysPage = () => {
                 </div>
               ))}
             </div>
+            )}
           </div>
 
           {/* RIGHT: Sticky Map */}
