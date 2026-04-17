@@ -50,20 +50,24 @@ const BookingFormContent = ({
   handleDateChange, fetchQuote, handleReserveClick,
   // layout variant
   mobileDrawer,
+  drawerOpen,
 }) => {
   const [startDate, endDate] = dateRange;
   const calendarRef = useRef(null);
   const guestRef = useRef(null);
 
   useEffect(() => {
-    if (!mobileDrawer) return; // desktop dropdowns handle their own outside-click
+    // Only register the outside-click listener for the mobile instance
+    // AND only while the drawer is actually visible — otherwise it fires
+    // on desktop interactions and immediately closes the guest dropdown.
+    if (!mobileDrawer || !drawerOpen) return;
     const handleOutside = (e) => {
       if (guestRef.current && !guestRef.current.contains(e.target))
         setIsGuestOpen(false);
     };
     document.addEventListener("mousedown", handleOutside);
     return () => document.removeEventListener("mousedown", handleOutside);
-  }, [mobileDrawer, setIsGuestOpen]);
+  }, [mobileDrawer, drawerOpen, setIsGuestOpen]);
 
   return (
     <>
@@ -152,7 +156,7 @@ const BookingFormContent = ({
         </div>
 
         {isGuestOpen && (
-          <div className="cc-dropdown-menu cc-guest-stepper-menu">
+          <div className="cc-dropdown-menu cc-guest-stepper-menu" onClick={(e) => e.stopPropagation()}>
             <div className="cc-guest-stepper-row">
               <div className="cc-guest-stepper-info">
                 <span className="cc-guest-stepper-title">Guests</span>
@@ -341,7 +345,7 @@ const BookingWidget = () => {
     <>
       {/* ── Desktop card (hidden on mobile via CSS) ── */}
       <div className="cc-booking-widget cc-booking-widget--desktop">
-        <BookingFormContent {...sharedProps} mobileDrawer={false} />
+        <BookingFormContent {...sharedProps} mobileDrawer={false} drawerOpen={false} />
       </div>
 
       {/* ── Mobile: fixed bottom bar + slide-up drawer (portal to body) ── */}
@@ -391,7 +395,7 @@ const BookingWidget = () => {
             </div>
 
             <div className="cc-drawer-body">
-              <BookingFormContent {...sharedProps} mobileDrawer={true} />
+              <BookingFormContent {...sharedProps} mobileDrawer={true} drawerOpen={isDrawerOpen} />
             </div>
           </div>
         </>,

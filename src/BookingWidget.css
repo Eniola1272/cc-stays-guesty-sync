@@ -130,6 +130,7 @@
 
 .cc-clear-dates:hover {
   color: var(--cc-text-dark);
+  background-color: #fff;
 }
 
 /* ── Widget-specific calendar overrides (single month, full width, seamless) ── */
@@ -699,6 +700,12 @@
 
 .cc-search-calendar .react-datepicker__navigation {
   top: 14px !important;
+}
+
+.cc-search-calendar .react-datepicker__navigation:hover,
+.cc-search-calendar .react-datepicker__navigation:active {
+  background-color: #fff;
+  color: #2e4233;
 }
 
 /* ─────────────────────────────────────────
