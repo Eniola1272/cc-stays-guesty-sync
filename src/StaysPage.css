@@ -511,6 +511,11 @@
   overflow: hidden;
 }
 
+/* ── Mobile map block (hidden on desktop, shown above cards on mobile) ── */
+.stays-map-mobile {
+  display: none;
+}
+
 /* ═══════════════════════════════════════════
    MOBILE BAR + DRAWER — hidden on desktop
 ═══════════════════════════════════════════ */
@@ -557,13 +562,35 @@
     display: none;
   }
 
-  /* Map hidden on mobile */
+  /* Desktop side map hidden on mobile (replaced by mobile map above) */
   .stays-map {
     display: none;
   }
 
-  /* Sub-bar — hidden on mobile */
+  /* Mobile full-width map block */
+  .stays-map-mobile {
+    display: block;
+    width: 100%;
+    height: 280px;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  /* Sub-bar — visible on mobile so user can toggle the map */
   .stays-subbar {
+    display: flex;
+    flex-wrap: wrap;
+    height: auto;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .stays-subbar-btn {
+    font-size: 11px;
+  }
+
+  .stays-subbar-count {
     display: none;
   }
 

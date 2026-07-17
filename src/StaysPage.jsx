@@ -97,7 +97,7 @@ const StepperRow = ({ label, sub, value, onChange }) => (
 const StaysPage = () => {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showMap, setShowMap] = useState(window.innerWidth > 768);
+  const [showMap, setShowMap] = useState(true);
 
   // Filter State
   const [locationFilter, setLocationFilter] = useState("");
@@ -321,6 +321,35 @@ const StaysPage = () => {
             </div>
           )}
         </div>
+
+        {/* ── Mobile map (above subbar) ── */}
+        {showMap && (
+          <div className="stays-map-mobile">
+            <MapContainer center={mapCenter} zoom={11} style={{ height: "100%", width: "100%" }}>
+              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+              {filteredProperties.map((prop) => (
+                <Marker key={prop.id} position={[prop.lat, prop.lng]} icon={createPriceIcon(prop.price)}>
+                  <Popup minWidth={220}>
+                    <div style={{ fontFamily: "sans-serif" }}>
+                      <img src={prop.image} alt={prop.title} style={{ width: "100%", height: "130px", objectFit: "cover", borderRadius: "4px", marginBottom: "10px" }} />
+                      <strong style={{ fontSize: "15px", display: "block", marginBottom: "4px" }}>{prop.title}</strong>
+                      <span style={{ fontSize: "13px", color: "#666" }}>📍 {prop.city}</span>
+                      <div style={{ display: "flex", gap: "12px", fontSize: "12px", color: "#444", margin: "8px 0" }}>
+                        <span>🛏️ {prop.bedrooms} bed</span>
+                        <span>🛁 {prop.bathrooms} bath</span>
+                        <span>👥 {prop.guests} guests</span>
+                      </div>
+                      <div style={{ fontSize: "14px", fontWeight: "bold", marginBottom: "10px" }}>
+                        ${prop.price} <span style={{ fontWeight: "normal", color: "#888" }}>/ night</span>
+                      </div>
+                      <a href={prop.url} style={{ display: "block", textAlign: "center", background: "#3b5240", color: "#fff", padding: "8px", borderRadius: "4px", textDecoration: "none", fontSize: "13px", fontWeight: "bold" }}>View Stay →</a>
+                    </div>
+                  </Popup>
+                </Marker>
+              ))}
+            </MapContainer>
+          </div>
+        )}
 
         {/* ── Sub-bar ── */}
         <div className="stays-subbar">
