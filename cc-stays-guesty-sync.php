@@ -13,8 +13,8 @@ class CC_Stays_Guesty_Sync
 {
 
     // Your Guesty Credentials
-    private $client_id = '0oatncf3pajf7P7cP5d7';
-    private $client_secret = 'wuhCr4GiMiLyE0fwSnbntL_MZ980jiCtmM8ymRuGljMTe4SpBoCF2rt0ZsLzi3Jx';
+    private $client_id = '0oavt02lhecydwH7t5d7';
+    private $client_secret = 'CN36Ejom8wbtPe9CkTWx0_AZZBURIRXoZniRuo2US8g0xlaI03b4e7AvHfqYj5Y1';
     private $api_base = 'https://open-api.guesty.com';
 
     public function __construct()
