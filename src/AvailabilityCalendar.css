@@ -1,0 +1,250 @@
+:root {
+  --cc-green-dark: #34533a;
+  --cc-text-dark: #2c2c2c;
+  --cc-text-light: #a0a0a0;
+  --cc-border-light: #e0e0e0;
+  --cc-font-primary: "Montserrat", "Inter", sans-serif;
+  --cc-font-serif: "Playfair Display", "Georgia", serif;
+}
+
+.cc-availability-container {
+  width: 100%;
+  max-width: 800px;
+  font-family: var(--cc-font-primary);
+  margin-top: 40px;
+}
+
+/* Header section with text and line */
+.cc-availability-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.cc-availability-header h2 {
+  font-family: var(--cc-font-serif);
+  font-size: 28px;
+  color: var(--cc-green-dark);
+  margin: 0;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.cc-availability-header .cc-header-line {
+  flex-grow: 1;
+  height: 1px;
+  background-color: var(--cc-green-dark);
+  margin-left: 20px;
+  opacity: 0.6;
+}
+
+/* Calendar Navigation Arrows (matching design) */
+.cc-calendar-nav {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 2; /* Ensure it stays above datepicker elements */
+}
+
+.cc-nav-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #888;
+  transition: all 0.2s ease;
+}
+
+.cc-nav-btn:hover {
+  border-color: var(--cc-text-dark);
+  color: var(--cc-text-dark);
+}
+
+.cc-nav-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* The actual DatePicker inline container */
+.cc-calendar-wrapper {
+  position: relative;
+  /* Push slightly up so arrows flank the months */
+  margin-top: -50px;
+}
+
+/* Hide default datepicker arrows since we made custom ones */
+.cc-calendar-wrapper .react-datepicker__navigation {
+  display: none !important;
+}
+
+/* React DatePicker Customizations for inline 2-month view */
+.cc-calendar-wrapper .react-datepicker {
+  font-family: var(--cc-font-serif);
+  border: none !important;
+  background: transparent;
+  width: 100%;
+  display: flex;
+  justify-content: space-between; /* space out the two months */
+}
+
+.cc-calendar-wrapper .react-datepicker__month-container {
+  width: 48%;
+  border: 1px solid #e0e0e0;
+  background: #fff;
+  padding-bottom: 10px;
+  box-sizing: border-box;
+}
+
+.cc-calendar-wrapper .react-datepicker__header {
+  background: white;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 10px 0;
+}
+
+.cc-calendar-wrapper .react-datepicker__current-month {
+  font-family: var(--cc-font-serif);
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--cc-text-dark);
+  margin-bottom: 10px;
+}
+
+.cc-calendar-wrapper .react-datepicker__day-names {
+  margin-top: 10px;
+}
+
+.cc-calendar-wrapper .react-datepicker__day-name {
+  color: var(--cc-text-dark);
+  width: 2.5rem;
+  line-height: 2.5rem;
+  font-size: 14px;
+}
+
+.cc-calendar-wrapper .react-datepicker__day {
+  width: 2.5rem;
+  line-height: 2.5rem;
+  font-size: 15px;
+  color: var(--cc-text-dark);
+  border-radius: 0;
+}
+
+.cc-calendar-wrapper .react-datepicker__day--disabled {
+  color: #f0f0f0;
+  cursor: not-allowed;
+  position: relative;
+}
+
+.cc-calendar-wrapper .react-datepicker__day--disabled .disabled-cross {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 12px;
+  color: #f4f4f4;
+  font-family: sans-serif;
+  pointer-events: none;
+}
+
+/* Show More Button */
+.cc-show-more-btn {
+  margin-top: 30px;
+  background: white;
+  border: 1px solid var(--cc-text-dark);
+  color: var(--cc-text-dark);
+  padding: 10px 24px;
+  font-size: 14px;
+  font-family: var(--cc-font-primary);
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.cc-show-more-btn:hover {
+  background: var(--cc-text-dark);
+  color: white;
+}
+
+/* ===== Mobile Responsive ===== */
+
+@media (max-width: 768px) {
+  .cc-availability-container {
+    max-width: 100%;
+    padding: 0 15px;
+    box-sizing: border-box;
+  }
+
+  .cc-availability-header h2 {
+    font-size: 22px;
+  }
+
+  /* Stack the two months vertically */
+  .cc-calendar-wrapper .react-datepicker {
+    flex-direction: column !important;
+    gap: 20px;
+  }
+
+  .cc-calendar-wrapper .react-datepicker__month-container {
+    width: 100% !important;
+  }
+
+  /* Remove the negative margin that was for desktop flanking arrows */
+  .cc-calendar-wrapper {
+    margin-top: 0;
+  }
+
+  /* Shrink day cells to fit mobile */
+  .cc-calendar-wrapper .react-datepicker__day-name,
+  .cc-calendar-wrapper .react-datepicker__day {
+    width: 2rem;
+    line-height: 2rem;
+    font-size: 13px;
+  }
+
+  .cc-calendar-wrapper .react-datepicker__current-month {
+    font-size: 14px;
+  }
+
+  .cc-nav-btn {
+    width: 30px;
+    height: 30px;
+  }
+
+  .cc-nav-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cc-availability-header h2 {
+    font-size: 18px;
+  }
+
+  .cc-availability-header .cc-header-line {
+    margin-left: 12px;
+  }
+
+  .cc-calendar-wrapper .react-datepicker__day-name,
+  .cc-calendar-wrapper .react-datepicker__day {
+    width: 1.8rem;
+    line-height: 1.8rem;
+    font-size: 12px;
+    margin: 1px;
+  }
+
+  .cc-calendar-wrapper .react-datepicker__current-month {
+    font-size: 13px;
+  }
+
+  .cc-show-more-btn {
+    width: 100%;
+    text-align: center;
+  }
+}

@@ -29,6 +29,20 @@ class CC_Stays_Guesty_Sync
         // Register the Elementor shortcode
         add_shortcode('cc_stays_booking', [$this, 'render_booking_widget']);
 
+        // Register the Availability Calendar shortcode
+        add_shortcode('cc_stays_availability', [$this, 'render_availability_widget']);
+
+        // Register the Checkout shortcode
+        add_shortcode('cc_stays_checkout', [$this, 'render_checkout_widget']);
+
+        add_shortcode('cc_stays_dynamic_map', [$this, 'render_dynamic_leaflet_map']);
+
+        // Register the Global Search Bar shortcode
+        add_shortcode('cc_stays_search_bar', [$this, 'render_search_bar_widget']);
+
+        // Register the Stays Archive App shortcode
+        add_shortcode('cc_stays_archive', function() { return '<div id="cc-stays-react-archive"></div>'; });
+
         // Enqueue the compiled React app
         add_action('wp_enqueue_scripts', [$this, 'enqueue_react_app']);
     }
@@ -127,8 +141,7 @@ class CC_Stays_Guesty_Sync
                 $post_id = $existing_posts[0]->ID;
                 $post_data['ID'] = $post_id;
                 wp_update_post($post_data);
-            }
-            else {
+            } else {
                 // Create new property
                 $post_id = wp_insert_post($post_data);
             }
@@ -136,6 +149,17 @@ class CC_Stays_Guesty_Sync
             // Map the Advanced Custom Fields (ACF)
             if ($post_id && !is_wp_error($post_id)) {
                 update_post_meta($post_id, 'guesty_listing_id', $guesty_id);
+
+                // Add the Leaflet GPS Coordinates!
+                if (isset($listing['address']['lat'])) {
+                    update_post_meta($post_id, 'latitude', $listing['address']['lat']);
+                }
+                if (isset($listing['address']['lng'])) {
+                    update_post_meta($post_id, 'longitude', $listing['address']['lng']);
+                }
+                if (isset($listing['address']['full'])) {
+                    update_post_meta($post_id, 'address_full', $listing['address']['full']);
+                }
 
                 // Example ACF updates:
                 if (isset($listing['prices']['basePrice'])) {
@@ -151,45 +175,40 @@ class CC_Stays_Guesty_Sync
                     update_post_meta($post_id, 'location_city', $listing['address']['city']);
                 }
 
-                // Get the first image from the Guesty pictures array
-                if (!empty($listing['pictures']) && is_array($listing['pictures'])) {
-                    $first_image = $listing['pictures'][0];
-                    // Guesty usually stores the best quality under 'original' or 'large'
-                    $image_url = isset($first_image['original']) ? $first_image['original'] : (isset($first_image['large']) ? $first_image['large'] : false);
-
-                    if ($image_url) {
-                        $this->sideload_featured_image($post_id, $image_url);
-                    }
-                }
             }
         }
     }
 
     /**
-     * Step 4: Sideload Image to WordPress Media Library
+     * Step 4: Sideload Images to WordPress Media Library and return the ID
      */
-    private function sideload_featured_image($post_id, $image_url)
+    private function sideload_property_image($post_id, $image_url, $is_featured = false)
     {
-        // Prevent re-downloading the exact same image on every sync
-        $synced_image_url = get_post_meta($post_id, '_guesty_synced_image', true);
-        if ($synced_image_url === $image_url) {
-            return;
+        // Create a unique meta key for each image URL to prevent duplicate downloads
+        $hash = md5($image_url);
+        $existing_id = get_post_meta($post_id, '_guesty_img_' . $hash, true);
+
+        if ($existing_id) {
+            return $existing_id; // Already downloaded!
         }
 
-        // Require necessary WordPress core files for handling media
         require_once(ABSPATH . 'wp-admin/includes/media.php');
         require_once(ABSPATH . 'wp-admin/includes/file.php');
         require_once(ABSPATH . 'wp-admin/includes/image.php');
 
-        // Download the image and return the new Media Library ID
         $attachment_id = media_sideload_image($image_url, $post_id, null, 'id');
 
         if (!is_wp_error($attachment_id)) {
-            // Set it as the Elementor Featured Image
-            set_post_thumbnail($post_id, $attachment_id);
-            // Save the Guesty URL in the database so we know it's already done
-            update_post_meta($post_id, '_guesty_synced_image', $image_url);
+            // Remember that we downloaded this specific URL
+            update_post_meta($post_id, '_guesty_img_' . $hash, $attachment_id);
+
+            if ($is_featured) {
+                set_post_thumbnail($post_id, $attachment_id);
+            }
+            return $attachment_id;
         }
+
+        return false;
     }
 
     /**
@@ -223,6 +242,27 @@ class CC_Stays_Guesty_Sync
             'callback' => [$this, 'get_guesty_quote'],
             'permission_callback' => '__return_true' // Open to public for booking
         ]);
+
+        // Availability calendar endpoint (GET)
+        register_rest_route('cc-stays/v1', '/availability', [
+            'methods' => 'GET',
+            'callback' => [$this, 'get_guesty_availability'],
+            'permission_callback' => '__return_true'
+        ]);
+
+        // Checkout/Booking endpoint (POST)
+        register_rest_route('cc-stays/v1', '/book', [
+            'methods' => 'POST',
+            'callback' => [$this, 'create_guesty_reservation'],
+            'permission_callback' => '__return_true'
+        ]);
+
+        // Stays Archive Master Data endpoint (GET)
+        register_rest_route('cc-stays/v1', '/search-stays', [
+            'methods' => 'GET',
+            'callback' => [$this, 'get_stays_archive_data'],
+            'permission_callback' => '__return_true'
+        ]);
     }
 
     /**
@@ -242,40 +282,126 @@ class CC_Stays_Guesty_Sync
             return new WP_Error('auth_failed', 'Could not authenticate with booking server.', ['status' => 500]);
         }
 
+        // Build the payload we're sending to Guesty
+        $guesty_payload = [
+            'listingId' => sanitize_text_field($params['listingId']),
+            'checkInDateLocalized' => sanitize_text_field($params['checkIn']),
+            'checkOutDateLocalized' => sanitize_text_field($params['checkOut']),
+            'guestsCount' => isset($params['guests']) ? intval($params['guests']) : 1,
+            'source' => 'website'
+        ];
+
         // Ping Guesty's quoting endpoint
-        $response = wp_remote_post($this->api_base . '/v1/reservations/quotes', [
+        $response = wp_remote_post($this->api_base . '/v1/quotes', [
             'headers' => [
                 'Authorization' => 'Bearer ' . $token,
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
             ],
-            'body' => wp_json_encode([
-                'listingId' => sanitize_text_field($params['listingId']),
-                'checkIn' => sanitize_text_field($params['checkIn']),
-                'checkOut' => sanitize_text_field($params['checkOut']),
-                'guestsCount' => isset($params['guests']) ? intval($params['guests']) : 1
-            ]),
+            'body' => wp_json_encode($guesty_payload),
             'timeout' => 15
         ]);
 
         if (is_wp_error($response)) {
-            return new WP_Error('api_error', 'Failed to connect to Guesty API.', ['status' => 500]);
+            return new WP_REST_Response([
+                'available' => false,
+                'message' => 'Failed to connect to Guesty API.',
+                'debug' => [
+                    'wp_error' => $response->get_error_message(),
+                    'payload_sent' => $guesty_payload
+                ]
+            ], 500);
         }
 
-        $body = json_decode(wp_remote_retrieve_body($response), true);
+        $http_code = wp_remote_retrieve_response_code($response);
+        $raw_body = wp_remote_retrieve_body($response);
+        $body = json_decode($raw_body, true);
 
-        // If Guesty returns an error (like "Dates not available")
-        if (isset($body['error'])) {
-            return new WP_REST_Response(['available' => false, 'message' => $body['error']['message']], 400);
+        // If Guesty returns an error code (anything outside the 200-299 success range)
+        if ($http_code < 200 || $http_code >= 300) {
+            return new WP_REST_Response([
+                'available' => false,
+                'message' => isset($body['error']['message']) ? $body['error']['message'] : 'Guesty returned HTTP ' . $http_code,
+                'debug' => [
+                    'guesty_http_code' => $http_code,
+                    'guesty_response' => $body,
+                    'payload_sent' => $guesty_payload
+                ]
+            ], 200); // Return 200 to our frontend so React can gracefully read the JSON error
         }
+
+        // Drill down into Guesty's nested quoting structure to find the price
+        $rate_plan = isset($body['rates']['ratePlans'][0]) ? $body['rates']['ratePlans'][0] : null;
+        $money_data = isset($rate_plan['money']['money']) ? $rate_plan['money']['money'] : null;
+
+        $total_price = isset($money_data['subTotalPrice']) ? $money_data['subTotalPrice'] : null;
+        $currency = isset($money_data['currency']) ? $money_data['currency'] : 'USD';
+
+        // Grab the breakdown (Nightly Rate vs Cleaning Fees)
+        $breakdown = isset($money_data['invoiceItems']) ? $money_data['invoiceItems'] : null;
 
         // If successful, pass the pricing breakdown back to React
         return new WP_REST_Response([
             'available' => true,
-            'totalPrice' => $body['prices']['totalPrice'],
-            'currency' => $body['currency'],
-            'breakdown' => $body['prices'] // Includes taxes, cleaning fees, etc.
+            'totalPrice' => $total_price,
+            'currency' => $currency,
+            'breakdown' => $breakdown,
+            'debug' => [
+                'guesty_http_code' => $http_code,
+                'payload_sent' => $guesty_payload,
+                'raw_guesty_response' => $body
+            ]
         ], 200);
+    }
+
+    /**
+     * Fetch blocked/unavailable dates from Guesty's Calendar API
+     */
+    public function get_guesty_availability($request)
+    {
+        $listing_id = sanitize_text_field($request->get_param('listingId'));
+
+        if (empty($listing_id)) {
+            return new WP_Error('missing_data', 'Listing ID is required.', ['status' => 400]);
+        }
+
+        $token = $this->get_access_token();
+        if (!$token) {
+            return new WP_Error('auth_failed', 'Could not authenticate with booking server.', ['status' => 500]);
+        }
+
+        // Fetch 12 months of calendar data from Guesty
+        $today = date('Y-m-d');
+        $end_date = date('Y-m-d', strtotime('+12 months'));
+
+        $response = wp_remote_get(
+            $this->api_base . '/v1/availability-pricing/api/calendar/listings/' . $listing_id . '?startDate=' . $today . '&endDate=' . $end_date,
+            [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $token,
+                    'Accept' => 'application/json',
+                ],
+                'timeout' => 15
+            ]
+        );
+
+        if (is_wp_error($response)) {
+            return new WP_Error('api_error', 'Failed to connect to Guesty Calendar API.', ['status' => 500]);
+        }
+
+        $body = json_decode(wp_remote_retrieve_body($response), true);
+
+        // Filter out the unavailable dates
+        $blocked_dates = [];
+        if (isset($body['data']['days']) && is_array($body['data']['days'])) {
+            foreach ($body['data']['days'] as $day) {
+                if (isset($day['status']) && $day['status'] !== 'available') {
+                    $blocked_dates[] = $day['date']; // "YYYY-MM-DD"
+                }
+            }
+        }
+
+        return new WP_REST_Response(['blockedDates' => $blocked_dates], 200);
     }
 
     /**
@@ -293,8 +419,29 @@ class CC_Stays_Guesty_Sync
         if (!$guesty_id)
             return '<p>Booking unavailable (No Guesty ID found).</p>';
 
-        // Output the div for React to mount to, passing the Guesty ID
-        return '<div id="cc-stays-react-booking" data-listing-id="' . esc_attr($guesty_id) . '"></div>';
+        // Fetch the property's nightly rate and min stay from post meta
+        $nightly_rate = get_post_meta($post_id, 'nightly_rate', true) ?: '';
+        $min_nights = get_post_meta($post_id, 'min_nights', true) ?: '2';
+
+        // Output the div for React to mount to, passing the Guesty ID and pricing data
+        return '<div id="cc-stays-react-booking" data-listing-id="' . esc_attr($guesty_id) . '" data-nightly-rate="' . esc_attr($nightly_rate) . '" data-min-nights="' . esc_attr($min_nights) . '"></div>';
+    }
+
+    /**
+     * Render the React mount point for the Availability Calendar via Shortcode
+     */
+    public function render_availability_widget()
+    {
+        if (!is_singular('properties'))
+            return '';
+
+        $post_id = get_the_ID();
+        $guesty_id = get_post_meta($post_id, 'guesty_listing_id', true);
+
+        if (!$guesty_id)
+            return '';
+
+        return '<div id="cc-stays-react-availability" data-listing-id="' . esc_attr($guesty_id) . '"></div>';
     }
 
     /**
@@ -302,9 +449,10 @@ class CC_Stays_Guesty_Sync
      */
     public function enqueue_react_app()
     {
-        // Only load this heavy JS if we are on a single property page
-        if (!is_singular('properties'))
+        // Load React on single properties, checkout, the homepage, AND the unified Stays/Properties catalog
+        if (!is_singular('properties') && !is_page('checkout') && !is_front_page() && !is_page(['stays', 'properties'])) {
             return;
+        }
 
         $plugin_dir = plugin_dir_path(__FILE__);
         $plugin_url = plugin_dir_url(__FILE__);
@@ -328,10 +476,165 @@ class CC_Stays_Guesty_Sync
             wp_enqueue_style(
                 'cc-stays-react-datepicker-css',
                 $plugin_url . 'build/index.jsx.css',
-            [],
+                [],
                 $assets['version']
             );
         }
+    }
+
+    /**
+     * Handle the request from React and create the reservation in Guesty
+     */
+    public function create_guesty_reservation($request)
+    {
+        $params = $request->get_json_params();
+
+        // Validate that we received the guest data
+        if (empty($params['listingId']) || empty($params['checkIn']) || empty($params['checkOut']) || empty($params['guest'])) {
+            return new WP_Error('missing_data', 'Missing required booking data.', ['status' => 400]);
+        }
+
+        $token = $this->get_access_token();
+        if (!$token) {
+            return new WP_Error('auth_failed', 'Could not authenticate with booking server.', ['status' => 500]);
+        }
+
+        $guest_data = $params['guest'];
+
+        $check_in_date = sanitize_text_field($params['checkIn']);
+        $check_out_date = sanitize_text_field($params['checkOut']);
+
+        // Build the final reservation payload for Guesty
+        $guesty_payload = [
+            'listingId' => sanitize_text_field($params['listingId']),
+            'checkInDateLocalized' => $check_in_date, // Guesty specifically requested this key
+            'checkOutDateLocalized' => $check_out_date, // Guesty specifically requested this key
+            'status' => 'reserved', // Keep this so Guesty locks the calendar only temporarily!
+            'guestsCount' => isset($params['guests']) ? intval($params['guests']) : 1,
+            'source' => 'website',
+            'guest' => [
+                'firstName' => sanitize_text_field($guest_data['firstName']),
+                'lastName' => sanitize_text_field($guest_data['lastName']),
+                'email' => sanitize_email($guest_data['email']),
+                'phone' => sanitize_text_field($guest_data['phone']),
+            ]
+        ];
+
+        // Ping Guesty's Reservation Creation Endpoint
+        $response = wp_remote_post($this->api_base . '/v1/reservations', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $token,
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ],
+            'body' => wp_json_encode($guesty_payload),
+            'timeout' => 20
+        ]);
+
+        if (is_wp_error($response)) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => 'Failed to connect to Guesty API.'
+            ], 500);
+        }
+
+        $http_code = wp_remote_retrieve_response_code($response);
+        $raw_body = wp_remote_retrieve_body($response); // Grab the raw text before decoding!
+        $body = json_decode($raw_body, true);
+
+        // Handle errors from Guesty (like if the dates got booked by someone else while they were checking out)
+        if ($http_code < 200 || $http_code >= 300) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => isset($body['error']['message']) ? $body['error']['message'] : 'Failed to create reservation.',
+                'debug' => [
+                    'http_code' => $http_code,
+                    'raw_response' => $raw_body, // This will expose the exact Guesty error
+                    'payload_sent' => $guesty_payload
+                ]
+            ], 400);
+        }
+
+        // Success! Pass the confirmation back to React
+        return new WP_REST_Response([
+            'success' => true,
+            'message' => 'Reservation created successfully.',
+            'reservationId' => isset($body['_id']) ? $body['_id'] : null,
+            'paymentUrl' => isset($body['paymentUrl']) ? $body['paymentUrl'] : null
+        ], 200);
+    }
+
+    /**
+     * Render the React mount point for the Checkout Page
+     */
+    public function render_checkout_widget()
+    {
+        // This shortcode can be placed anywhere, it doesn't need to be on a single property page
+        return '<div id="cc-stays-react-checkout"></div>';
+    }
+
+    /**
+     * Bridge function to feed Guesty coordinates into the 'Leaflet Map' plugin
+     */
+    public function render_dynamic_leaflet_map() {
+        // Only run on single property pages
+        if (!is_singular('properties')) return '';
+
+        $post_id = get_the_ID();
+        
+        // Grab the coordinates we synced from Guesty
+        $lat = get_post_meta($post_id, 'latitude', true);
+        $lng = get_post_meta($post_id, 'longitude', true);
+
+        if (empty($lat) || empty($lng)) {
+            return '<p>Map location currently unavailable.</p>';
+        }
+
+        // Build the shortcodes required by the 'Leaflet Map' plugin
+        $map_shortcode = sprintf('[leaflet-map lat="%s" lng="%s" zoom="14" height="400"]', $lat, $lng);
+        $marker_shortcode = sprintf('[leaflet-marker lat="%s" lng="%s"]', $lat, $lng);
+
+        // Tell WordPress to execute the plugin's shortcodes
+        return do_shortcode($map_shortcode . $marker_shortcode);
+    }
+
+    public function render_search_bar_widget() {
+        return '<div id="cc-stays-react-search-bar"></div>';
+    }
+
+    public function get_stays_archive_data() {
+        $properties = get_posts([
+            'post_type'      => 'properties',
+            'posts_per_page' => -1,
+            'post_status'    => 'publish'
+        ]);
+
+        $results = [];
+        foreach ($properties as $prop) {
+            $post_id = $prop->ID;
+            $image_url = get_the_post_thumbnail_url($post_id, 'large');
+            
+            $raw_content  = get_post_field('post_content', $post_id);
+            $description  = wp_trim_words(strip_tags($raw_content), 20, '...');
+
+            $results[] = [
+                'id'          => $post_id,
+                'title'       => $prop->post_title,
+                'url'         => get_permalink($post_id),
+                'image'       => $image_url ? $image_url : 'https://via.placeholder.com/400x250?text=No+Image',
+                'city'        => get_post_meta($post_id, 'location_city', true) ?: 'Florida',
+                'guests'      => (int) (get_post_meta($post_id, 'guests', true) ?: 2),
+                'bedrooms'    => (int) (get_post_meta($post_id, 'bedrooms', true) ?: 1),
+                'bathrooms'   => (int) (get_post_meta($post_id, 'bathrooms', true) ?: 1),
+                'pets'        => (int) get_post_meta($post_id, 'pets_allowed', true),
+                'price'       => get_post_meta($post_id, 'nightly_rate', true) ?: 0,
+                'description' => $description ?: '',
+                'lat'         => floatval(get_post_meta($post_id, 'latitude', true)),
+                'lng'         => floatval(get_post_meta($post_id, 'longitude', true)),
+            ];
+        }
+
+        return new WP_REST_Response($results, 200);
     }
 }
 
