@@ -37,6 +37,25 @@ const getNights = (checkIn, checkOut) => {
   return Math.max(Math.round((end - start) / 86400000), 0);
 };
 
+const CheckIcon = () => (
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M20 6 9 17l-5-5" />
+  </svg>
+);
+
+const MailIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <rect x="3" y="5" width="18" height="14" rx="2" />
+    <path d="m3 7 9 6 9-6" />
+  </svg>
+);
+
+const PhoneIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.35 1.9.65 2.81a2 2 0 0 1-.45 2.11L8.05 9.9a16 16 0 0 0 6 6l1.26-1.26a2 2 0 0 1 2.11-.45c.91.3 1.85.52 2.81.65A2 2 0 0 1 22 16.92z" />
+  </svg>
+);
+
 const CheckoutForm = () => {
     const [bookingData, setBookingData] = useState(null);
     const [property, setProperty] = useState(null);
@@ -153,18 +172,65 @@ const CheckoutForm = () => {
         );
     }
 
-    if (message) return (
-        <div className="cc-checkout-shell">
-            <div className={`cc-checkout-message ${message.startsWith("Error:") ? "is-error" : ""}`}>
-                <p>{message}</p>
-                {message.startsWith("Error:") && (
-                    <button type="button" className="cc-checkout-message-btn" onClick={() => setMessage(null)}>
-                        Return to details
-                    </button>
+    if (message) {
+        const isError = message.startsWith("Error:");
+
+        return (
+            <div className="cc-checkout-shell">
+                {isError ? (
+                    <div className="cc-checkout-message is-error">
+                        <p>{message}</p>
+                        <button type="button" className="cc-checkout-message-btn" onClick={() => setMessage(null)}>
+                            Return to details
+                        </button>
+                    </div>
+                ) : (
+                    <div className="cc-checkout-success-card">
+                        <div className="cc-checkout-success-content">
+                            <div className="cc-checkout-success-icon">
+                                <CheckIcon />
+                            </div>
+                            <p className="cc-checkout-success-kicker">Request received</p>
+                            <h1>Booking confirmed</h1>
+                            <p className="cc-checkout-success-copy">
+                                Check your email for payment instructions. Our team will review your stay details and send the next step shortly.
+                            </p>
+
+                            <div className="cc-checkout-success-details">
+                                <div>
+                                    <span>Stay</span>
+                                    <strong>{property?.title || "CC Stays reservation"}</strong>
+                                </div>
+                                <div>
+                                    <span>Dates</span>
+                                    <strong>{formatDate(bookingData.checkIn)} - {formatDate(bookingData.checkOut)}</strong>
+                                </div>
+                                <div>
+                                    <span>Total</span>
+                                    <strong>{formatMoney(total, currency)}</strong>
+                                </div>
+                            </div>
+
+                            <div className="cc-checkout-success-contact">
+                                <a href="mailto:hello@ccstays.com">
+                                    <MailIcon />
+                                    <span>hello@ccstays.com</span>
+                                </a>
+                                <a href="tel:7865686823">
+                                    <PhoneIcon />
+                                    <span>786-568-6823</span>
+                                </a>
+                            </div>
+                        </div>
+                        <div className="cc-checkout-success-mark" aria-hidden="true">
+                            <span>CC</span>
+                            <strong>STAYS</strong>
+                        </div>
+                    </div>
                 )}
             </div>
-        </div>
-    );
+        );
+    }
 
     return (
         <div className="cc-checkout-shell">

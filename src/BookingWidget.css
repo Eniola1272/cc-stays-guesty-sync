@@ -1091,6 +1091,156 @@
   padding-inline: 24px;
 }
 
+.cc-checkout-success-card {
+  position: relative;
+  isolation: isolate;
+  width: min(100%, 860px);
+  min-height: 560px;
+  margin: 44px auto 0;
+  overflow: hidden;
+  background: var(--cc-green-dark);
+  color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 24px 60px rgba(28, 36, 30, 0.18);
+}
+
+.cc-checkout-success-card::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 58%;
+  height: 42%;
+  background: #e6e5d9;
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+  z-index: -1;
+}
+
+.cc-checkout-success-content {
+  width: min(100%, 610px);
+  padding: clamp(40px, 7vw, 76px);
+  box-sizing: border-box;
+}
+
+.cc-checkout-success-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 30px;
+  border: 1.5px solid rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  color: #fff;
+}
+
+.cc-checkout-success-kicker {
+  margin: 0 0 12px;
+  font-family: var(--cc-font-serif);
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 18px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+}
+
+.cc-checkout-success-content h1 {
+  margin: 0;
+  font-family: var(--cc-font-serif);
+  color: #fff;
+  font-size: clamp(48px, 8vw, 86px);
+  line-height: 0.95;
+  font-weight: 400;
+}
+
+.cc-checkout-success-copy {
+  max-width: 560px;
+  margin: 28px 0 0;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 18px;
+  line-height: 1.65;
+}
+
+.cc-checkout-success-details {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 34px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.cc-checkout-success-details div {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.cc-checkout-success-details span {
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+}
+
+.cc-checkout-success-details strong {
+  color: #fff;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.cc-checkout-success-contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 26px;
+  margin-top: 36px;
+}
+
+.cc-checkout-success-contact a {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  font-size: 16px;
+  text-decoration: none;
+}
+
+.cc-checkout-success-contact a:hover {
+  text-decoration: underline;
+}
+
+.cc-checkout-success-mark {
+  position: absolute;
+  right: clamp(34px, 7vw, 76px);
+  bottom: 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: #1d3525;
+}
+
+.cc-checkout-success-mark span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 108px;
+  height: 108px;
+  border: 3px solid currentColor;
+  border-radius: 50%;
+  font-family: var(--cc-font-serif);
+  font-size: 38px;
+  letter-spacing: 2px;
+}
+
+.cc-checkout-success-mark strong {
+  font-family: var(--cc-font-serif);
+  font-size: 30px;
+  font-weight: 400;
+  letter-spacing: 1px;
+}
+
 /* ─────────────────────────────────────────
    SearchBar — Mobile: icon-only search button
 ───────────────────────────────────────── */
@@ -1236,6 +1386,67 @@
   .cc-checkout-mobile-submit:disabled {
     background: #aeb4ba;
     cursor: not-allowed;
+  }
+
+  .cc-checkout-success-card {
+    min-height: auto;
+    margin-top: 18px;
+    border-radius: 8px;
+  }
+
+  .cc-checkout-success-card::after {
+    width: 76%;
+    height: 30%;
+  }
+
+  .cc-checkout-success-content {
+    padding: 34px 24px 170px;
+  }
+
+  .cc-checkout-success-icon {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 24px;
+  }
+
+  .cc-checkout-success-kicker {
+    font-size: 13px;
+    letter-spacing: 3px;
+  }
+
+  .cc-checkout-success-content h1 {
+    font-size: 48px;
+  }
+
+  .cc-checkout-success-copy {
+    font-size: 16px;
+    line-height: 1.55;
+  }
+
+  .cc-checkout-success-details {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .cc-checkout-success-contact {
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .cc-checkout-success-mark {
+    right: 24px;
+    bottom: 22px;
+  }
+
+  .cc-checkout-success-mark span {
+    width: 82px;
+    height: 82px;
+    font-size: 30px;
+    border-width: 2px;
+  }
+
+  .cc-checkout-success-mark strong {
+    font-size: 23px;
   }
 
   /* Hide desktop card on mobile */
