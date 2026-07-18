@@ -39,6 +39,56 @@ const fmtDate = (d) =>
 const fmtShort = (d) =>
   d ? d.toLocaleDateString("en-US", { month: "short", day: "numeric" }) : null;
 
+const toMoneyNumber = (value) => {
+  if (typeof value === "number") return Number.isFinite(value) ? value : 0;
+  if (typeof value === "string") {
+    const parsed = Number(value.replace(/[^0-9.-]/g, ""));
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+  if (value && typeof value === "object") {
+    return toMoneyNumber(value.amount ?? value.value ?? value.total ?? value.totalPrice);
+  }
+  return 0;
+};
+
+const getItemAmount = (item) =>
+  toMoneyNumber(item?.amount ?? item?.total ?? item?.totalPrice ?? item?.price ?? item?.value);
+
+const getItemLabel = (item) =>
+  String(item?.title ?? item?.name ?? item?.type ?? item?.description ?? "").toLowerCase();
+
+const getQuoteCharges = (quote) => {
+  const total = toMoneyNumber(quote?.totalPrice);
+  const items = Array.isArray(quote?.breakdown) ? quote.breakdown : [];
+  let subtotal = 0;
+  let fees = 0;
+  let taxes = 0;
+
+  items.forEach((item) => {
+    const label = getItemLabel(item);
+    const amount = getItemAmount(item);
+    if (!amount) return;
+
+    if (label.includes("tax") || label.includes("vat")) {
+      taxes += amount;
+    } else if (label.includes("fee") || label.includes("clean") || label.includes("service")) {
+      fees += amount;
+    } else if (label.includes("night") || label.includes("rent") || label.includes("accommodation") || label.includes("fare")) {
+      subtotal += amount;
+    }
+  });
+
+  if (!subtotal && total) subtotal = Math.max(total - fees - taxes, 0);
+
+  return {
+    subtotal,
+    fees,
+    taxes,
+    total,
+    currency: quote?.currency || "USD",
+  };
+};
+
 // ── Shared booking form content (used in both desktop card and mobile drawer) ──
 const BookingFormContent = ({
   // state
@@ -307,13 +357,20 @@ const BookingWidget = () => {
   };
 
   const handleReserveClick = () => {
+    const charges = getQuoteCharges(quote);
     const params = new URLSearchParams({
       listingId,
       checkIn: startDate.toISOString().split("T")[0],
       checkOut: endDate.toISOString().split("T")[0],
       guests,
-      price: quote.totalPrice,
+      price: charges.total || quote.totalPrice,
+      currency: charges.currency,
     });
+
+    if (charges.subtotal) params.set("subtotal", charges.subtotal);
+    if (charges.fees) params.set("fees", charges.fees);
+    if (charges.taxes) params.set("taxes", charges.taxes);
+
     window.location.href = `/checkout?${params.toString()}`;
   };
 

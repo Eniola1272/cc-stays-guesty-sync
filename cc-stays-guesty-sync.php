@@ -619,6 +619,7 @@ class CC_Stays_Guesty_Sync
 
             $results[] = [
                 'id'          => $post_id,
+                'listingId'   => get_post_meta($post_id, 'guesty_listing_id', true),
                 'title'       => $prop->post_title,
                 'url'         => get_permalink($post_id),
                 'image'       => $image_url ? $image_url : 'https://via.placeholder.com/400x250?text=No+Image',
