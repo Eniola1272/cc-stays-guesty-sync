@@ -287,7 +287,6 @@ const AmenitiesSection = ({ mountNode }) => {
               </button>
             </div>
             <div className="cc-amenities-dialog-body">
-              <h2>What this place offers</h2>
               {groups.map((group) => (
                 <section className="cc-amenities-group" key={group.title}>
                   <h3>{group.title}</h3>
