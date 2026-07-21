@@ -261,9 +261,7 @@ const AmenitiesSection = ({ mountNode }) => {
   }, [modalOpen]);
 
   return (
-    <section className="cc-amenities-section" aria-labelledby="cc-amenities-title">
-      <h2 id="cc-amenities-title">What this place offers</h2>
-
+    <section className="cc-amenities-section" aria-label="What this place offers">
       <div className="cc-amenities-preview">
         {previewAmenities.map((item) => (
           <div className="cc-amenity-preview-item" key={`${item.category}-${item.name}`}>
