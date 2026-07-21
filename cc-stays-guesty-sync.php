@@ -32,6 +32,9 @@ class CC_Stays_Guesty_Sync
         // Register the Availability Calendar shortcode
         add_shortcode('cc_stays_availability', [$this, 'render_availability_widget']);
 
+        // Register the Airbnb-style Amenities shortcode
+        add_shortcode('cc_stays_amenities', [$this, 'render_amenities_widget']);
+
         // Register the Checkout shortcode
         add_shortcode('cc_stays_checkout', [$this, 'render_checkout_widget']);
 
@@ -173,6 +176,9 @@ class CC_Stays_Guesty_Sync
                 }
                 if (isset($listing['address']['city'])) {
                     update_post_meta($post_id, 'location_city', $listing['address']['city']);
+                }
+                if (isset($listing['amenities']) && is_array($listing['amenities'])) {
+                    update_post_meta($post_id, 'guesty_amenities', wp_json_encode($listing['amenities']));
                 }
 
             }
@@ -442,6 +448,54 @@ class CC_Stays_Guesty_Sync
             return '';
 
         return '<div id="cc-stays-react-availability" data-listing-id="' . esc_attr($guesty_id) . '"></div>';
+    }
+
+    /**
+     * Render the Airbnb-style amenities section via shortcode.
+     */
+    public function render_amenities_widget()
+    {
+        if (!is_singular('properties'))
+            return '';
+
+        $post_id = get_the_ID();
+        $amenities_json = $this->get_property_amenities_json($post_id);
+
+        return '<div class="cc-stays-react-amenities" data-amenities="' . esc_attr($amenities_json) . '"></div>';
+    }
+
+    private function get_property_amenities_json($post_id)
+    {
+        $meta_keys = [
+            'guesty_amenities',
+            'amenities',
+            'property_amenities',
+            'listing_amenities',
+        ];
+
+        foreach ($meta_keys as $meta_key) {
+            $value = get_post_meta($post_id, $meta_key, true);
+            if (empty($value))
+                continue;
+
+            if (is_array($value)) {
+                return wp_json_encode($value);
+            }
+
+            $decoded = json_decode($value, true);
+            if (json_last_error() === JSON_ERROR_NONE && !empty($decoded)) {
+                return wp_json_encode($decoded);
+            }
+
+            if (is_string($value)) {
+                $items = array_filter(array_map('trim', preg_split('/[\r\n,]+/', $value)));
+                if (!empty($items)) {
+                    return wp_json_encode(array_values($items));
+                }
+            }
+        }
+
+        return '';
     }
 
     /**

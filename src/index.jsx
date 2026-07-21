@@ -5,6 +5,7 @@ import AvailabilityCalendar from "./AvailabilityCalendar";
 import CheckoutForm from "./CheckoutForm";
 import SearchBar from "./SearchBar";
 import StaysPage from "./StaysPage";
+import AmenitiesSection from "./AmenitiesSection";
 
 // Wait for the DOM to load
 document.addEventListener("DOMContentLoaded", () => {
@@ -44,4 +45,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const staysRoot = createRoot(staysMount);
       staysRoot.render(<StaysPage />);
   }
+
+  // 6. Mount Property Amenities Sections
+  document.querySelectorAll('.cc-stays-react-amenities').forEach((amenitiesMount) => {
+      const amenitiesRoot = createRoot(amenitiesMount);
+      amenitiesRoot.render(<AmenitiesSection mountNode={amenitiesMount} />);
+  });
 });
