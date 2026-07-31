@@ -3,22 +3,6 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./BookingWidget.css";
 
-const SearchIcon = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <circle cx="11" cy="11" r="8" />
-    <line x1="21" y1="21" x2="16.65" y2="16.65" />
-  </svg>
-);
-
 const PinIcon = () => (
   <svg
     width="16"
@@ -144,14 +128,38 @@ const SearchBar = () => {
     .join(", ");
 
   const pillSection = (name) => ({
-    padding: "8px 18px",
-    borderRadius: "50px",
+    minHeight: "72px",
+    padding: "18px 26px",
+    borderRadius: "0",
     cursor: "pointer",
-    background: activeSection === name ? "#fff" : "transparent",
-    boxShadow: activeSection === name ? "0 2px 10px rgba(0,0,0,0.1)" : "none",
-    transition: "all 0.15s ease",
+    background:
+      activeSection === name ? "rgba(41, 41, 41, 0.035)" : "transparent",
+    boxShadow: "none",
+    transition: "background-color 0.18s ease",
     userSelect: "none",
+    boxSizing: "border-box",
   });
+
+  const fieldLabelStyle = {
+    fontFamily: '"IBM Plex Mono", ui-monospace, Menlo, monospace',
+    fontSize: "9.5px",
+    fontWeight: "500",
+    letterSpacing: "0.16em",
+    lineHeight: 1.1,
+    textTransform: "uppercase",
+    color: "rgba(41,41,41,0.45)",
+  };
+
+  const fieldValueStyle = {
+    marginTop: "7px",
+    fontSize: "16px",
+    fontWeight: "400",
+    lineHeight: 1.2,
+    color: "rgba(41,41,41,0.85)",
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+  };
 
   return (
     <div
@@ -168,39 +176,28 @@ const SearchBar = () => {
       <form
         onSubmit={handleSearch}
         className="cc-searchbar-form"
-        style={{ position: "relative", width: "100%", maxWidth: "760px" }}
+        style={{ position: "relative", width: "100%", maxWidth: "840px" }}
       >
-        {/* PILL BAR */}
+        {/* SEARCH BAR */}
         <div className="cc-searchbar-pill">
           {/* WHERE */}
           <div
             className="cc-searchbar-section"
             style={{
               ...pillSection("where"),
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-              flex: "2.0",
             }}
             onClick={() =>
               setActiveSection(activeSection === "where" ? null : "where")
             }
           >
-            <SearchIcon />
-            <div>
-              <div
-                className={`cc-pill-label${location ? " filled" : ""}`}
-                style={{ fontSize: "11px", fontWeight: "700", color: "#222" }}
-              >
-                Where
-              </div>
-              {location && (
-                <div
-                  style={{ fontSize: "12px", color: "#555", marginTop: "1px" }}
-                >
-                  {location}
-                </div>
-              )}
+            <div
+              className="cc-pill-label"
+              style={fieldLabelStyle}
+            >
+              Where
+            </div>
+            <div style={fieldValueStyle}>
+              {location || "Add location"}
             </div>
           </div>
 
@@ -209,24 +206,18 @@ const SearchBar = () => {
           {/* WHEN */}
           <div
             className="cc-searchbar-section"
-            style={{ ...pillSection("when"), flex: "2.0" }}
+            style={pillSection("when")}
             onClick={() =>
               setActiveSection(activeSection === "when" ? null : "when")
             }
           >
             <div
-              className={`cc-pill-label${dateLabel ? " filled" : ""}`}
-              style={{ fontSize: "11px", fontWeight: "700", color: "#222" }}
+              className="cc-pill-label"
+              style={fieldLabelStyle}
             >
               When
             </div>
-            {dateLabel && (
-              <div
-                style={{ fontSize: "12px", color: "#555", marginTop: "1px" }}
-              >
-                {dateLabel}
-              </div>
-            )}
+            <div style={fieldValueStyle}>{dateLabel || "Add dates"}</div>
           </div>
 
           <div className="cc-searchbar-divider" />
@@ -234,24 +225,18 @@ const SearchBar = () => {
           {/* WHO */}
           <div
             className="cc-searchbar-section"
-            style={{ ...pillSection("who"), flex: "2.0" }}
+            style={pillSection("who")}
             onClick={() =>
               setActiveSection(activeSection === "who" ? null : "who")
             }
           >
             <div
-              className={`cc-pill-label${whoLabel ? " filled" : ""}`}
-              style={{ fontSize: "11px", fontWeight: "700", color: "#222" }}
+              className="cc-pill-label"
+              style={fieldLabelStyle}
             >
               Who
             </div>
-            {whoLabel && (
-              <div
-                style={{ fontSize: "12px", color: "#555", marginTop: "1px" }}
-              >
-                {whoLabel}
-              </div>
-            )}
+            <div style={fieldValueStyle}>{whoLabel || "Add guests"}</div>
           </div>
 
           {/* SEARCH BUTTON */}
@@ -261,23 +246,21 @@ const SearchBar = () => {
             style={{
               display: "flex",
               alignItems: "center",
-              gap: "8px",
-              background: "#34533a",
-              color: "#fff",
+              justifyContent: "center",
+              background: "#36543b",
+              color: "#fafafa",
               border: "none",
-              borderRadius: "50px",
-              padding: "14px 22px",
+              borderRadius: "0 2px 2px 0",
+              padding: "0 42px",
               cursor: "pointer",
-              fontWeight: "600",
-              fontSize: "14px",
+              fontWeight: "500",
+              fontSize: "12px",
+              letterSpacing: "0.16em",
+              textTransform: "uppercase",
               flexShrink: 0,
+              alignSelf: "stretch",
             }}
-            onMouseOver={(e) =>
-              (e.currentTarget.style.background = "#34533a90")
-            }
-            onMouseOut={(e) => (e.currentTarget.style.background = "#34533a")}
           >
-            <SearchIcon />
             <span className="cc-searchbar-submit-text">Search</span>
           </button>
         </div>
@@ -288,12 +271,13 @@ const SearchBar = () => {
             className="cc-searchbar-dropdown cc-where-dropdown"
             style={{
               position: "absolute",
-              top: "68px",
+              top: "84px",
               left: 0,
               background: "#fff",
-              borderRadius: "16px",
-              boxShadow: "0 8px 32px rgba(0,0,0,0.15)",
-              padding: "20px",
+              border: "1px solid rgba(41,41,41,0.14)",
+              borderRadius: "2px",
+              boxShadow: "0 18px 48px rgba(41,41,41,0.12)",
+              padding: "22px",
               minWidth: "320px",
               zIndex: 200,
             }}
@@ -306,22 +290,24 @@ const SearchBar = () => {
               style={{
                 width: "100%",
                 border: "none",
-                borderBottom: "1px solid #eee",
+                borderBottom: "1px solid rgba(41,41,41,0.14)",
                 outline: "none",
                 fontSize: "15px",
                 paddingBottom: "12px",
                 marginBottom: "16px",
                 boxSizing: "border-box",
-                color: "#222",
+                color: "#292929",
+                fontFamily: '"Archivo", "Helvetica Neue", Helvetica, Arial, sans-serif',
               }}
             />
             <div
               style={{
-                fontSize: "11px",
-                fontWeight: "700",
-                color: "#888",
+                fontFamily: '"IBM Plex Mono", ui-monospace, Menlo, monospace',
+                fontSize: "9.5px",
+                fontWeight: "500",
+                color: "rgba(41,41,41,0.45)",
                 marginBottom: "12px",
-                letterSpacing: "0.5px",
+                letterSpacing: "0.16em",
                 textTransform: "uppercase",
               }}
             >
@@ -344,7 +330,7 @@ const SearchBar = () => {
                   alignItems: "center",
                   gap: "12px",
                   padding: "10px 8px",
-                  borderRadius: "8px",
+                  borderRadius: "2px",
                   cursor: "pointer",
                 }}
                 onMouseEnter={(e) =>
@@ -357,7 +343,7 @@ const SearchBar = () => {
                 <div
                   style={{
                     background: "#f2f2f2",
-                    borderRadius: "8px",
+                    borderRadius: "2px",
                     padding: "8px",
                     display: "flex",
                     flexShrink: 0,
@@ -370,7 +356,7 @@ const SearchBar = () => {
                     style={{
                       fontSize: "14px",
                       fontWeight: "500",
-                      color: "#222",
+                      color: "#292929",
                     }}
                   >
                     {l.label}
@@ -392,13 +378,14 @@ const SearchBar = () => {
             className="cc-searchbar-dropdown cc-when-dropdown"
             style={{
               position: "absolute",
-              top: "68px",
+              top: "84px",
               left: "50%",
               transform: "translateX(-50%)",
               background: "#fff",
-              borderRadius: "16px",
-              boxShadow: "0 8px 32px rgba(0,0,0,0.15)",
-              padding: "20px",
+              border: "1px solid rgba(41,41,41,0.14)",
+              borderRadius: "2px",
+              boxShadow: "0 18px 48px rgba(41,41,41,0.12)",
+              padding: "22px",
               zIndex: 200,
             }}
           >
@@ -415,14 +402,16 @@ const SearchBar = () => {
                   type="button"
                   className="black-text"
                   style={{
-                    padding: "6px 16px",
-                    borderRadius: "20px",
-                    border: "1.5px solid #222",
+                    padding: "7px 16px",
+                    borderRadius: "2px",
+                    border: "1px solid #292929",
                     background: "#fff",
-                    fontWeight: "600",
-                    fontSize: "13px",
+                    fontWeight: "500",
+                    fontSize: "12px",
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
                     cursor: "pointer",
-                    color: "#333",
+                    color: "#292929",
                   }}
                 >
                   Dates
@@ -467,12 +456,13 @@ const SearchBar = () => {
             className="cc-searchbar-dropdown cc-who-dropdown"
             style={{
               position: "absolute",
-              top: "68px",
+              top: "84px",
               right: 0,
               background: "#fff",
-              borderRadius: "16px",
-              boxShadow: "0 8px 32px rgba(0,0,0,0.15)",
-              padding: "20px",
+              border: "1px solid rgba(41,41,41,0.14)",
+              borderRadius: "2px",
+              boxShadow: "0 18px 48px rgba(41,41,41,0.12)",
+              padding: "22px",
               minWidth: "300px",
               zIndex: 200,
             }}
@@ -505,7 +495,7 @@ const SearchBar = () => {
                   <div
                     style={{
                       fontSize: "15px",
-                      color: "#222",
+                      color: "#292929",
                       fontWeight: "500",
                     }}
                   >
