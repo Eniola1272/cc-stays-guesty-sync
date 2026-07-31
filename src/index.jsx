@@ -6,6 +6,7 @@ import CheckoutForm from "./CheckoutForm";
 import SearchBar from "./SearchBar";
 import StaysPage from "./StaysPage";
 import AmenitiesSection from "./AmenitiesSection";
+import HomePageSections from "./HomePageSections";
 
 // Wait for the DOM to load
 document.addEventListener("DOMContentLoaded", () => {
@@ -50,5 +51,11 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll('.cc-stays-react-amenities').forEach((amenitiesMount) => {
       const amenitiesRoot = createRoot(amenitiesMount);
       amenitiesRoot.render(<AmenitiesSection mountNode={amenitiesMount} />);
+  });
+
+  // 7. Mount Homepage Middle Sections
+  document.querySelectorAll('.cc-stays-react-homepage').forEach((homepageMount) => {
+      const homepageRoot = createRoot(homepageMount);
+      homepageRoot.render(<HomePageSections mountNode={homepageMount} />);
   });
 });

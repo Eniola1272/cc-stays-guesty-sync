@@ -43,6 +43,10 @@ class CC_Stays_Guesty_Sync
         // Register the Global Search Bar shortcode
         add_shortcode('cc_stays_search_bar', [$this, 'render_search_bar_widget']);
 
+        // Register the homepage body sections shortcode
+        add_shortcode('cc_stays_homepage', [$this, 'render_homepage_sections_widget']);
+        add_shortcode('cc_stays_homepage_sections', [$this, 'render_homepage_sections_widget']);
+
         // Register the Stays Archive App shortcode
         add_shortcode('cc_stays_archive', function() { return '<div id="cc-stays-react-archive"></div>'; });
 
@@ -504,7 +508,16 @@ class CC_Stays_Guesty_Sync
     public function enqueue_react_app()
     {
         // Load React on single properties, checkout, the homepage, AND the unified Stays/Properties catalog
-        if (!is_singular('properties') && !is_page('checkout') && !is_front_page() && !is_page(['stays', 'properties'])) {
+        $has_homepage_shortcode = false;
+        if (is_singular()) {
+            $post = get_post();
+            $has_homepage_shortcode = $post && (
+                has_shortcode($post->post_content, 'cc_stays_homepage') ||
+                has_shortcode($post->post_content, 'cc_stays_homepage_sections')
+            );
+        }
+
+        if (!is_singular('properties') && !is_page('checkout') && !is_front_page() && !is_page(['stays', 'properties']) && !$has_homepage_shortcode) {
             return;
         }
 
@@ -654,6 +667,26 @@ class CC_Stays_Guesty_Sync
 
     public function render_search_bar_widget() {
         return '<div id="cc-stays-react-search-bar"></div>';
+    }
+
+    public function render_homepage_sections_widget($atts = []) {
+        $atts = shortcode_atts([
+            'stays_url' => '/stays',
+            'book_direct_url' => '/book-direct',
+            'reviews_url' => '/reviews',
+            'about_url' => '/about-us',
+            'owners_url' => '/partner-with-us',
+        ], $atts, 'cc_stays_homepage');
+
+        $links = [
+            'stays' => esc_url_raw($atts['stays_url']),
+            'bookDirect' => esc_url_raw($atts['book_direct_url']),
+            'reviews' => esc_url_raw($atts['reviews_url']),
+            'about' => esc_url_raw($atts['about_url']),
+            'owners' => esc_url_raw($atts['owners_url']),
+        ];
+
+        return '<div class="cc-stays-react-homepage" data-links="' . esc_attr(wp_json_encode($links)) . '"></div>';
     }
 
     public function get_stays_archive_data() {
