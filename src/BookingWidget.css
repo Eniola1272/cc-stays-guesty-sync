@@ -18,8 +18,8 @@
   --cc-text-light: var(--cc-muted);
   --cc-border-light: var(--cc-line);
   --cc-bg-light: var(--cc-white);
-  --cc-font-primary: "Archivo", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --cc-font-serif: "Bodoni Moda", Didot, "Bodoni MT", Georgia, serif;
+  --cc-font-primary: "Archivo", sans-serif;
+  --cc-font-serif: "Bodoni Moda", serif;
   --cc-font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
 }
 

@@ -297,7 +297,7 @@ const SearchBar = () => {
                 marginBottom: "16px",
                 boxSizing: "border-box",
                 color: "#292929",
-                fontFamily: '"Archivo", "Helvetica Neue", Helvetica, Arial, sans-serif',
+    fontFamily: '"Archivo", sans-serif',
               }}
             />
             <div

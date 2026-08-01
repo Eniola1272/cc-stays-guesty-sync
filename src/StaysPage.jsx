@@ -330,7 +330,7 @@ const StaysPage = () => {
               {filteredProperties.map((prop) => (
                 <Marker key={prop.id} position={[prop.lat, prop.lng]} icon={createPriceIcon(prop.price)}>
                   <Popup minWidth={220}>
-                    <div style={{ fontFamily: "sans-serif" }}>
+                    <div style={{ fontFamily: 'var(--cc-font-primary, "Archivo", sans-serif)' }}>
                       <img src={prop.image} alt={prop.title} style={{ width: "100%", height: "130px", objectFit: "cover", borderRadius: "4px", marginBottom: "10px" }} />
                       <strong style={{ fontSize: "15px", display: "block", marginBottom: "4px" }}>{prop.title}</strong>
                       <span style={{ fontSize: "13px", color: "#666" }}>📍 {prop.city}</span>
@@ -426,7 +426,7 @@ const StaysPage = () => {
                 {filteredProperties.map((prop) => (
                   <Marker key={prop.id} position={[prop.lat, prop.lng]} icon={createPriceIcon(prop.price)}>
                     <Popup minWidth={220}>
-                      <div style={{ fontFamily: "sans-serif" }}>
+                      <div style={{ fontFamily: 'var(--cc-font-primary, "Archivo", sans-serif)' }}>
                         <img src={prop.image} alt={prop.title} style={{ width: "100%", height: "130px", objectFit: "cover", borderRadius: "4px", marginBottom: "10px" }} />
                         <strong style={{ fontSize: "15px", display: "block", marginBottom: "4px" }}>{prop.title}</strong>
                         <span style={{ fontSize: "13px", color: "#666" }}>📍 {prop.city}</span>

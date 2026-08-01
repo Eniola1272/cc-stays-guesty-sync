@@ -671,19 +671,25 @@ class CC_Stays_Guesty_Sync
 
     public function render_homepage_sections_widget($atts = []) {
         $atts = shortcode_atts([
+            'home_url' => '/',
             'stays_url' => '/stays',
             'book_direct_url' => '/book-direct',
             'reviews_url' => '/reviews',
             'about_url' => '/about-us',
             'owners_url' => '/partner-with-us',
+            'faq_url' => '/faq',
+            'contact_url' => '/contact',
         ], $atts, 'cc_stays_homepage');
 
         $links = [
+            'home' => esc_url_raw($atts['home_url']),
             'stays' => esc_url_raw($atts['stays_url']),
             'bookDirect' => esc_url_raw($atts['book_direct_url']),
             'reviews' => esc_url_raw($atts['reviews_url']),
             'about' => esc_url_raw($atts['about_url']),
             'owners' => esc_url_raw($atts['owners_url']),
+            'faq' => esc_url_raw($atts['faq_url']),
+            'contact' => esc_url_raw($atts['contact_url']),
         ];
 
         return '<div class="cc-stays-react-homepage" data-links="' . esc_attr(wp_json_encode($links)) . '"></div>';

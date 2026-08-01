@@ -1,12 +1,16 @@
 import React, { useEffect, useMemo, useState } from "react";
+import SearchBar from "./SearchBar";
 import "./HomePageSections.css";
 
 const DEFAULT_LINKS = {
+  home: "/",
   stays: "/stays",
   bookDirect: "/book-direct",
   reviews: "/reviews",
   about: "/about-us",
   owners: "/partner-with-us",
+  faq: "/faq",
+  contact: "/contact",
 };
 
 const featuredFallbacks = [
@@ -206,11 +210,51 @@ const HomePageSections = ({ mountNode }) => {
   const detailImage = imageSet[0] || featured[0];
   const founderImage = imageSet[1] || featured[1] || detailImage;
   const finalImage = imageSet[2] || featured[2] || detailImage;
+  const heroImage = imageSet[0] || detailImage;
 
   const propertyUrl = (title) => findProperty(properties, title)?.url || links.stays;
 
   return (
     <main className="cc-homepage-sections">
+      <section className="cc-home-hero">
+        <ImagePanel property={heroImage} ratio="21 / 9" />
+        <div className="cc-home-hero-scrim" />
+        <header className="cc-home-header">
+          <a className="cc-home-logo" href={links.home} aria-label="CC Stays home">
+            <span>C|C</span>
+            <strong>STAYS</strong>
+          </a>
+          <nav className="cc-home-nav" aria-label="Homepage navigation">
+            <a href={links.stays}>Our Stays</a>
+            <a href={links.about}>About Us</a>
+            <a href={links.bookDirect}>Book Direct</a>
+            <a href={links.faq}>FAQ</a>
+            <a href={links.contact}>Contact</a>
+          </nav>
+          <a className="cc-home-header-button" href={links.stays}>
+            Find a Stay
+          </a>
+          <a className="cc-home-menu-link" href={links.stays}>
+            Stays
+          </a>
+        </header>
+        <div className="cc-home-hero-content">
+          <h1>Stay somewhere you'll remember.</h1>
+          <p>Every CC Stay is designed to feel like the trip already started.</p>
+          <div className="cc-home-hero-search">
+            <SearchBar />
+          </div>
+          <a className="cc-home-mobile-search" href={links.stays}>
+            <span>Start your search</span>
+            <strong>Explore</strong>
+          </a>
+          <div className="cc-home-trust">
+            <span>★★★★★</span>
+            <p>Guest-loved homes for group trips, quiet escapes, and long weekends.</p>
+          </div>
+        </div>
+      </section>
+
       <section className="cc-home-section cc-home-featured">
         <div className="cc-home-wrap">
           <div className="cc-home-eyebrow">Featured Stays</div>
