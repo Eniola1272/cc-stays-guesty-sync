@@ -161,14 +161,14 @@ const Rule = () => (
   </div>
 );
 
-const ImagePanel = ({ property, className = "", ratio = "4 / 5" }) => {
-  const image = property?.image;
+const ImagePanel = ({ property, image, className = "", ratio = "4 / 5" }) => {
+  const panelImage = image || property?.image;
   return (
     <div
       className={`cc-home-image ${className}`}
       style={{
         aspectRatio: ratio,
-        backgroundImage: image ? `url("${image}")` : undefined,
+        backgroundImage: panelImage ? `url("${panelImage}")` : undefined,
       }}
     />
   );
@@ -177,6 +177,7 @@ const ImagePanel = ({ property, className = "", ratio = "4 / 5" }) => {
 const HomePageSections = ({ mountNode }) => {
   const [properties, setProperties] = useState([]);
   const [links, setLinks] = useState(DEFAULT_LINKS);
+  const [images, setImages] = useState({});
 
   useEffect(() => {
     if (mountNode?.dataset?.links) {
@@ -184,6 +185,14 @@ const HomePageSections = ({ mountNode }) => {
         setLinks({ ...DEFAULT_LINKS, ...JSON.parse(mountNode.dataset.links) });
       } catch (error) {
         setLinks(DEFAULT_LINKS);
+      }
+    }
+
+    if (mountNode?.dataset?.images) {
+      try {
+        setImages(JSON.parse(mountNode.dataset.images));
+      } catch (error) {
+        setImages({});
       }
     }
   }, [mountNode]);
@@ -211,13 +220,15 @@ const HomePageSections = ({ mountNode }) => {
   const founderImage = imageSet[1] || featured[1] || detailImage;
   const finalImage = imageSet[2] || featured[2] || detailImage;
   const heroImage = imageSet[0] || detailImage;
+  const cardImages = [images.cardOne, images.cardTwo, images.cardThree];
+  const reviewImages = [images.reviewOne, images.reviewTwo, images.reviewThree];
 
   const propertyUrl = (title) => findProperty(properties, title)?.url || links.stays;
 
   return (
     <main className="cc-homepage-sections">
       <section className="cc-home-hero">
-        <ImagePanel property={heroImage} ratio="21 / 9" />
+        <ImagePanel property={heroImage} image={images.hero} ratio="21 / 9" />
         <div className="cc-home-hero-scrim" />
         <header className="cc-home-header">
           <a className="cc-home-logo" href={links.home} aria-label="CC Stays home">
@@ -264,13 +275,13 @@ const HomePageSections = ({ mountNode }) => {
             gathering, relaxing, and creating memories together.
           </p>
           <div className="cc-home-cards">
-            {featured.map((property) => (
+            {featured.map((property, index) => (
               <a
                 className="cc-home-card"
                 href={property.url || links.stays}
                 key={property.title}
               >
-                <ImagePanel property={property} />
+                <ImagePanel property={property} image={cardImages[index]} />
                 <h3>{property.title}</h3>
                 <div className="cc-home-card-location">
                   {property.city || "Florida"}
@@ -303,6 +314,7 @@ const HomePageSections = ({ mountNode }) => {
             </h2>
             <ImagePanel
               property={detailImage}
+              image={images.detail}
               className="cc-home-inset-image"
               ratio="1 / 1"
             />
@@ -316,7 +328,7 @@ const HomePageSections = ({ mountNode }) => {
 
         <div className="cc-home-standard">
           <div className="cc-home-standard-image">
-            <ImagePanel property={detailImage} ratio="3 / 4" />
+            <ImagePanel property={detailImage} image={images.standard} ratio="3 / 4" />
             <div>Thoughtfully designed, meticulously kept</div>
           </div>
           <div className="cc-home-standard-list">
@@ -383,6 +395,7 @@ const HomePageSections = ({ mountNode }) => {
                 <div className="cc-home-review-meta">
                   <ImagePanel
                     property={featured[index]}
+                    image={reviewImages[index]}
                     className="cc-home-review-thumb"
                     ratio="1 / 1"
                   />
@@ -407,6 +420,7 @@ const HomePageSections = ({ mountNode }) => {
         <div className="cc-home-host-image">
           <ImagePanel
             property={founderImage}
+            image={images.hosts}
             className="cc-home-arch-image"
             ratio="3 / 4"
           />
@@ -459,7 +473,7 @@ const HomePageSections = ({ mountNode }) => {
       </section>
 
       <section className="cc-home-final">
-        <ImagePanel property={finalImage} ratio="21 / 9" />
+        <ImagePanel property={finalImage} image={images.final} ratio="21 / 9" />
         <div className="cc-home-final-overlay" />
         <div className="cc-home-final-content">
           <h2>Planning a trip?</h2>

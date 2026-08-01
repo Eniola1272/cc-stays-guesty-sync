@@ -109,6 +109,20 @@
   letter-spacing: 0.03em;
 }
 
+.cc-home-logo:hover,
+.cc-home-logo:focus,
+.cc-home-logo:hover span,
+.cc-home-logo:focus span,
+.cc-home-logo:hover strong,
+.cc-home-logo:focus strong {
+  color: var(--home-base);
+  text-decoration: none;
+  opacity: 1;
+  transform: none;
+  filter: none;
+  background: transparent;
+}
+
 .cc-home-nav {
   display: flex;
   gap: 34px;

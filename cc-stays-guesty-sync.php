@@ -692,7 +692,22 @@ class CC_Stays_Guesty_Sync
             'contact' => esc_url_raw($atts['contact_url']),
         ];
 
-        return '<div class="cc-stays-react-homepage" data-links="' . esc_attr(wp_json_encode($links)) . '"></div>';
+        $image_base = plugin_dir_url(__FILE__) . 'assets/home/';
+        $images = [
+            'hero' => $image_base . 'villa-banana-pool-exterior.jpg',
+            'cardOne' => $image_base . 'villa-banana-pool-lounge.jpg',
+            'cardTwo' => $image_base . 'villa-banana-outdoor-dining.jpg',
+            'cardThree' => $image_base . 'villa-banana-blue-bedroom.jpg',
+            'detail' => $image_base . 'villa-banana-lounge-detail.jpg',
+            'standard' => $image_base . 'villa-banana-turquoise-bedroom.jpg',
+            'hosts' => $image_base . 'villa-banana-kitchen.jpg',
+            'final' => $image_base . 'villa-banana-outdoor-dining.jpg',
+            'reviewOne' => $image_base . 'villa-banana-loungers.jpg',
+            'reviewTwo' => $image_base . 'villa-banana-game-room.jpg',
+            'reviewThree' => $image_base . 'villa-banana-bathroom.jpg',
+        ];
+
+        return '<div class="cc-stays-react-homepage" data-links="' . esc_attr(wp_json_encode($links)) . '" data-images="' . esc_attr(wp_json_encode($images)) . '"></div>';
     }
 
     public function get_stays_archive_data() {
