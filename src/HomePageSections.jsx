@@ -162,13 +162,23 @@ const Rule = () => (
 );
 
 const ImagePanel = ({ property, image, className = "", ratio = "4 / 5" }) => {
-  const panelImage = image || property?.image;
+  const fallbackGradient =
+    "radial-gradient(80% 60% at 50% 82%, rgba(166, 191, 191, 0.55), rgba(166, 191, 191, 0) 60%), linear-gradient(180deg, #b9c7c4 0%, #8ca6a2 46%, #4e6c64 100%)";
+  const imageUrls = [image, property?.image].filter(Boolean);
+  const uniqueImageUrls = [...new Set(imageUrls)];
+  const backgroundImage =
+    uniqueImageUrls.length > 0
+      ? `${uniqueImageUrls
+          .map((url) => `url("${String(url).replace(/"/g, "%22")}")`)
+          .join(", ")}, ${fallbackGradient}`
+      : undefined;
+
   return (
     <div
       className={`cc-home-image ${className}`}
       style={{
         aspectRatio: ratio,
-        backgroundImage: panelImage ? `url("${panelImage}")` : undefined,
+        backgroundImage,
       }}
     />
   );
@@ -412,6 +422,48 @@ const HomePageSections = ({ mountNode }) => {
             <a className="cc-home-text-link" href={links.reviews}>
               Read more guest reviews →
             </a>
+          </div>
+        </div>
+      </section>
+
+      <section className="cc-home-duo">
+        <div className="cc-home-management">
+          <div className="cc-home-wrap cc-home-management-inner">
+            <ImagePanel
+              property={detailImage}
+              image={images.manage}
+              className="cc-home-feature-image"
+              ratio="16 / 10"
+            />
+            <div className="cc-home-management-copy">
+              <h2>We don't just manage. We transform.</h2>
+              <p>
+                We turn unique homes into high-performing hospitality assets
+                through intentional design, revenue intelligence, in-house
+                operations, and real hospitality standards.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="cc-home-host-teaser">
+          <div className="cc-home-wrap cc-home-host-teaser-inner">
+            <div className="cc-home-host-teaser-copy">
+              <h2>Meet the Hosts</h2>
+              <p>
+                Meet the people shaping each CC Stay, from the design choices
+                guests notice to the support that makes every arrival feel easy.
+              </p>
+              <a className="cc-home-button cc-home-button-compact" href={links.about}>
+                Read More
+              </a>
+            </div>
+            <ImagePanel
+              property={founderImage}
+              image={images.hostTeaser}
+              className="cc-home-feature-image"
+              ratio="16 / 10"
+            />
           </div>
         </div>
       </section>

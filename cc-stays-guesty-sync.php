@@ -700,6 +700,8 @@ class CC_Stays_Guesty_Sync
             'cardThree' => $image_base . 'villa-banana-blue-bedroom.jpg',
             'detail' => $image_base . 'villa-banana-lounge-detail.jpg',
             'standard' => $image_base . 'villa-banana-turquoise-bedroom.jpg',
+            'manage' => $image_base . 'villa-banana-pool-exterior.jpg',
+            'hostTeaser' => $image_base . 'villa-banana-outdoor-dining.jpg',
             'hosts' => $image_base . 'villa-banana-kitchen.jpg',
             'final' => $image_base . 'villa-banana-outdoor-dining.jpg',
             'reviewOne' => $image_base . 'villa-banana-loungers.jpg',
