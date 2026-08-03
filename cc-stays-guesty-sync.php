@@ -694,12 +694,12 @@ class CC_Stays_Guesty_Sync
 
         $image_base = plugin_dir_url(__FILE__) . 'assets/home/';
         $images = [
-            'hero' => $image_base . 'cc-outdoor-guests-dining-lifestyle.jpg',
-            'cardOne' => $image_base . 'villa-banana-pool-lounge.jpg',
-            'cardTwo' => $image_base . 'cc-bedroom-lamp-detail.jpg',
-            'cardThree' => $image_base . 'cc-game-room-pool-view.jpg',
-            'detail' => $image_base . 'cc-bedroom-green-tray.jpg',
-            'standard' => $image_base . 'cc-living-room-mural.jpg',
+            'hero' => 'https://indigo-hawk-918016.hostingersite.com/wp-content/uploads/2026/04/Isles-Villa-3.png',
+            'cardOne' => 'https://indigo-hawk-918016.hostingersite.com/wp-content/uploads/2026/07/villa-ban-5.jpg',
+            'cardTwo' => 'https://indigo-hawk-918016.hostingersite.com/wp-content/uploads/2026/04/Bamboo-1-43.png',
+            'cardThree' => 'https://indigo-hawk-918016.hostingersite.com/wp-content/uploads/2026/04/Manatee-1-40.png',
+            'detail' => 'https://indigo-hawk-918016.hostingersite.com/wp-content/uploads/2026/04/Casa-Palma-1-6.png',
+            'standard' => 'https://indigo-hawk-918016.hostingersite.com/wp-content/uploads/2026/04/Isles-Villa-11.png',
             'manage' => $image_base . 'cc-hero-evening-bikes.jpg',
             'hostTeaser' => $image_base . 'cc-hero-sunset-pool.jpg',
             'hosts' => $image_base . 'cc-welcome-tray.jpg',
