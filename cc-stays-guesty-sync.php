@@ -694,14 +694,14 @@ class CC_Stays_Guesty_Sync
 
         $image_base = plugin_dir_url(__FILE__) . 'assets/home/';
         $images = [
-            'hero' => $image_base . 'cc-hero-sunset-pool.jpg',
+            'hero' => $image_base . 'cc-outdoor-guests-dining-lifestyle.jpg',
             'cardOne' => $image_base . 'villa-banana-pool-lounge.jpg',
             'cardTwo' => $image_base . 'cc-bedroom-lamp-detail.jpg',
             'cardThree' => $image_base . 'cc-game-room-pool-view.jpg',
             'detail' => $image_base . 'cc-bedroom-green-tray.jpg',
             'standard' => $image_base . 'cc-living-room-mural.jpg',
             'manage' => $image_base . 'cc-hero-evening-bikes.jpg',
-            'hostTeaser' => $image_base . 'cc-outdoor-guests-dining-lifestyle.jpg',
+            'hostTeaser' => $image_base . 'cc-hero-sunset-pool.jpg',
             'hosts' => $image_base . 'cc-welcome-tray.jpg',
             'final' => $image_base . 'villa-banana-outdoor-dining.jpg',
             'reviewOne' => $image_base . 'villa-banana-loungers.jpg',

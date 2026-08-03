@@ -229,7 +229,7 @@ const HomePageSections = ({ mountNode }) => {
   const detailImage = imageSet[0] || featured[0];
   const founderImage = imageSet[1] || featured[1] || detailImage;
   const finalImage = imageSet[2] || featured[2] || detailImage;
-  const heroImage = imageSet[0] || detailImage;
+  const heroImage = imageSet[3] || detailImage;
   const cardImages = [images.cardOne, images.cardTwo, images.cardThree];
   const reviewImages = [images.reviewOne, images.reviewTwo, images.reviewThree];
 
