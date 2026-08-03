@@ -200,7 +200,7 @@
 }
 
 .cc-home-hero-search {
-  width: min(100%, 840px);
+  width: min(100%, 1040px);
   margin-top: 32px;
 }
 
@@ -958,7 +958,7 @@
   }
 
   .cc-home-hero-search {
-    width: min(100%, 780px);
+    width: min(100%, 960px);
   }
 
   .cc-home-cards {

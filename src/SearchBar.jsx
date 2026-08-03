@@ -19,6 +19,22 @@ const PinIcon = () => (
   </svg>
 );
 
+const SearchIcon = () => (
+  <svg
+    width="17"
+    height="17"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="#555"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <circle cx="11" cy="11" r="7" />
+    <path d="M16.5 16.5 21 21" />
+  </svg>
+);
+
 const LOCATIONS = [
   { label: "Florida", sublabel: null },
   { label: "Fort Lauderdale", sublabel: "Fort Lauderdale, Florida" },
@@ -81,6 +97,9 @@ const SearchBar = () => {
   const [activeSection, setActiveSection] = useState(null);
   const [location, setLocation] = useState("");
   const [locationSearch, setLocationSearch] = useState("");
+  const [properties, setProperties] = useState([]);
+  const [propertySearch, setPropertySearch] = useState("");
+  const [selectedProperty, setSelectedProperty] = useState(null);
   const [dateRange, setDateRange] = useState([null, null]);
   const [startDate, endDate] = dateRange;
   const [guests, setGuests] = useState(0);
@@ -97,6 +116,15 @@ const SearchBar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    fetch("/wp-json/cc-stays/v1/search-stays")
+      .then((response) => response.json())
+      .then((data) => {
+        if (Array.isArray(data)) setProperties(data);
+      })
+      .catch(() => setProperties([]));
+  }, []);
+
   const handleSearch = (e) => {
     e.preventDefault();
     const checkIn = startDate ? startDate.toISOString().split("T")[0] : "";
@@ -107,6 +135,23 @@ const SearchBar = () => {
     if (checkOut) params.append("checkOut", checkOut);
     if (guests > 0) params.append("guests", guests);
     if (pets > 0) params.append("pets", pets);
+
+    const typedProperty = propertySearch.trim().toLowerCase();
+    const propertyDestination =
+      selectedProperty ||
+      (typedProperty
+        ? properties.find(
+            (property) =>
+              String(property.title || "").trim().toLowerCase() === typedProperty,
+          )
+        : null);
+
+    if (propertyDestination?.url) {
+      const query = params.toString();
+      window.location.href = `${propertyDestination.url}${query ? `?${query}` : ""}`;
+      return;
+    }
+
     window.location.href = `/stays?${params.toString()}`;
   };
 
@@ -126,6 +171,16 @@ const SearchBar = () => {
   ]
     .filter(Boolean)
     .join(", ");
+  const propertyLabel = selectedProperty?.title || propertySearch || "";
+  const filteredProperties = properties
+    .filter((property) => {
+      const term = propertySearch.trim().toLowerCase();
+      if (!term) return true;
+      return [property.title, property.city]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(term));
+    })
+    .slice(0, 7);
 
   const pillSection = (name) => ({
     minHeight: "72px",
@@ -176,7 +231,7 @@ const SearchBar = () => {
       <form
         onSubmit={handleSearch}
         className="cc-searchbar-form"
-        style={{ position: "relative", width: "100%", maxWidth: "840px" }}
+        style={{ position: "relative", width: "100%", maxWidth: "1040px" }}
       >
         {/* SEARCH BAR */}
         <div className="cc-searchbar-pill">
@@ -237,6 +292,27 @@ const SearchBar = () => {
               Who
             </div>
             <div style={fieldValueStyle}>{whoLabel || "Add guests"}</div>
+          </div>
+
+          <div className="cc-searchbar-divider" />
+
+          {/* PROPERTY */}
+          <div
+            className="cc-searchbar-section"
+            style={pillSection("property")}
+            onClick={() =>
+              setActiveSection(activeSection === "property" ? null : "property")
+            }
+          >
+            <div
+              className="cc-pill-label"
+              style={fieldLabelStyle}
+            >
+              Property
+            </div>
+            <div style={fieldValueStyle}>
+              {propertyLabel || "Jump to a stay"}
+            </div>
           </div>
 
           {/* SEARCH BUTTON */}
@@ -369,6 +445,119 @@ const SearchBar = () => {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* PROPERTY DROPDOWN */}
+        {activeSection === "property" && (
+          <div
+            className="cc-searchbar-dropdown cc-property-dropdown"
+            style={{
+              position: "absolute",
+              top: "84px",
+              right: 0,
+              background: "#fff",
+              border: "1px solid rgba(41,41,41,0.14)",
+              borderRadius: "2px",
+              boxShadow: "0 18px 48px rgba(41,41,41,0.12)",
+              padding: "22px",
+              minWidth: "340px",
+              zIndex: 200,
+            }}
+          >
+            <input
+              autoFocus
+              value={propertySearch}
+              onChange={(e) => {
+                setPropertySearch(e.target.value);
+                setSelectedProperty(null);
+              }}
+              placeholder="Search by property name..."
+              style={{
+                width: "100%",
+                border: "none",
+                borderBottom: "1px solid rgba(41,41,41,0.14)",
+                outline: "none",
+                fontSize: "15px",
+                paddingBottom: "12px",
+                marginBottom: "16px",
+                boxSizing: "border-box",
+                color: "#292929",
+                fontFamily: '"Archivo", sans-serif',
+              }}
+            />
+            <div
+              style={{
+                fontFamily: '"IBM Plex Mono", ui-monospace, Menlo, monospace',
+                fontSize: "9.5px",
+                fontWeight: "500",
+                color: "rgba(41,41,41,0.45)",
+                marginBottom: "12px",
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
+              }}
+            >
+              Jump to a property
+            </div>
+            {filteredProperties.length > 0 ? (
+              filteredProperties.map((property) => (
+                <div
+                  key={property.id || property.url || property.title}
+                  onClick={() => {
+                    setSelectedProperty(property);
+                    setPropertySearch(property.title || "");
+                    setActiveSection(null);
+                  }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "12px",
+                    padding: "10px 8px",
+                    borderRadius: "2px",
+                    cursor: "pointer",
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.background = "#f7f7f7")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.background = "transparent")
+                  }
+                >
+                  <div
+                    style={{
+                      background: "#f2f2f2",
+                      borderRadius: "2px",
+                      padding: "8px",
+                      display: "flex",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <SearchIcon />
+                  </div>
+                  <div style={{ minWidth: 0 }}>
+                    <div
+                      style={{
+                        fontSize: "14px",
+                        fontWeight: "500",
+                        color: "#292929",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {property.title}
+                    </div>
+                    <div style={{ fontSize: "12px", color: "#888" }}>
+                      {property.city || "CC Stays"}
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div style={{ color: "#888", fontSize: "13px", padding: "8px 0" }}>
+                No matching properties found.
+              </div>
+            )}
           </div>
         )}
 
