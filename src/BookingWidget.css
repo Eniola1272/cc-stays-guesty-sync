@@ -1317,7 +1317,35 @@
     right: 0 !important;
     width: auto;
     min-width: 0 !important;
+    max-height: calc(100vh - 150px);
+    overflow-y: auto;
     transform: none !important;
+  }
+
+  .cc-when-dropdown {
+    padding: 16px !important;
+  }
+
+  .cc-search-calendar .react-datepicker__month-container {
+    float: none;
+    width: 100%;
+    padding: 0;
+  }
+
+  .cc-search-calendar
+    .react-datepicker__month-container
+    + .react-datepicker__month-container {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid #eee;
+    border-left: 0;
+  }
+
+  .cc-search-calendar .react-datepicker__day-name,
+  .cc-search-calendar .react-datepicker__day {
+    width: 34px !important;
+    height: 34px !important;
+    line-height: 34px !important;
   }
 }
 

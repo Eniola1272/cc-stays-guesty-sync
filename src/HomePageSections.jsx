@@ -318,10 +318,6 @@ const HomePageSections = ({ mountNode }) => {
           <div className="cc-home-hero-search">
             <SearchBar />
           </div>
-          <a className="cc-home-mobile-search" href={links.stays}>
-            <span>When are you going?</span>
-            <strong>Search</strong>
-          </a>
           <div className="cc-home-trust">
             <span>★★★★★</span>
             <p>Guest-loved homes for group trips, quiet escapes, and long weekends.</p>
