@@ -5,10 +5,10 @@ import "./HomePageSections.css";
 const DEFAULT_LINKS = {
   home: "/",
   stays: "/stays",
-  bookDirect: "/book-direct",
+  bookDirect: "/about",
   reviews: "/reviews",
-  about: "/about-us",
-  owners: "/partner-with-us",
+  about: "/about",
+  owners: "/list-with-us",
   faq: "/faq",
   contact: "/contact",
 };
@@ -398,7 +398,7 @@ const HomePageSections = ({ mountNode }) => {
               Book Direct
             </a>
             <a className="cc-home-text-link" href={links.bookDirect}>
-              How direct booking works →
+              About Us →
             </a>
           </div>
         </div>

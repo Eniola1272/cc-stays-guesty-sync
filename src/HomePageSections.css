@@ -296,22 +296,26 @@
 
 .cc-home-image {
   position: relative;
+  display: block;
   width: 100%;
   overflow: hidden;
   background:
     radial-gradient(80% 60% at 50% 82%, rgba(166, 191, 191, 0.55), rgba(166, 191, 191, 0) 60%),
     linear-gradient(180deg, #b9c7c4 0%, #8ca6a2 46%, #4e6c64 100%);
   background-position: center;
-  background-size: cover;
+  background-size: cover !important;
 }
 
 .cc-home-image img {
-  position: absolute;
-  inset: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  position: absolute !important;
+  inset: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  min-width: 100% !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  max-width: none !important;
+  object-fit: cover !important;
   object-position: center;
 }
 

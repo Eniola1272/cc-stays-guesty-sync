@@ -673,10 +673,10 @@ class CC_Stays_Guesty_Sync
         $atts = shortcode_atts([
             'home_url' => '/',
             'stays_url' => '/stays',
-            'book_direct_url' => '/book-direct',
+            'book_direct_url' => '/about',
             'reviews_url' => '/reviews',
-            'about_url' => '/about-us',
-            'owners_url' => '/partner-with-us',
+            'about_url' => '/about',
+            'owners_url' => '/list-with-us',
             'faq_url' => '/faq',
             'contact_url' => '/contact',
         ], $atts, 'cc_stays_homepage');
