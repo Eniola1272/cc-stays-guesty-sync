@@ -204,6 +204,7 @@ const HomePageSections = ({ mountNode }) => {
   const [properties, setProperties] = useState([]);
   const [links, setLinks] = useState(DEFAULT_LINKS);
   const [images, setImages] = useState({});
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (mountNode?.dataset?.links) {
@@ -250,6 +251,24 @@ const HomePageSections = ({ mountNode }) => {
   const reviewImages = [images.reviewOne, images.reviewTwo, images.reviewThree];
 
   const propertyUrl = (title) => findProperty(properties, title)?.url || links.stays;
+  const navLinks = [
+    ["Our Stays", links.stays],
+    ["About Us", links.about],
+    ["Book Direct", links.bookDirect],
+    ["FAQ", links.faq],
+    ["Contact", links.contact],
+  ];
+
+  useEffect(() => {
+    if (!isMobileMenuOpen) return undefined;
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") setIsMobileMenuOpen(false);
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isMobileMenuOpen]);
 
   return (
     <main className="cc-homepage-sections">
@@ -262,19 +281,37 @@ const HomePageSections = ({ mountNode }) => {
             <strong>STAYS</strong>
           </a>
           <nav className="cc-home-nav" aria-label="Homepage navigation">
-            <a href={links.stays}>Our Stays</a>
-            <a href={links.about}>About Us</a>
-            <a href={links.bookDirect}>Book Direct</a>
-            <a href={links.faq}>FAQ</a>
-            <a href={links.contact}>Contact</a>
+            {navLinks.map(([label, href]) => (
+              <a href={href} key={label}>{label}</a>
+            ))}
           </nav>
           <a className="cc-home-header-button" href={links.stays}>
             Find a Stay
           </a>
-          <a className="cc-home-menu-link" href={links.stays}>
-            Stays
-          </a>
+          <button
+            type="button"
+            className={`cc-home-menu-button ${isMobileMenuOpen ? "cc-home-menu-button--open" : ""}`}
+            aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={isMobileMenuOpen}
+            onClick={() => setIsMobileMenuOpen((open) => !open)}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
         </header>
+        <div className={`cc-home-mobile-menu ${isMobileMenuOpen ? "cc-home-mobile-menu--open" : ""}`}>
+          <nav aria-label="Mobile homepage navigation">
+            {navLinks.map(([label, href]) => (
+              <a href={href} key={label} onClick={() => setIsMobileMenuOpen(false)}>
+                {label}
+              </a>
+            ))}
+            <a href={links.owners} onClick={() => setIsMobileMenuOpen(false)}>
+              List With Us
+            </a>
+          </nav>
+        </div>
         <div className="cc-home-hero-content">
           <h1>Stay somewhere you'll remember.</h1>
           <p>Every CC Stay is designed to feel like the trip already started.</p>
@@ -282,8 +319,8 @@ const HomePageSections = ({ mountNode }) => {
             <SearchBar />
           </div>
           <a className="cc-home-mobile-search" href={links.stays}>
-            <span>Start your search</span>
-            <strong>Explore</strong>
+            <span>When are you going?</span>
+            <strong>Search</strong>
           </a>
           <div className="cc-home-trust">
             <span>★★★★★</span>
@@ -459,27 +496,6 @@ const HomePageSections = ({ mountNode }) => {
                 operations, and real hospitality standards.
               </p>
             </div>
-          </div>
-        </div>
-
-        <div className="cc-home-host-teaser">
-          <div className="cc-home-wrap cc-home-host-teaser-inner">
-            <div className="cc-home-host-teaser-copy">
-              <h2>Meet the Hosts</h2>
-              <p>
-                Meet the people shaping each CC Stay, from the design choices
-                guests notice to the support that makes every arrival feel easy.
-              </p>
-              <a className="cc-home-button cc-home-button-compact" href={links.about}>
-                Read More
-              </a>
-            </div>
-            <ImagePanel
-              property={founderImage}
-              image={images.hostTeaser}
-              className="cc-home-feature-image"
-              ratio="16 / 10"
-            />
           </div>
         </div>
       </section>

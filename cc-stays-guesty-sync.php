@@ -703,7 +703,7 @@ class CC_Stays_Guesty_Sync
             'manage' => $image_base . 'cc-hero-evening-bikes.jpg',
             'hostTeaser' => $image_base . 'cc-hero-sunset-pool.jpg',
             'hosts' => $image_base . 'cc-welcome-tray.jpg',
-            'final' => $image_base . 'villa-banana-outdoor-dining.jpg',
+            'final' => 'https://indigo-hawk-918016.hostingersite.com/wp-content/uploads/2026/04/Isles-Villa-8.png',
             'reviewOne' => $image_base . 'villa-banana-loungers.jpg',
             'reviewTwo' => $image_base . 'villa-banana-game-room.jpg',
             'reviewThree' => $image_base . 'villa-banana-bathroom.jpg',
