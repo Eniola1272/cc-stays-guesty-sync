@@ -161,26 +161,42 @@ const Rule = () => (
   </div>
 );
 
-const ImagePanel = ({ property, image, className = "", ratio = "4 / 5" }) => {
-  const fallbackGradient =
-    "radial-gradient(80% 60% at 50% 82%, rgba(166, 191, 191, 0.55), rgba(166, 191, 191, 0) 60%), linear-gradient(180deg, #b9c7c4 0%, #8ca6a2 46%, #4e6c64 100%)";
-  const imageUrls = [image, property?.image].filter(Boolean);
-  const uniqueImageUrls = [...new Set(imageUrls)];
-  const backgroundImage =
-    uniqueImageUrls.length > 0
-      ? `${uniqueImageUrls
-          .map((url) => `url("${String(url).replace(/"/g, "%22")}")`)
-          .join(", ")}, ${fallbackGradient}`
-      : undefined;
+const ImagePanel = ({
+  property,
+  image,
+  className = "",
+  ratio = "4 / 5",
+  priority = false,
+}) => {
+  const sources = useMemo(
+    () => [...new Set([image, property?.image].filter(Boolean))],
+    [image, property?.image],
+  );
+  const [sourceIndex, setSourceIndex] = useState(0);
+
+  useEffect(() => {
+    setSourceIndex(0);
+  }, [sources]);
+
+  const currentSource = sources[sourceIndex];
 
   return (
     <div
       className={`cc-home-image ${className}`}
       style={{
         aspectRatio: ratio,
-        backgroundImage,
       }}
-    />
+    >
+      {currentSource && (
+        <img
+          src={currentSource}
+          alt=""
+          loading={priority ? "eager" : "lazy"}
+          fetchPriority={priority ? "high" : undefined}
+          onError={() => setSourceIndex((index) => index + 1)}
+        />
+      )}
+    </div>
   );
 };
 
@@ -238,7 +254,7 @@ const HomePageSections = ({ mountNode }) => {
   return (
     <main className="cc-homepage-sections">
       <section className="cc-home-hero">
-        <ImagePanel property={heroImage} image={images.hero} ratio="21 / 9" />
+        <ImagePanel property={heroImage} image={images.hero} ratio="21 / 9" priority />
         <div className="cc-home-hero-scrim" />
         <header className="cc-home-header">
           <a className="cc-home-logo" href={links.home} aria-label="CC Stays home">

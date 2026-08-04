@@ -737,7 +737,7 @@
 
 .cc-searchbar-pill {
   display: grid;
-  grid-template-columns: minmax(0, 0.95fr) 1px minmax(0, 0.95fr) 1px minmax(0, 0.9fr) 1px minmax(0, 1.15fr) auto;
+  grid-template-columns: minmax(0, 0.95fr) 1px minmax(0, 0.95fr) 1px minmax(0, 0.9fr) auto 1px minmax(0, 1.15fr);
   align-items: center;
   background: rgba(255, 255, 255, 0.965);
   border-radius: 2px;
@@ -751,6 +751,10 @@
 
 .cc-searchbar-section {
   min-width: 0;
+}
+
+.cc-searchbar-section--property {
+  border-radius: 0 2px 2px 0;
 }
 
 .cc-searchbar-divider {
@@ -1291,6 +1295,10 @@
     border-bottom: 1px solid var(--cc-line);
   }
 
+  .cc-searchbar-section--property {
+    border-radius: 0;
+  }
+
   .cc-searchbar-divider {
     display: none;
   }
@@ -1299,7 +1307,7 @@
     width: 100%;
     min-height: 54px;
     padding: 0 24px !important;
-    border-radius: 0 0 2px 2px !important;
+    border-radius: 0 !important;
     gap: 0 !important;
   }
 

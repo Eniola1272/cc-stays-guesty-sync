@@ -305,6 +305,20 @@
   background-size: cover;
 }
 
+.cc-home-image img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.cc-home-hero > .cc-home-image img {
+  object-position: center 58%;
+}
+
 .cc-home-card:nth-child(1) .cc-home-image,
 .cc-home-card:nth-child(2) .cc-home-image,
 .cc-home-card:nth-child(3) .cc-home-image,
@@ -1008,6 +1022,10 @@
 
   .cc-home-hero > .cc-home-image {
     background-position: center;
+  }
+
+  .cc-home-hero > .cc-home-image img {
+    object-position: center;
   }
 
   .cc-home-header {

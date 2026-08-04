@@ -294,11 +294,36 @@ const SearchBar = () => {
             <div style={fieldValueStyle}>{whoLabel || "Add guests"}</div>
           </div>
 
+          {/* SEARCH BUTTON */}
+          <button
+            type="submit"
+            className="cc-searchbar-submit"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "#36543b",
+              color: "#fafafa",
+              border: "none",
+              borderRadius: "0",
+              padding: "0 42px",
+              cursor: "pointer",
+              fontWeight: "500",
+              fontSize: "12px",
+              letterSpacing: "0.16em",
+              textTransform: "uppercase",
+              flexShrink: 0,
+              alignSelf: "stretch",
+            }}
+          >
+            <span className="cc-searchbar-submit-text">Search</span>
+          </button>
+
           <div className="cc-searchbar-divider" />
 
           {/* PROPERTY */}
           <div
-            className="cc-searchbar-section"
+            className="cc-searchbar-section cc-searchbar-section--property"
             style={pillSection("property")}
             onClick={() =>
               setActiveSection(activeSection === "property" ? null : "property")
@@ -314,31 +339,6 @@ const SearchBar = () => {
               {propertyLabel || "Jump to a stay"}
             </div>
           </div>
-
-          {/* SEARCH BUTTON */}
-          <button
-            type="submit"
-            className="cc-searchbar-submit"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              background: "#36543b",
-              color: "#fafafa",
-              border: "none",
-              borderRadius: "0 2px 2px 0",
-              padding: "0 42px",
-              cursor: "pointer",
-              fontWeight: "500",
-              fontSize: "12px",
-              letterSpacing: "0.16em",
-              textTransform: "uppercase",
-              flexShrink: 0,
-              alignSelf: "stretch",
-            }}
-          >
-            <span className="cc-searchbar-submit-text">Search</span>
-          </button>
         </div>
 
         {/* WHERE DROPDOWN */}
