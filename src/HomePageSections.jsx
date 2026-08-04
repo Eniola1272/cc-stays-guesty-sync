@@ -543,6 +543,7 @@ const HomePageSections = ({ mountNode }) => {
               Stay.
             </p>
           </div>
+          <div className="cc-home-reed cc-home-reed-dark cc-home-reed-thin" />
           <div className="cc-home-partner-foot">
             <span>We take on a limited number of homes each year</span>
             <a className="cc-home-text-link" href={links.owners}>
