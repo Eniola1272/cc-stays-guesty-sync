@@ -775,7 +775,12 @@
   border-radius: 2px;
   box-shadow: 0 18px 48px rgba(41, 41, 41, 0.12);
   padding: 22px;
+  text-align: left;
   z-index: 9999 !important;
+}
+
+.cc-searchbar-dropdown input {
+  text-align: left !important;
 }
 
 /* Keep field labels visible above selected values/placeholders */

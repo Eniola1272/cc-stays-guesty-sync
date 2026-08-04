@@ -185,6 +185,10 @@
   cursor: pointer;
 }
 
+.cc-home-menu-button:hover {
+  background: transparent !important;
+}
+
 .cc-home-menu-button span {
   display: block;
   width: 42px;

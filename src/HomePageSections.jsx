@@ -9,7 +9,7 @@ const DEFAULT_LINKS = {
   reviews: "/reviews",
   about: "/about",
   owners: "/list-with-us",
-  faq: "/faq",
+  faq: "/list-with-us/#faq",
   contact: "/contact",
 };
 

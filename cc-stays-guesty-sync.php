@@ -677,7 +677,7 @@ class CC_Stays_Guesty_Sync
             'reviews_url' => '/reviews',
             'about_url' => '/about',
             'owners_url' => '/list-with-us',
-            'faq_url' => '/faq',
+            'faq_url' => '/list-with-us/#faq',
             'contact_url' => '/contact',
         ], $atts, 'cc_stays_homepage');
 
