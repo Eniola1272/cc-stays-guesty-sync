@@ -502,7 +502,7 @@ const HomePageSections = ({ mountNode }) => {
             property={founderImage}
             image={images.hosts}
             className="cc-home-arch-image"
-            ratio="3 / 4"
+            ratio="1 / 1"
           />
         </div>
         <div className="cc-home-host-copy">

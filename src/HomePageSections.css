@@ -916,19 +916,43 @@
   background: var(--home-base);
 }
 
+.cc-home-hosts::before {
+  content: "STAYS";
+  position: absolute;
+  right: clamp(36px, 6vw, 118px);
+  bottom: 18px;
+  z-index: 0;
+  color: rgba(41, 41, 41, 0.035);
+  font-family: var(--home-display);
+  font-size: clamp(86px, 11vw, 178px);
+  line-height: 0.8;
+  letter-spacing: 0;
+  pointer-events: none;
+}
+
 .cc-home-hosts::after {
   content: "C|C";
   position: absolute;
-  right: -90px;
-  top: 40px;
+  right: clamp(34px, 5vw, 96px);
+  top: 28px;
+  z-index: 0;
+  display: grid;
+  width: clamp(330px, 35vw, 560px);
+  aspect-ratio: 1;
+  place-items: center;
+  border: clamp(10px, 1vw, 16px) solid rgba(41, 41, 41, 0.035);
+  border-radius: 50%;
   color: rgba(41, 41, 41, 0.045);
   font-family: var(--home-display);
-  font-size: 220px;
+  font-size: clamp(116px, 14vw, 235px);
+  line-height: 1;
   letter-spacing: -0.06em;
   pointer-events: none;
 }
 
 .cc-home-host-image {
+  position: relative;
+  z-index: 1;
   padding: 76px 0 76px 84px;
 }
 
@@ -1432,6 +1456,7 @@
     display: block;
   }
 
+  .cc-home-hosts::before,
   .cc-home-hosts::after {
     display: none;
   }
