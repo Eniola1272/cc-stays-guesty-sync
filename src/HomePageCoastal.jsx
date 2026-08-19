@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import SearchBar from "./SearchBar";
 import "./HomePageSections.css";
+import "./HomePageCoastal.css";
 
 const DEFAULT_LINKS = {
   home: "/",
@@ -9,7 +10,7 @@ const DEFAULT_LINKS = {
   reviews: "/reviews",
   about: "/about",
   owners: "/list-with-us",
-  faq: "/list-with-us/#faq",
+  faq: "/faq",
   contact: "/contact",
 };
 
@@ -150,15 +151,23 @@ const Icon = ({ type }) => {
   );
 };
 
-const Rule = () => (
-  <div className="cc-home-rule" aria-hidden="true">
-    <span />
-    <svg viewBox="0 0 40 40">
-      <circle cx="20" cy="20" r="15" fill="none" stroke="currentColor" />
-      <line x1="20" y1="8" x2="20" y2="32" stroke="currentColor" />
-    </svg>
-    <span />
-  </div>
+const BedIcon = () => (
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M3.5 11.2V19M20.5 19v-4.8a3 3 0 0 0-3-3H8.2a3 3 0 0 0-3 3V19M5.2 15.8h15.3M7.4 11.2V7.8h5.1a2 2 0 0 1 2 2v1.4" />
+  </svg>
+);
+
+const BathIcon = () => (
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M4 12.5h16v1.2a5.8 5.8 0 0 1-5.8 5.8H9.8A5.8 5.8 0 0 1 4 13.7v-1.2zM7 12.5V6.7a2.2 2.2 0 0 1 4.4 0M10.4 7.2h3" />
+  </svg>
+);
+
+const GuestIcon = () => (
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <circle cx="12" cy="7.4" r="3.2" />
+    <path d="M5.6 20.2a6.4 6.4 0 0 1 12.8 0" />
+  </svg>
 );
 
 const ImagePanel = ({
@@ -200,7 +209,7 @@ const ImagePanel = ({
   );
 };
 
-const HomePageSections = ({ mountNode }) => {
+const HomePageCoastal = ({ mountNode }) => {
   const [properties, setProperties] = useState([]);
   const [links, setLinks] = useState(DEFAULT_LINKS);
   const [images, setImages] = useState({});
@@ -234,11 +243,18 @@ const HomePageSections = ({ mountNode }) => {
   }, []);
 
   const featured = useMemo(
-    () =>
-      featuredFallbacks.map((fallback, index) => ({
+    () => {
+      const primary = featuredFallbacks.map((fallback, index) => ({
         ...fallback,
         ...(findProperty(properties, fallback.title) || properties[index] || {}),
-      })),
+      }));
+      const primaryKeys = new Set(primary.map((property) => normalize(property.title)));
+      const additional = properties.filter(
+        (property) => property?.title && !primaryKeys.has(normalize(property.title)),
+      );
+
+      return [...primary, ...additional];
+    },
     [properties],
   );
 
@@ -254,7 +270,7 @@ const HomePageSections = ({ mountNode }) => {
   const navLinks = [
     ["Our Stays", links.stays],
     ["About Us", links.about],
-    ["Book Direct", links.bookDirect],
+    ["Partner With Us", links.owners],
     ["FAQ", links.faq],
     ["Contact", links.contact],
   ];
@@ -271,7 +287,7 @@ const HomePageSections = ({ mountNode }) => {
   }, [isMobileMenuOpen]);
 
   return (
-    <main className="cc-homepage-sections">
+    <main className="cc-homepage-sections cc-homepage-coastal">
       <section className="cc-home-hero">
         <ImagePanel property={heroImage} image={images.hero} ratio="21 / 9" priority />
         <div className="cc-home-hero-scrim" />
@@ -286,7 +302,7 @@ const HomePageSections = ({ mountNode }) => {
             ))}
           </nav>
           <a className="cc-home-header-button" href={links.stays}>
-            Find a Stay
+            Book Now
           </a>
           <button
             type="button"
@@ -307,16 +323,13 @@ const HomePageSections = ({ mountNode }) => {
                 {label}
               </a>
             ))}
-            <a href={links.owners} onClick={() => setIsMobileMenuOpen(false)}>
-              List With Us
-            </a>
           </nav>
         </div>
         <div className="cc-home-hero-content">
           <h1>Stay somewhere you'll remember.</h1>
           <p>Every CC Stay is designed to feel like the trip already started.</p>
           <div className="cc-home-hero-search">
-            <SearchBar />
+            <SearchBar showLocation={false} />
           </div>
           <div className="cc-home-trust">
             <span>★★★★★</span>
@@ -325,42 +338,41 @@ const HomePageSections = ({ mountNode }) => {
         </div>
       </section>
 
-      <section className="cc-home-section cc-home-featured">
+      <section className="cc-home-section cc-home-featured cc-home-coastal-featured">
         <div className="cc-home-wrap">
-          <div className="cc-home-eyebrow">Featured Stays</div>
-          <h2>Homes worth planning a trip around.</h2>
-          <p className="cc-home-lead">
-            Explore a selection of thoughtfully designed homes made for
-            gathering, relaxing, and creating memories together.
-          </p>
-          <div className="cc-home-cards">
+          <div className="cc-home-featured-layout">
+            <div className="cc-home-featured-intro">
+              <div className="cc-home-eyebrow">Featured Stays</div>
+              <h2>Stays designed around the trip.</h2>
+              <a className="cc-home-text-link" href={links.stays}>
+                View all stays →
+              </a>
+            </div>
+          <div className="cc-home-cards" aria-label="Featured stays carousel">
             {featured.map((property, index) => (
               <a
-                className="cc-home-card"
+                className="cc-home-card cc-home-stay-card"
                 href={property.url || links.stays}
                 key={property.title}
               >
-                <ImagePanel property={property} image={cardImages[index]} />
-                <h3>{property.title}</h3>
-                <div className="cc-home-card-location">
-                  {property.city || "Florida"}
-                </div>
-                <div className="cc-home-spec">
-                  {property.bedrooms || 2} BR · {property.bathrooms || 2} BA ·
-                  SLEEPS {property.guests || 6}
+                <ImagePanel property={property} image={cardImages[index]} ratio="5 / 4" />
+                <div className="cc-home-stay-card-body">
+                  <h3>{property.title}</h3>
+                  <div className="cc-home-card-location">
+                    {property.city || "Florida"}
+                  </div>
+                  <div className="cc-home-spec">
+                    <span><BedIcon /> {property.bedrooms || 2} BD</span>
+                    <span><BathIcon /> {property.bathrooms || 2} BA</span>
+                    <span><GuestIcon /> {property.guests || 6} Guests</span>
+                  </div>
                 </div>
               </a>
             ))}
           </div>
-          <div className="cc-home-center">
-            <a className="cc-home-text-link" href={links.stays}>
-              View all stays →
-            </a>
           </div>
         </div>
       </section>
-
-      <Rule />
 
       <section className="cc-home-dark">
         <div className="cc-home-statement cc-home-wrap">
@@ -477,27 +489,6 @@ const HomePageSections = ({ mountNode }) => {
         </div>
       </section>
 
-      <section className="cc-home-duo">
-        <div className="cc-home-management">
-          <div className="cc-home-wrap cc-home-management-inner">
-            <ImagePanel
-              property={detailImage}
-              image={images.manage}
-              className="cc-home-feature-image"
-              ratio="16 / 10"
-            />
-            <div className="cc-home-management-copy">
-              <h2>We don't just manage. We transform.</h2>
-              <p>
-                We turn unique homes into high-performing hospitality assets
-                through intentional design, revenue intelligence, in-house
-                operations, and real hospitality standards.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <section className="cc-home-hosts">
         <div className="cc-home-host-image">
           <ImagePanel
@@ -529,32 +520,6 @@ const HomePageSections = ({ mountNode }) => {
         </div>
       </section>
 
-      <section className="cc-home-partner">
-        <div className="cc-home-wrap">
-          <div className="cc-home-eyebrow">Partner With Us</div>
-          <h2>Your home should be more than another listing.</h2>
-          <div className="cc-home-partner-cols">
-            <p>
-              We partner with owners of distinctive homes to elevate their
-              design, strengthen their performance, and deliver the kind of
-              hospitality guests remember.
-            </p>
-            <p>
-              Every property in our collection is thoughtfully positioned,
-              professionally operated, and held to the standards behind every CC
-              Stay.
-            </p>
-          </div>
-          <div className="cc-home-reed cc-home-reed-dark cc-home-reed-thin" />
-          <div className="cc-home-partner-foot">
-            <span>We take on a limited number of homes each year</span>
-            <a className="cc-home-text-link" href={links.owners}>
-              See if your home is a fit →
-            </a>
-          </div>
-        </div>
-      </section>
-
       <section className="cc-home-final">
         <ImagePanel property={finalImage} image={images.final} ratio="21 / 9" />
         <div className="cc-home-final-overlay" />
@@ -570,4 +535,4 @@ const HomePageSections = ({ mountNode }) => {
   );
 };
 
-export default HomePageSections;
+export default HomePageCoastal;

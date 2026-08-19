@@ -93,7 +93,7 @@ const Counter = ({ value, onChange }) => (
   </div>
 );
 
-const SearchBar = () => {
+const SearchBar = ({ showLocation = true }) => {
   const [activeSection, setActiveSection] = useState(null);
   const [location, setLocation] = useState("");
   const [locationSearch, setLocationSearch] = useState("");
@@ -130,7 +130,7 @@ const SearchBar = () => {
     const checkIn = startDate ? startDate.toISOString().split("T")[0] : "";
     const checkOut = endDate ? endDate.toISOString().split("T")[0] : "";
     const params = new URLSearchParams();
-    if (location) params.append("location", location);
+    if (showLocation && location) params.append("location", location);
     if (checkIn) params.append("checkIn", checkIn);
     if (checkOut) params.append("checkOut", checkOut);
     if (guests > 0) params.append("guests", guests);
@@ -235,28 +235,32 @@ const SearchBar = () => {
       >
         {/* SEARCH BAR */}
         <div className="cc-searchbar-pill">
-          {/* WHERE */}
-          <div
-            className="cc-searchbar-section"
-            style={{
-              ...pillSection("where"),
-            }}
-            onClick={() =>
-              setActiveSection(activeSection === "where" ? null : "where")
-            }
-          >
-            <div
-              className="cc-pill-label"
-              style={fieldLabelStyle}
-            >
-              Where
-            </div>
-            <div style={fieldValueStyle}>
-              {location || "Add location"}
-            </div>
-          </div>
+          {showLocation && (
+            <>
+              {/* WHERE */}
+              <div
+                className="cc-searchbar-section"
+                style={{
+                  ...pillSection("where"),
+                }}
+                onClick={() =>
+                  setActiveSection(activeSection === "where" ? null : "where")
+                }
+              >
+                <div
+                  className="cc-pill-label"
+                  style={fieldLabelStyle}
+                >
+                  Where
+                </div>
+                <div style={fieldValueStyle}>
+                  {location || "Add location"}
+                </div>
+              </div>
 
-          <div className="cc-searchbar-divider" />
+              <div className="cc-searchbar-divider" />
+            </>
+          )}
 
           {/* WHEN */}
           <div
@@ -342,7 +346,7 @@ const SearchBar = () => {
         </div>
 
         {/* WHERE DROPDOWN */}
-        {activeSection === "where" && (
+        {showLocation && activeSection === "where" && (
           <div
             className="cc-searchbar-dropdown cc-where-dropdown"
             style={{

@@ -46,6 +46,7 @@ class CC_Stays_Guesty_Sync
         // Register the homepage body sections shortcode
         add_shortcode('cc_stays_homepage', [$this, 'render_homepage_sections_widget']);
         add_shortcode('cc_stays_homepage_sections', [$this, 'render_homepage_sections_widget']);
+        add_shortcode('cc_stays_homepage_coastal', [$this, 'render_homepage_coastal_widget']);
 
         // Register the Stays Archive App shortcode
         add_shortcode('cc_stays_archive', function() { return '<div id="cc-stays-react-archive"></div>'; });
@@ -513,7 +514,8 @@ class CC_Stays_Guesty_Sync
             $post = get_post();
             $has_homepage_shortcode = $post && (
                 has_shortcode($post->post_content, 'cc_stays_homepage') ||
-                has_shortcode($post->post_content, 'cc_stays_homepage_sections')
+                has_shortcode($post->post_content, 'cc_stays_homepage_sections') ||
+                has_shortcode($post->post_content, 'cc_stays_homepage_coastal')
             );
         }
 
@@ -694,7 +696,7 @@ class CC_Stays_Guesty_Sync
 
         $image_base = plugin_dir_url(__FILE__) . 'assets/home/';
         $images = [
-            'hero' => 'https://indigo-hawk-918016.hostingersite.com/wp-content/uploads/2026/04/Isles-Villa-3.png',
+            'hero' => 'https://indigo-hawk-918016.hostingersite.com/wp-content/uploads/2026/04/Casa-Palma-1-4.png',
             'cardOne' => 'https://indigo-hawk-918016.hostingersite.com/wp-content/uploads/2026/07/villa-ban-5.jpg',
             'cardTwo' => 'https://indigo-hawk-918016.hostingersite.com/wp-content/uploads/2026/04/Bamboo-1-43.png',
             'cardThree' => 'https://indigo-hawk-918016.hostingersite.com/wp-content/uploads/2026/04/Manatee-1-40.png',
@@ -710,6 +712,47 @@ class CC_Stays_Guesty_Sync
         ];
 
         return '<div class="cc-stays-react-homepage" data-links="' . esc_attr(wp_json_encode($links)) . '" data-images="' . esc_attr(wp_json_encode($images)) . '"></div>';
+    }
+
+    public function render_homepage_coastal_widget($atts = []) {
+        $atts = shortcode_atts([
+            'home_url' => '/',
+            'stays_url' => '/stays',
+            'book_direct_url' => '/about',
+            'reviews_url' => '/reviews',
+            'about_url' => '/about',
+            'owners_url' => '/list-with-us',
+            'faq_url' => '/faq',
+            'contact_url' => '/contact',
+        ], $atts, 'cc_stays_homepage_coastal');
+
+        $links = [
+            'home' => esc_url_raw($atts['home_url']),
+            'stays' => esc_url_raw($atts['stays_url']),
+            'bookDirect' => esc_url_raw($atts['book_direct_url']),
+            'reviews' => esc_url_raw($atts['reviews_url']),
+            'about' => esc_url_raw($atts['about_url']),
+            'owners' => esc_url_raw($atts['owners_url']),
+            'faq' => esc_url_raw($atts['faq_url']),
+            'contact' => esc_url_raw($atts['contact_url']),
+        ];
+
+        $image_base = plugin_dir_url(__FILE__) . 'assets/home/';
+        $images = [
+            'hero' => 'https://indigo-hawk-918016.hostingersite.com/wp-content/uploads/2026/04/Isles-Villa-3.png',
+            'cardOne' => 'https://indigo-hawk-918016.hostingersite.com/wp-content/uploads/2026/07/villa-ban-5.jpg',
+            'cardTwo' => 'https://indigo-hawk-918016.hostingersite.com/wp-content/uploads/2026/04/Bamboo-1-43.png',
+            'cardThree' => 'https://indigo-hawk-918016.hostingersite.com/wp-content/uploads/2026/04/Manatee-1-40.png',
+            'detail' => 'https://indigo-hawk-918016.hostingersite.com/wp-content/uploads/2026/04/Casa-Palma-1-6.png',
+            'standard' => 'https://indigo-hawk-918016.hostingersite.com/wp-content/uploads/2026/04/Isles-Villa-11.png',
+            'hosts' => $image_base . 'cc-welcome-tray.jpg',
+            'final' => 'https://indigo-hawk-918016.hostingersite.com/wp-content/uploads/2026/04/Isles-Villa-8.png',
+            'reviewOne' => $image_base . 'villa-banana-loungers.jpg',
+            'reviewTwo' => $image_base . 'villa-banana-game-room.jpg',
+            'reviewThree' => $image_base . 'villa-banana-bathroom.jpg',
+        ];
+
+        return '<div class="cc-stays-react-homepage-coastal" data-links="' . esc_attr(wp_json_encode($links)) . '" data-images="' . esc_attr(wp_json_encode($images)) . '"></div>';
     }
 
     public function get_stays_archive_data() {
