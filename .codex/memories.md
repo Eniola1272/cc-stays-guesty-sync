@@ -34,7 +34,7 @@ These are working memories, not gospel. Before changing code, verify the current
 
 ## Hosting And Migration
 
-- Staging domains mentioned in the thread included Hostinger and Pantheon, including `dev-cc-stays.pantheonsite.io` and `indigo-hawk-918016.hostingersite.com`.
+- Staging domains mentioned in the thread included Hostinger and Pantheon, including `dev-cc-stays.pantheonsite.io` and `indigo-hawk-918016.hostingersite.com` and `sienna-goose-738572.hostingersite.com`.
 - Domain changes should not break React fetches if all site calls use relative URLs.
 - After moving hosts/domains, flush WordPress permalinks by visiting Settings > Permalinks and clicking Save Changes.
 - On Hostinger, purge LiteSpeed cache and consider toggling Object Cache while debugging Guesty auth.
@@ -99,8 +99,8 @@ Useful variables:
   --cc-border: #ebebeb;
   --cc-text-dark: #222222;
   --cc-text-muted: #717171;
-  --cc-font-serif: 'Georgia', serif;
-  --cc-font-sans: 'Helvetica Neue', Arial, sans-serif;
+  --cc-font-serif: "Georgia", serif;
+  --cc-font-sans: "Helvetica Neue", Arial, sans-serif;
 }
 ```
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import SearchBar from "./SearchBar";
 import "./HomePageSections.css";
 import "./HomePageCoastal.css";
@@ -61,32 +61,32 @@ const reviews = [
 
 const standards = [
   [
-    "01",
+    "shield",
     "Only the Best Homes",
     "Every home is carefully selected, so you know you're booking somewhere exceptional.",
   ],
   [
-    "02",
+    "star",
     "Design That Feels Better",
     "Thoughtfully designed spaces that aren't just beautiful - they change how your stay feels.",
   ],
   [
-    "03",
+    "house",
     "Effortless Stays",
     "From booking to checkout, everything is simple, seamless, and handled for you.",
   ],
   [
-    "04",
+    "heart",
     "Exceptional Amenities",
     "Fast WiFi, fully equipped kitchens, pools, gathering spaces, and thoughtful extras - everything you need and nothing you don't.",
   ],
   [
-    "05",
+    "clock",
     "Real Support, When You Need It",
     "Questions, recommendations, special requests, or the unexpected - our team is here to help.",
   ],
   [
-    "06",
+    "check",
     "Spotless, Every Time",
     "Meticulous cleaning and inspection standards mean every home feels fresh, consistent, and completely ready for your arrival.",
   ],
@@ -170,6 +170,59 @@ const GuestIcon = () => (
   </svg>
 );
 
+const PillarIcon = ({ type }) => {
+  if (type === "shield") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 3.6 18.2 6v5.2c0 4.1-2.5 7.7-6.2 9.2-3.7-1.5-6.2-5.1-6.2-9.2V6L12 3.6z" />
+      </svg>
+    );
+  }
+
+  if (type === "star") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="m12 4.2 2.2 4.5 5 .7-3.6 3.5.9 4.9-4.5-2.4-4.5 2.4.9-4.9-3.6-3.5 5-.7L12 4.2z" />
+      </svg>
+    );
+  }
+
+  if (type === "house") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4.6 10.9 12 4.8l7.4 6.1" />
+        <path d="M6.6 9.8v9.4h10.8V9.8" />
+        <path d="M10 19.2v-5.4h4v5.4" />
+      </svg>
+    );
+  }
+
+  if (type === "heart") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 19.2s-6.8-4.1-6.8-9.1A3.8 3.8 0 0 1 12 7.8a3.8 3.8 0 0 1 6.8 2.3c0 5-6.8 9.1-6.8 9.1z" />
+      </svg>
+    );
+  }
+
+  if (type === "clock") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="7.4" />
+        <path d="M12 7.8v4.4l3 1.8" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4.7 12.7 9.2 17 19.3 7" />
+      <path d="M7.3 7.2h-2a1.8 1.8 0 0 0-1.8 1.8v9.2A1.8 1.8 0 0 0 5.3 20h13.4a1.8 1.8 0 0 0 1.8-1.8V9a1.8 1.8 0 0 0-1.8-1.8h-2" />
+      <path d="M9 5h6v4H9z" />
+    </svg>
+  );
+};
+
 const ImagePanel = ({
   property,
   image,
@@ -214,6 +267,7 @@ const HomePageCoastal = ({ mountNode }) => {
   const [links, setLinks] = useState(DEFAULT_LINKS);
   const [images, setImages] = useState({});
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const featuredScrollerRef = useRef(null);
 
   useEffect(() => {
     if (mountNode?.dataset?.links) {
@@ -267,6 +321,15 @@ const HomePageCoastal = ({ mountNode }) => {
   const reviewImages = [images.reviewOne, images.reviewTwo, images.reviewThree];
 
   const propertyUrl = (title) => findProperty(properties, title)?.url || links.stays;
+  const scrollFeatured = (direction) => {
+    const scroller = featuredScrollerRef.current;
+    if (!scroller) return;
+
+    scroller.scrollBy({
+      left: direction * scroller.clientWidth,
+      behavior: "smooth",
+    });
+  };
   const navLinks = [
     ["Our Stays", links.stays],
     ["About Us", links.about],
@@ -344,32 +407,62 @@ const HomePageCoastal = ({ mountNode }) => {
             <div className="cc-home-featured-intro">
               <div className="cc-home-eyebrow">Featured Stays</div>
               <h2>Stays designed around the trip.</h2>
-              <a className="cc-home-text-link" href={links.stays}>
-                View all stays →
-              </a>
+              <div className="cc-home-featured-actions">
+                <a className="cc-home-text-link" href={links.stays}>
+                  View all stays →
+                </a>
+              </div>
             </div>
-          <div className="cc-home-cards" aria-label="Featured stays carousel">
-            {featured.map((property, index) => (
-              <a
-                className="cc-home-card cc-home-stay-card"
-                href={property.url || links.stays}
-                key={property.title}
+            <div className="cc-home-carousel-shell">
+              <div className="cc-home-featured-arrows" aria-label="Featured stays controls">
+                <button
+                  className="cc-home-featured-arrow cc-home-featured-arrow--prev"
+                  type="button"
+                  aria-label="Previous featured stays"
+                  onClick={() => scrollFeatured(-1)}
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="m15 5-7 7 7 7" />
+                  </svg>
+                </button>
+                <button
+                  className="cc-home-featured-arrow cc-home-featured-arrow--next"
+                  type="button"
+                  aria-label="Next featured stays"
+                  onClick={() => scrollFeatured(1)}
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="m9 5 7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+              <div
+                className="cc-home-cards"
+                aria-label="Featured stays carousel"
+                ref={featuredScrollerRef}
               >
-                <ImagePanel property={property} image={cardImages[index]} ratio="5 / 4" />
-                <div className="cc-home-stay-card-body">
-                  <h3>{property.title}</h3>
-                  <div className="cc-home-card-location">
-                    {property.city || "Florida"}
-                  </div>
-                  <div className="cc-home-spec">
-                    <span><BedIcon /> {property.bedrooms || 2} BD</span>
-                    <span><BathIcon /> {property.bathrooms || 2} BA</span>
-                    <span><GuestIcon /> {property.guests || 6} Guests</span>
-                  </div>
-                </div>
-              </a>
-            ))}
-          </div>
+                {featured.map((property, index) => (
+                  <a
+                    className="cc-home-card cc-home-stay-card"
+                    href={property.url || links.stays}
+                    key={property.title}
+                  >
+                    <ImagePanel property={property} image={cardImages[index]} ratio="5 / 4" />
+                    <div className="cc-home-stay-card-body">
+                      <h3>{property.title}</h3>
+                      <div className="cc-home-card-location">
+                        {property.city || "Florida"}
+                      </div>
+                      <div className="cc-home-spec">
+                        <span><BedIcon /> {property.bedrooms || 2} Beds</span>
+                        <span><BathIcon /> {property.bathrooms || 2} Baths</span>
+                        <span><GuestIcon /> {property.guests || 6} Guests</span>
+                      </div>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -387,7 +480,7 @@ const HomePageCoastal = ({ mountNode }) => {
               property={detailImage}
               image={images.detail}
               className="cc-home-inset-image"
-              ratio="1 / 1"
+              ratio="4 / 3"
             />
           </div>
           <p>
@@ -401,16 +494,17 @@ const HomePageCoastal = ({ mountNode }) => {
         <div className="cc-home-standard">
           <div className="cc-home-standard-image">
             <ImagePanel property={detailImage} image={images.standard} ratio="3 / 4" />
-            <div>Thoughtfully designed, meticulously kept</div>
           </div>
           <div className="cc-home-standard-list">
             <div className="cc-home-standard-head">
               <div className="cc-home-eyebrow">The CC Stays Standard</div>
               <h2>Six things we hold to, in every home.</h2>
             </div>
-            {standards.map(([number, title, copy]) => (
-              <div className="cc-home-standard-item" key={number}>
-                <div className="cc-home-number">{number}</div>
+            {standards.map(([icon, title, copy]) => (
+              <div className="cc-home-standard-item" key={title}>
+                <div className="cc-home-pillar-icon">
+                  <PillarIcon type={icon} />
+                </div>
                 <div>
                   <h3>{title}</h3>
                   <p>{copy}</p>
@@ -420,7 +514,6 @@ const HomePageCoastal = ({ mountNode }) => {
           </div>
         </div>
       </section>
-
       <section className="cc-home-band">
         <div className="cc-home-wrap">
           <div className="cc-home-reed cc-home-reed-muted cc-home-reed-thin" />
