@@ -105,6 +105,7 @@ const SearchBar = ({ showLocation = true }) => {
   const [guests, setGuests] = useState(0);
   const [pets, setPets] = useState(0);
   const ref = useRef(null);
+  const whoSectionRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -284,6 +285,7 @@ const SearchBar = ({ showLocation = true }) => {
           {/* WHO */}
           <div
             className="cc-searchbar-section"
+            ref={whoSectionRef}
             style={pillSection("who")}
             onClick={() =>
               setActiveSection(activeSection === "who" ? null : "who")
@@ -650,13 +652,18 @@ const SearchBar = ({ showLocation = true }) => {
             style={{
               position: "absolute",
               top: "84px",
-              right: 0,
+              left: whoSectionRef.current
+                ? `${whoSectionRef.current.offsetLeft}px`
+                : "50%",
               background: "#fff",
               border: "1px solid rgba(41,41,41,0.14)",
               borderRadius: "2px",
               boxShadow: "0 18px 48px rgba(41,41,41,0.12)",
               padding: "22px",
               minWidth: "300px",
+              width: whoSectionRef.current
+                ? `${Math.max(300, whoSectionRef.current.offsetWidth)}px`
+                : "300px",
               zIndex: 200,
             }}
           >

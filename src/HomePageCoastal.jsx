@@ -319,6 +319,7 @@ const HomePageCoastal = ({ mountNode }) => {
   const heroImage = imageSet[3] || detailImage;
   const cardImages = [images.cardOne, images.cardTwo, images.cardThree];
   const reviewImages = [images.reviewOne, images.reviewTwo, images.reviewThree];
+  const logoImage = images.logo;
 
   const propertyUrl = (title) => findProperty(properties, title)?.url || links.stays;
   const scrollFeatured = (direction) => {
@@ -356,8 +357,7 @@ const HomePageCoastal = ({ mountNode }) => {
         <div className="cc-home-hero-scrim" />
         <header className="cc-home-header">
           <a className="cc-home-logo" href={links.home} aria-label="CC Stays home">
-            <span>C|C</span>
-            <strong>STAYS</strong>
+            <img src={logoImage} alt="CC Stays" />
           </a>
           <nav className="cc-home-nav" aria-label="Homepage navigation">
             {navLinks.map(([label, href]) => (
@@ -471,11 +471,19 @@ const HomePageCoastal = ({ mountNode }) => {
         <div className="cc-home-statement cc-home-wrap">
           <div className="cc-home-eyebrow">Not Your Typical Stay</div>
           <div className="cc-home-statement-row">
-            <h2>
-              Most rentals are furnished.
-              <br />
-              Ours are <em>designed.</em>
-            </h2>
+            <div className="cc-home-statement-copy">
+              <h2>
+                Most rentals are furnished.
+                <br />
+                Ours are <em>designed.</em>
+              </h2>
+              <p>
+                We believe where you stay shapes how the entire trip feels.
+                That's why every CC Stay is thoughtfully selected, intentionally
+                designed, and supported by people who genuinely care about your
+                experience.
+              </p>
+            </div>
             <ImagePanel
               property={detailImage}
               image={images.detail}
@@ -483,11 +491,6 @@ const HomePageCoastal = ({ mountNode }) => {
               ratio="4 / 3"
             />
           </div>
-          <p>
-            We believe where you stay shapes how the entire trip feels. That's
-            why every CC Stay is thoughtfully selected, intentionally designed,
-            and supported by people who genuinely care about your experience.
-          </p>
           <div className="cc-home-reed cc-home-reed-muted cc-home-reed-thin" />
         </div>
 

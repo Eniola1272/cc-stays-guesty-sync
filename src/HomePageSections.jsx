@@ -249,6 +249,7 @@ const HomePageSections = ({ mountNode }) => {
   const heroImage = imageSet[3] || detailImage;
   const cardImages = [images.cardOne, images.cardTwo, images.cardThree];
   const reviewImages = [images.reviewOne, images.reviewTwo, images.reviewThree];
+  const logoImage = images.logo;
 
   const propertyUrl = (title) => findProperty(properties, title)?.url || links.stays;
   const navLinks = [
@@ -277,8 +278,7 @@ const HomePageSections = ({ mountNode }) => {
         <div className="cc-home-hero-scrim" />
         <header className="cc-home-header">
           <a className="cc-home-logo" href={links.home} aria-label="CC Stays home">
-            <span>C|C</span>
-            <strong>STAYS</strong>
+            <img src={logoImage} alt="CC Stays" />
           </a>
           <nav className="cc-home-nav" aria-label="Homepage navigation">
             {navLinks.map(([label, href]) => (

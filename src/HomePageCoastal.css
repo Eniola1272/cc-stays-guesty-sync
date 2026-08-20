@@ -232,10 +232,34 @@
   gap: clamp(56px, 6vw, 104px);
 }
 
+.cc-homepage-coastal .cc-home-statement-copy {
+  min-width: 0;
+}
+
+.cc-homepage-coastal .cc-home-statement-copy p {
+  max-width: 620px;
+  margin-top: 44px;
+}
+
 .cc-homepage-coastal .cc-home-inset-image {
   width: 100%;
   max-width: 560px;
   justify-self: end;
+}
+
+.cc-homepage-coastal .cc-home-standard {
+  grid-template-columns: minmax(420px, 0.46fr) minmax(0, 0.54fr);
+  width: min(100%, 1320px);
+  padding-top: 86px;
+}
+
+.cc-homepage-coastal .cc-home-standard-image {
+  padding-right: clamp(44px, 4.4vw, 72px);
+}
+
+.cc-homepage-coastal .cc-home-standard-image .cc-home-image {
+  height: clamp(760px, 68vw, 980px);
+  aspect-ratio: auto !important;
 }
 
 .cc-homepage-coastal .cc-home-standard-item {
@@ -354,6 +378,20 @@
   .cc-homepage-coastal .cc-home-stay-card h3 {
     min-height: 0;
     font-size: 18px;
+  }
+
+  .cc-homepage-coastal .cc-home-standard {
+    width: min(100%, 1160px);
+    padding-top: 20px;
+  }
+
+  .cc-homepage-coastal .cc-home-standard-image {
+    padding-right: 0;
+  }
+
+  .cc-homepage-coastal .cc-home-standard-image .cc-home-image {
+    height: auto;
+    aspect-ratio: 3 / 4 !important;
   }
 
   .cc-homepage-coastal .cc-home-statement-row {
