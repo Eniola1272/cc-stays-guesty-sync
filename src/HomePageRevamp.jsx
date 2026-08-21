@@ -131,9 +131,50 @@ const CcWatermark = () => (
 const LogoMark = ({ logo, compact = false }) => (
   <span className={`cc-revamp-brand ${compact ? "cc-revamp-brand--compact" : ""}`}>
     {logo ? <img src={logo} alt="CC Stays" /> : null}
-    {!compact && <span>CC Stays</span>}
+    {/* {!compact && <span>CC Stays</span>}  */}
   </span>
 );
+
+const isVideoSource = (src) => /\.(mp4|webm|ogg)(\?.*)?$/i.test(String(src || ""));
+
+const ImagePanel = ({ property, image, ratio = "21 / 9", priority = false }) => {
+  const sources = useMemo(
+    () => uniqueImages(image, property?.image, property?.images || []),
+    [image, property?.image, property?.images],
+  );
+  const [sourceIndex, setSourceIndex] = useState(0);
+
+  useEffect(() => {
+    setSourceIndex(0);
+  }, [sources]);
+
+  const currentSource = sources[sourceIndex];
+  const handleError = () => setSourceIndex((index) => index + 1);
+
+  return (
+    <div className="cc-revamp-hero-media" style={{ aspectRatio: ratio }}>
+      {currentSource && isVideoSource(currentSource) ? (
+        <video
+          src={currentSource}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload={priority ? "auto" : "metadata"}
+          onError={handleError}
+        />
+      ) : currentSource ? (
+        <img
+          src={currentSource}
+          alt=""
+          loading={priority ? "eager" : "lazy"}
+          fetchPriority={priority ? "high" : undefined}
+          onError={handleError}
+        />
+      ) : null}
+    </div>
+  );
+};
 
 const Icon = ({ name }) => {
   const common = {
@@ -407,6 +448,7 @@ const HomePageRevamp = ({ mountNode }) => {
     const match = config ? featured.find((item) => item.key === config.key) : null;
     return match?.url || links.stays;
   };
+  const heroImage = featured.find((property) => property.images?.length) || featured[0];
 
   const navLinks = [
     ["Stays", links.stays],
@@ -419,6 +461,7 @@ const HomePageRevamp = ({ mountNode }) => {
   return (
     <main className="cc-revamp">
       <section className="cc-revamp-hero">
+        <ImagePanel property={heroImage} image={images.hero} ratio="21 / 9" priority />
         <CcWatermark />
         <header className="cc-revamp-nav">
           <a href={links.home} aria-label="CC Stays home">
@@ -449,7 +492,7 @@ const HomePageRevamp = ({ mountNode }) => {
           <div className="cc-revamp-section-head">
             <div>
               <div className="cc-revamp-eyebrow">The Collection</div>
-              <h2 className="cc-revamp-white-text">Find your stay.</h2>
+              <h2>Find your stay.</h2>
             </div>
             <a className="cc-revamp-text-link" href={links.stays}>View all stays <span>→</span></a>
           </div>
@@ -545,7 +588,7 @@ const HomePageRevamp = ({ mountNode }) => {
         <div className="cc-revamp-eyebrow">Book With CC Stays</div>
         <h2>Take the trip.<br />We&apos;ll take care of the <em>stay.</em></h2>
         <p>Choose a residence you can feel good about booking, then start looking forward to everything else.</p>
-        <a className="cc-revamp-button" href={links.stays}>Find your stay <span>→</span></a>
+        <a className="cc-revamp-button cc-revamp-white-text" href={links.stays}>Find your stay <span>→</span></a>
         <a className="cc-revamp-text-link" href={links.contact}>Need help choosing? Ask us <span>→</span></a>
       </section>
 

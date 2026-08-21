@@ -814,8 +814,9 @@ class CC_Stays_Guesty_Sync
         $asset_base = plugin_dir_url(__FILE__) . 'assets/';
         $image_base = $asset_base . 'home/';
         $images = [
-            'logo' => $asset_base . 'CC_Stays_logo.png',
-            'storyOne' => $image_base . 'villa-banana-kitchen.jpg',
+            'logo' => 'https://ccstays.com/wp-content/uploads/2026/08/CC_Stays_logo.png',
+            'hero' => 'https://ccstays.com/wp-content/uploads/2026/03/ZDWUJy55RE2qNR5ucgho_MMVid111-v.mp4',
+            'storyOne' => 'https://ccstays.com/wp-content/uploads/2026/08/ccright.jpeg',
             'storyTwo' => $image_base . 'cc-bedroom-green-tray.jpg',
             'storyInset' => $image_base . 'cc-bedroom-lamp-detail.jpg',
             'storyThree' => $image_base . 'cc-welcome-tray.jpg',
