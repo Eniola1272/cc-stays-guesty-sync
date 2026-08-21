@@ -9,8 +9,8 @@ const DEFAULT_LINKS = {
   about: "/about",
   journal: "/blog",
   contact: "/contact",
-  owners: "/list-with-us",
-  partner: "/list-with-us",
+  owners: "https://ccstays.guestyowners.com/",
+  partner: "https://partners.ccstays.com/",
   privacy: "/privacy-policy",
   terms: "/terms",
   accessibility: "/accessibility",
@@ -512,7 +512,7 @@ const HomePageRevamp = ({ mountNode }) => {
 
           <div className="cc-revamp-story cc-revamp-story--wide">
             <div className="cc-revamp-story-copy">
-              <div className="cc-revamp-eyebrow">Designed for the Stay</div>
+              <div className="cc-revamp-eyebrow2">Designed for the Stay</div>
               <h3>Spaces you settle into.</h3>
               <p>Every home is thoughtfully designed around how people actually live, gather, and unwind.</p>
             </div>
@@ -521,7 +521,7 @@ const HomePageRevamp = ({ mountNode }) => {
 
           <div className="cc-revamp-story cc-revamp-story--arch">
             <div className="cc-revamp-story-copy">
-              <div className="cc-revamp-eyebrow">Comfort, Everywhere</div>
+              <div className="cc-revamp-eyebrow2">Comfort, Everywhere</div>
               <h3>Made to feel as good as it looks.</h3>
               <p>Comfortable beds, generous spaces, and the privacy to settle in and make the home your own.</p>
             </div>

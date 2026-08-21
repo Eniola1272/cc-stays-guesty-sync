@@ -817,9 +817,9 @@ class CC_Stays_Guesty_Sync
             'logo' => 'https://ccstays.com/wp-content/uploads/2026/08/CC_Stays_logo.png',
             'hero' => 'https://ccstays.com/wp-content/uploads/2026/03/ZDWUJy55RE2qNR5ucgho_MMVid111-v.mp4',
             'storyOne' => 'https://ccstays.com/wp-content/uploads/2026/08/ccright.jpeg',
-            'storyTwo' => $image_base . 'cc-bedroom-green-tray.jpg',
-            'storyInset' => $image_base . 'cc-bedroom-lamp-detail.jpg',
-            'storyThree' => $image_base . 'cc-welcome-tray.jpg',
+            'storyTwo' => 'https://ccstays.com/wp-content/uploads/2026/04/Casa-Palma-1-31.png',
+            'storyInset' => 'https://ccstays.com/wp-content/uploads/2026/07/71BBE3AA-BE2C-4D05-8E98-150181B7DC9F-2.jpg',
+            'storyThree' => 'https://ccstays.com/wp-content/uploads/2026/07/9.jpg',
             'propertyImages' => [
                 'bamboo' => [
                     'https://ccstays.com/wp-content/uploads/2026/04/Bamboo-1-43.png',
