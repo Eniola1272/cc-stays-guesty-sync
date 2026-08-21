@@ -8,6 +8,7 @@ import StaysPage from "./StaysPage";
 import AmenitiesSection from "./AmenitiesSection";
 import HomePageSections from "./HomePageSections";
 import HomePageCoastal from "./HomePageCoastal";
+import HomePageRevamp from "./HomePageRevamp";
 
 // Wait for the DOM to load
 document.addEventListener("DOMContentLoaded", () => {
@@ -64,5 +65,11 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll('.cc-stays-react-homepage-coastal').forEach((homepageMount) => {
       const homepageRoot = createRoot(homepageMount);
       homepageRoot.render(<HomePageCoastal mountNode={homepageMount} />);
+  });
+
+  // 9. Mount Revamped Homepage Variant
+  document.querySelectorAll('.cc-stays-react-homepage-revamp').forEach((homepageMount) => {
+      const homepageRoot = createRoot(homepageMount);
+      homepageRoot.render(<HomePageRevamp mountNode={homepageMount} />);
   });
 });

@@ -47,6 +47,7 @@ class CC_Stays_Guesty_Sync
         add_shortcode('cc_stays_homepage', [$this, 'render_homepage_sections_widget']);
         add_shortcode('cc_stays_homepage_sections', [$this, 'render_homepage_sections_widget']);
         add_shortcode('cc_stays_homepage_coastal', [$this, 'render_homepage_coastal_widget']);
+        add_shortcode('cc_stays_homepage_revamp', [$this, 'render_homepage_revamp_widget']);
 
         // Register the Stays Archive App shortcode
         add_shortcode('cc_stays_archive', function() { return '<div id="cc-stays-react-archive"></div>'; });
@@ -178,6 +179,14 @@ class CC_Stays_Guesty_Sync
                 }
                 if (isset($listing['bathrooms'])) {
                     update_post_meta($post_id, 'bathrooms', $listing['bathrooms']);
+                }
+                $guest_count = $listing['accommodates'] ?? $listing['personCapacity'] ?? $listing['maxOccupancy'] ?? null;
+                if (!empty($guest_count)) {
+                    update_post_meta($post_id, 'guests', intval($guest_count));
+                }
+                $min_nights = $listing['terms']['minNights'] ?? $listing['minNights'] ?? null;
+                if (!empty($min_nights)) {
+                    update_post_meta($post_id, 'min_nights', intval($min_nights));
                 }
                 if (isset($listing['address']['city'])) {
                     update_post_meta($post_id, 'location_city', $listing['address']['city']);
@@ -515,7 +524,8 @@ class CC_Stays_Guesty_Sync
             $has_homepage_shortcode = $post && (
                 has_shortcode($post->post_content, 'cc_stays_homepage') ||
                 has_shortcode($post->post_content, 'cc_stays_homepage_sections') ||
-                has_shortcode($post->post_content, 'cc_stays_homepage_coastal')
+                has_shortcode($post->post_content, 'cc_stays_homepage_coastal') ||
+                has_shortcode($post->post_content, 'cc_stays_homepage_revamp')
             );
         }
 
@@ -650,21 +660,38 @@ class CC_Stays_Guesty_Sync
         if (!is_singular('properties')) return '';
 
         $post_id = get_the_ID();
-        
-        // Grab the coordinates we synced from Guesty
-        $lat = get_post_meta($post_id, 'latitude', true);
-        $lng = get_post_meta($post_id, 'longitude', true);
 
-        if (empty($lat) || empty($lng)) {
-            return '<p>Map location currently unavailable.</p>';
+        // Grab the coordinates we synced from Guesty
+        $lat = floatval(get_post_meta($post_id, 'latitude', true));
+        $lng = floatval(get_post_meta($post_id, 'longitude', true));
+
+        if (!$lat || !$lng) {
+            return '<p class="cc-listing-map-empty">Map location currently unavailable.</p>';
         }
 
-        // Build the shortcodes required by the 'Leaflet Map' plugin
-        $map_shortcode = sprintf('[leaflet-map lat="%s" lng="%s" zoom="14" height="400"]', $lat, $lng);
-        $marker_shortcode = sprintf('[leaflet-marker lat="%s" lng="%s"]', $lat, $lng);
+        $delta = 0.012;
+        $bbox = implode(',', [
+            $lng - $delta,
+            $lat - $delta,
+            $lng + $delta,
+            $lat + $delta,
+        ]);
+        $src = add_query_arg([
+            'bbox' => $bbox,
+            'layer' => 'mapnik',
+            'marker' => $lat . ',' . $lng,
+        ], 'https://www.openstreetmap.org/export/embed.html');
+        $link = add_query_arg([
+            'mlat' => $lat,
+            'mlon' => $lng,
+        ], 'https://www.openstreetmap.org/') . '#map=15/' . $lat . '/' . $lng;
 
-        // Tell WordPress to execute the plugin's shortcodes
-        return do_shortcode($map_shortcode . $marker_shortcode);
+        return sprintf(
+            '<div class="cc-listing-map-embed" style="position:relative;overflow:hidden;width:100%%;height:min(460px,70vh);border-radius:8px;background:#ede7db;"><iframe title="%s map" src="%s" width="100%%" height="100%%" loading="lazy" referrerpolicy="no-referrer-when-downgrade" style="position:absolute;inset:0;width:100%%;height:100%%;border:0;"></iframe></div><p class="cc-listing-map-link" style="margin-top:10px;"><a href="%s" target="_blank" rel="noopener">Open map</a></p>',
+            esc_attr(get_the_title($post_id)),
+            esc_url($src),
+            esc_url($link)
+        );
     }
 
     public function render_search_bar_widget() {
@@ -755,6 +782,68 @@ class CC_Stays_Guesty_Sync
         ];
 
         return '<div class="cc-stays-react-homepage-coastal" data-links="' . esc_attr(wp_json_encode($links)) . '" data-images="' . esc_attr(wp_json_encode($images)) . '"></div>';
+    }
+
+    public function render_homepage_revamp_widget($atts = []) {
+        $atts = shortcode_atts([
+            'home_url' => '/',
+            'stays_url' => '/stays',
+            'about_url' => '/about',
+            'contact_url' => '/contact',
+            'owners_url' => '/list-with-us',
+            'partner_url' => '/list-with-us',
+            'privacy_url' => '/privacy-policy',
+            'terms_url' => '/terms',
+            'accessibility_url' => '/accessibility',
+            'instagram_url' => 'https://www.instagram.com/ccstays',
+        ], $atts, 'cc_stays_homepage_revamp');
+
+        $links = [
+            'home' => esc_url_raw($atts['home_url']),
+            'stays' => esc_url_raw($atts['stays_url']),
+            'about' => esc_url_raw($atts['about_url']),
+            'contact' => esc_url_raw($atts['contact_url']),
+            'owners' => esc_url_raw($atts['owners_url']),
+            'partner' => esc_url_raw($atts['partner_url']),
+            'privacy' => esc_url_raw($atts['privacy_url']),
+            'terms' => esc_url_raw($atts['terms_url']),
+            'accessibility' => esc_url_raw($atts['accessibility_url']),
+            'instagram' => esc_url_raw($atts['instagram_url']),
+        ];
+
+        $asset_base = plugin_dir_url(__FILE__) . 'assets/';
+        $image_base = $asset_base . 'home/';
+        $images = [
+            'logo' => $asset_base . 'CC_Stays_logo.png',
+            'storyOne' => $image_base . 'villa-banana-kitchen.jpg',
+            'storyTwo' => $image_base . 'cc-bedroom-green-tray.jpg',
+            'storyInset' => $image_base . 'cc-bedroom-lamp-detail.jpg',
+            'storyThree' => $image_base . 'cc-welcome-tray.jpg',
+            'propertyImages' => [
+                'bamboo' => [
+                    'https://ccstays.com/wp-content/uploads/2026/04/Bamboo-1-43.png',
+                    $image_base . 'villa-banana-kitchen.jpg',
+                    $image_base . 'cc-welcome-tray.jpg',
+                ],
+                'hidden' => [
+                    $image_base . 'cc-hero-sunset-pool.jpg',
+                    $image_base . 'cc-living-room-mural.jpg',
+                    $image_base . 'cc-outdoor-guests-dining.jpg',
+                ],
+                'villa' => [
+                    $image_base . 'villa-banana-pool-exterior.jpg',
+                    $image_base . 'villa-banana-pool-lounge.jpg',
+                    $image_base . 'villa-banana-game-room.jpg',
+                ],
+                'manatee' => [
+                    'https://ccstays.com/wp-content/uploads/2026/04/Manatee-1-40.png',
+                    $image_base . 'cc-bedroom-lamp-detail.jpg',
+                    $image_base . 'cc-bedroom-green-tray.jpg',
+                ],
+            ],
+        ];
+
+        return '<div class="cc-stays-react-homepage-revamp" data-links="' . esc_attr(wp_json_encode($links)) . '" data-images="' . esc_attr(wp_json_encode($images)) . '"></div>';
     }
 
     public function get_stays_archive_data() {
