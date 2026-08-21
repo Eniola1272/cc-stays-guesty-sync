@@ -1112,3 +1112,7 @@
     flex-direction: column;
   }
 }
+
+.cc-revamp-white-text {
+  color: var(--revamp-cream);
+}

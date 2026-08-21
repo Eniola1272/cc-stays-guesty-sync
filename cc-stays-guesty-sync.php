@@ -723,8 +723,8 @@ class CC_Stays_Guesty_Sync
 
         $image_base = plugin_dir_url(__FILE__) . 'assets/home/';
         $images = [
-            'logo' => plugin_dir_url(__FILE__) . 'assets/CC_Stays_logo.png',
-            'hero' => 'https://ccstays.com/wp-content/uploads/2026/04/Casa-Palma-1-4.png',
+            'logo' => 'https://ccstays.com/wp-content/uploads/2026/08/CC_Stays_logo.png',
+            'hero' => 'https://ccstays.com/wp-content/uploads/2026/03/ZDWUJy55RE2qNR5ucgho_MMVid111-v.mp4',
             'cardOne' => 'https://ccstays.com/wp-content/uploads/2026/07/villa-ban-5.jpg',
             'cardTwo' => 'https://ccstays.com/wp-content/uploads/2026/04/Bamboo-1-43.png',
             'cardThree' => 'https://ccstays.com/wp-content/uploads/2026/04/Manatee-1-40.png',
@@ -767,8 +767,8 @@ class CC_Stays_Guesty_Sync
 
         $image_base = plugin_dir_url(__FILE__) . 'assets/home/';
         $images = [
-            'logo' => plugin_dir_url(__FILE__) . 'assets/CC_Stays_logo.png',
-            'hero' => 'https://ccstays.com/wp-content/uploads/2026/04/Casa-Palma-1-4.png',
+            'logo' => 'https://ccstays.com/wp-content/uploads/2026/08/CC_Stays_logo.png',
+            'hero' => 'https://ccstays.com/wp-content/uploads/2026/03/ZDWUJy55RE2qNR5ucgho_MMVid111-v.mp4',
             'cardOne' => 'https://ccstays.com/wp-content/uploads/2026/07/villa-ban-5.jpg',
             'cardTwo' => 'https://ccstays.com/wp-content/uploads/2026/04/Bamboo-1-43.png',
             'cardThree' => 'https://ccstays.com/wp-content/uploads/2026/04/Manatee-1-40.png',

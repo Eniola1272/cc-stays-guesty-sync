@@ -100,6 +100,13 @@ const normalize = (value) =>
 
 const firstPresent = (...values) => values.find((value) => value !== undefined && value !== null && value !== "");
 
+const syncedNumber = (value, fallback, fallbackSentinel = null) => {
+  const number = Number(value);
+  if (!Number.isFinite(number) || number <= 0) return fallback;
+  if (fallbackSentinel !== null && number === fallbackSentinel && fallback !== fallbackSentinel) return fallback;
+  return number;
+};
+
 const uniqueImages = (...groups) => {
   const seen = new Set();
   return groups
@@ -384,10 +391,10 @@ const HomePageRevamp = ({ mountNode }) => {
           key: config.key,
           title: config.title,
           city: firstPresent(synced.city, config.city),
-          guests: Number(firstPresent(synced.guests, config.guests)),
-          bedrooms: Number(firstPresent(synced.bedrooms, config.bedrooms)),
-          bathrooms: Number(firstPresent(synced.bathrooms, config.bathrooms)),
-          price: Number(firstPresent(synced.price, config.price)),
+          guests: syncedNumber(synced.guests, config.guests, 2),
+          bedrooms: syncedNumber(synced.bedrooms, config.bedrooms),
+          bathrooms: syncedNumber(synced.bathrooms, config.bathrooms),
+          price: syncedNumber(synced.price, config.price),
           url: synced.url || links.stays,
           images: gallery,
         };
@@ -442,7 +449,7 @@ const HomePageRevamp = ({ mountNode }) => {
           <div className="cc-revamp-section-head">
             <div>
               <div className="cc-revamp-eyebrow">The Collection</div>
-              <h2>Find your stay.</h2>
+              <h2 className="cc-revamp-white-text">Find your stay.</h2>
             </div>
             <a className="cc-revamp-text-link" href={links.stays}>View all stays <span>→</span></a>
           </div>
@@ -491,7 +498,7 @@ const HomePageRevamp = ({ mountNode }) => {
 
       <section className="cc-revamp-trip-band">
         <CcWatermark />
-        <h2>Sometimes the stay <em>is</em> the trip.</h2>
+        <h2 className="cc-revamp-white-text">Sometimes the stay <em>is</em> the trip.</h2>
         <a href={links.stays}>Explore the Collection <span>→</span></a>
       </section>
 
@@ -518,7 +525,7 @@ const HomePageRevamp = ({ mountNode }) => {
       <section className="cc-revamp-section cc-revamp-standard">
         <div className="cc-revamp-wrap">
           <div className="cc-revamp-eyebrow">The CC Stays Standard</div>
-          <h2>Everything you need.<br /><span>More than you expect.</span></h2>
+          <h2 className="cc-revamp-white-text">Everything you need.<br /><span>More than you expect.</span></h2>
           <div className="cc-revamp-standard-grid">
             {STANDARD_ITEMS.map(([icon, title, copy]) => (
               <div className="cc-revamp-standard-item" key={title}>
