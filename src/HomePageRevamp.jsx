@@ -4,7 +4,10 @@ import "./HomePageRevamp.css";
 const DEFAULT_LINKS = {
   home: "/",
   stays: "/stays",
+  destinations: "/stays",
+  experiences: "/stays",
   about: "/about",
+  journal: "/blog",
   contact: "/contact",
   owners: "/list-with-us",
   partner: "/list-with-us",
@@ -602,10 +605,13 @@ const HomePageRevamp = ({ mountNode }) => {
             <nav>
               <strong>Stay</strong>
               <a href={links.stays}>All Stays</a>
+              <a href={links.destinations}>Destinations</a>
+              <a href={links.experiences}>Experiences</a>
             </nav>
             <nav>
               <strong>CC Stays</strong>
               <a href={links.about}>About Us</a>
+              <a href={links.journal}>The Journal</a>
               <a href={links.contact}>Contact</a>
             </nav>
             <nav>
