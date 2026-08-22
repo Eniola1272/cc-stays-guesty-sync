@@ -1298,6 +1298,13 @@ class CC_Stays_Guesty_Sync
 
     private function cc_get_meta_first($post_id, $keys, $fallback = '') {
         foreach ($keys as $key) {
+            if (function_exists('get_field')) {
+                $acf_value = get_field($key, $post_id);
+                if ($acf_value !== false && $acf_value !== '' && $acf_value !== null && $acf_value !== []) {
+                    return $acf_value;
+                }
+            }
+
             $value = get_post_meta($post_id, $key, true);
             if ($value !== '' && $value !== null && $value !== []) {
                 return $value;
@@ -1329,6 +1336,48 @@ class CC_Stays_Guesty_Sync
         return $fallback;
     }
 
+    private function cc_normalize_meta_row($row, $columns = []) {
+        if (!is_array($row)) {
+            return [];
+        }
+
+        $item = [];
+        foreach ($columns as $index => $column) {
+            $value = $row[$column] ?? $row[$index] ?? '';
+
+            if ($column === 'title') {
+                $value = $value ?: ($row['heading'] ?? $row['label'] ?? $row['name'] ?? '');
+            } elseif ($column === 'copy') {
+                $value = $value ?: ($row['description'] ?? $row['text'] ?? $row['content'] ?? '');
+            } elseif ($column === 'icon') {
+                $value = $value ?: ($row['icon_name'] ?? $row['icon_slug'] ?? '');
+            }
+
+            if (is_array($value)) {
+                $value = $value['value'] ?? $value['label'] ?? $value['url'] ?? '';
+            }
+
+            $item[$column] = is_scalar($value) ? trim((string) $value) : '';
+        }
+
+        return array_filter($item) ? $item : [];
+    }
+
+    private function cc_normalize_meta_rows($rows, $columns = []) {
+        $items = [];
+        foreach ((array) $rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $item = $this->cc_normalize_meta_row($row, $columns);
+            if (!empty($item)) {
+                $items[] = $item;
+            }
+        }
+
+        return $items;
+    }
+
     private function cc_get_meta_rows($post_id, $keys, $fallback = [], $columns = []) {
         $value = $this->cc_get_meta_first($post_id, $keys, null);
         if ($value === null || $value === '') {
@@ -1336,12 +1385,18 @@ class CC_Stays_Guesty_Sync
         }
 
         if (is_array($value)) {
-            return array_values(array_filter($value));
+            $items = $this->cc_normalize_meta_rows($value, $columns);
+            return $items ?: $fallback;
         }
 
         $decoded = json_decode($value, true);
         if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-            return array_values(array_filter($decoded));
+            $items = $this->cc_normalize_meta_rows($decoded, $columns);
+            return $items ?: $fallback;
+        }
+
+        if (is_numeric($value)) {
+            return $fallback;
         }
 
         $rows = array_filter(array_map('trim', preg_split('/[\r\n]+/', (string) $value)));
