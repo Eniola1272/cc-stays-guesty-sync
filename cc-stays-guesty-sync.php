@@ -48,9 +48,19 @@ class CC_Stays_Guesty_Sync
         add_shortcode('cc_stays_homepage_sections', [$this, 'render_homepage_sections_widget']);
         add_shortcode('cc_stays_homepage_coastal', [$this, 'render_homepage_coastal_widget']);
         add_shortcode('cc_stays_homepage_revamp', [$this, 'render_homepage_revamp_widget']);
+        add_shortcode('cc_stays_about', [$this, 'render_about_page_widget']);
+        add_shortcode('cc_stays_about_revamp', [$this, 'render_about_page_widget']);
+        add_shortcode('cc_stays_journal', [$this, 'render_journal_page_widget']);
+        add_shortcode('cc_stays_journal_revamp', [$this, 'render_journal_page_widget']);
+        add_shortcode('cc_stays_contact', [$this, 'render_contact_page_widget']);
+        add_shortcode('cc_stays_contact_revamp', [$this, 'render_contact_page_widget']);
+        add_shortcode('cc_stays_destinations', [$this, 'render_destinations_page_widget']);
+        add_shortcode('cc_stays_destinations_revamp', [$this, 'render_destinations_page_widget']);
+        add_shortcode('cc_stays_experiences', [$this, 'render_experiences_page_widget']);
+        add_shortcode('cc_stays_experiences_revamp', [$this, 'render_experiences_page_widget']);
 
         // Register the Stays Archive App shortcode
-        add_shortcode('cc_stays_archive', function() { return '<div id="cc-stays-react-archive"></div>'; });
+        add_shortcode('cc_stays_archive', [$this, 'render_stays_archive_widget']);
 
         // Enqueue the compiled React app
         add_action('wp_enqueue_scripts', [$this, 'enqueue_react_app']);
@@ -283,6 +293,238 @@ class CC_Stays_Guesty_Sync
             'callback' => [$this, 'get_stays_archive_data'],
             'permission_callback' => '__return_true'
         ]);
+
+        register_rest_route('cc-stays/v1', '/journal-signup', [
+            'methods' => 'POST',
+            'callback' => [$this, 'handle_journal_signup'],
+            'permission_callback' => '__return_true'
+        ]);
+
+        register_rest_route('cc-stays/v1', '/contact', [
+            'methods' => 'POST',
+            'callback' => [$this, 'handle_contact_submission'],
+            'permission_callback' => '__return_true'
+        ]);
+    }
+
+    private function get_client_ip() {
+        $keys = ['HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'REMOTE_ADDR'];
+        foreach ($keys as $key) {
+            if (empty($_SERVER[$key])) {
+                continue;
+            }
+            $value = sanitize_text_field(wp_unslash($_SERVER[$key]));
+            $parts = explode(',', $value);
+            return trim($parts[0]);
+        }
+        return 'unknown';
+    }
+
+    private function is_rate_limited($bucket, $limit = 5, $window = 10 * MINUTE_IN_SECONDS) {
+        $ip = $this->get_client_ip();
+        $key = 'cc_stays_rate_' . md5($bucket . '|' . $ip);
+        $count = intval(get_transient($key));
+        if ($count >= $limit) {
+            return true;
+        }
+        set_transient($key, $count + 1, $window);
+        return false;
+    }
+
+    private function get_mailchimp_config() {
+        $api_key = defined('CC_STAYS_MAILCHIMP_API_KEY') ? CC_STAYS_MAILCHIMP_API_KEY : get_option('cc_stays_mailchimp_api_key', '');
+        $list_id = defined('CC_STAYS_MAILCHIMP_AUDIENCE_ID') ? CC_STAYS_MAILCHIMP_AUDIENCE_ID : get_option('cc_stays_mailchimp_audience_id', '');
+        $server = defined('CC_STAYS_MAILCHIMP_SERVER_PREFIX') ? CC_STAYS_MAILCHIMP_SERVER_PREFIX : get_option('cc_stays_mailchimp_server_prefix', '');
+
+        if (!$server && strpos($api_key, '-') !== false) {
+            $parts = explode('-', $api_key);
+            $server = end($parts);
+        }
+
+        return [
+            'api_key' => trim($api_key),
+            'list_id' => trim($list_id),
+            'server' => trim($server),
+        ];
+    }
+
+    public function handle_journal_signup($request) {
+        if ($this->is_rate_limited('journal_signup', 8)) {
+            return new WP_Error('rate_limited', 'Too many signup attempts. Please try again shortly.', ['status' => 429]);
+        }
+
+        $params = $request->get_json_params();
+        $email = sanitize_email($params['email'] ?? '');
+        $first_name = sanitize_text_field($params['firstName'] ?? '');
+        $last_name = sanitize_text_field($params['lastName'] ?? '');
+
+        if (!is_email($email)) {
+            return new WP_Error('invalid_email', 'Please enter a valid email address.', ['status' => 400]);
+        }
+
+        $config = $this->get_mailchimp_config();
+        if (empty($config['api_key']) || empty($config['list_id']) || empty($config['server'])) {
+            return new WP_Error('mailchimp_not_configured', 'Mailchimp is not configured yet.', ['status' => 500]);
+        }
+
+        $subscriber_hash = md5(strtolower($email));
+        $endpoint = sprintf(
+            'https://%s.api.mailchimp.com/3.0/lists/%s/members/%s',
+            rawurlencode($config['server']),
+            rawurlencode($config['list_id']),
+            $subscriber_hash
+        );
+
+        $payload = [
+            'email_address' => $email,
+            'status_if_new' => 'subscribed',
+            'status' => 'subscribed',
+            'merge_fields' => array_filter([
+                'FNAME' => $first_name,
+                'LNAME' => $last_name,
+            ]),
+            'tags' => ['CC Stays Journal'],
+        ];
+
+        $response = wp_remote_request($endpoint, [
+            'method' => 'PUT',
+            'headers' => [
+                'Authorization' => 'Basic ' . base64_encode('ccstays:' . $config['api_key']),
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ],
+            'body' => wp_json_encode($payload),
+            'timeout' => 15,
+        ]);
+
+        if (is_wp_error($response)) {
+            return new WP_Error('mailchimp_error', 'Could not connect to Mailchimp.', ['status' => 500]);
+        }
+
+        $http_code = wp_remote_retrieve_response_code($response);
+        $body = json_decode(wp_remote_retrieve_body($response), true);
+
+        if ($http_code < 200 || $http_code >= 300) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => $body['detail'] ?? 'Mailchimp could not save this signup.',
+            ], 400);
+        }
+
+        return new WP_REST_Response([
+            'success' => true,
+            'message' => 'You are on the list.',
+        ], 200);
+    }
+
+    private function create_guesty_contact($data) {
+        $token = $this->get_access_token();
+        if (!$token) {
+            return [
+                'success' => false,
+                'message' => 'Guesty authentication unavailable.',
+            ];
+        }
+
+        $name_parts = preg_split('/\s+/', trim($data['name']));
+        $first_name = array_shift($name_parts);
+        $last_name = trim(implode(' ', $name_parts));
+
+        $payload = [
+            'firstName' => $first_name ?: $data['name'],
+            'lastName' => $last_name,
+            'email' => $data['email'],
+            'emails' => [$data['email']],
+            'phone' => $data['phone'],
+            'phones' => $data['phone'] ? [$data['phone']] : [],
+            'preferredContactMethod' => $data['phone'] ? 'email' : 'email',
+            'notes' => sprintf(
+                "Website contact inquiry\nReason: %s\n\nMessage:\n%s",
+                $data['reason'],
+                $data['message']
+            ),
+        ];
+
+        $response = wp_remote_post($this->api_base . '/v1/contacts', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $token,
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ],
+            'body' => wp_json_encode($payload),
+            'timeout' => 15,
+        ]);
+
+        if (is_wp_error($response)) {
+            return [
+                'success' => false,
+                'message' => $response->get_error_message(),
+            ];
+        }
+
+        $http_code = wp_remote_retrieve_response_code($response);
+        $body = json_decode(wp_remote_retrieve_body($response), true);
+
+        return [
+            'success' => $http_code >= 200 && $http_code < 300,
+            'message' => $body['message'] ?? $body['error']['message'] ?? '',
+            'contactId' => $body['_id'] ?? null,
+        ];
+    }
+
+    public function handle_contact_submission($request) {
+        if ($this->is_rate_limited('contact_submission', 5)) {
+            return new WP_Error('rate_limited', 'Too many contact attempts. Please try again shortly.', ['status' => 429]);
+        }
+
+        $params = $request->get_json_params();
+        $honeypot = sanitize_text_field($params['website'] ?? '');
+        if (!empty($honeypot)) {
+            return new WP_REST_Response(['success' => true, 'message' => 'Message sent.'], 200);
+        }
+
+        $data = [
+            'name' => sanitize_text_field($params['name'] ?? ''),
+            'email' => sanitize_email($params['email'] ?? ''),
+            'phone' => sanitize_text_field($params['phone'] ?? ''),
+            'reason' => sanitize_text_field($params['reason'] ?? ''),
+            'message' => sanitize_textarea_field($params['message'] ?? ''),
+        ];
+
+        if (empty($data['name']) || !is_email($data['email']) || empty($data['reason']) || empty($data['message'])) {
+            return new WP_Error('missing_data', 'Name, email, reason, and message are required.', ['status' => 400]);
+        }
+
+        $guesty_result = $this->create_guesty_contact($data);
+        $to = defined('CC_STAYS_CONTACT_EMAIL') ? CC_STAYS_CONTACT_EMAIL : get_option('cc_stays_contact_email', get_option('admin_email'));
+        $subject = sprintf('New CC Stays inquiry: %s', $data['reason']);
+        $body = sprintf(
+            "Name: %s\nEmail: %s\nPhone: %s\nReason: %s\nGuesty contact: %s\n\nMessage:\n%s",
+            $data['name'],
+            $data['email'],
+            $data['phone'] ?: 'Not provided',
+            $data['reason'],
+            !empty($guesty_result['contactId']) ? $guesty_result['contactId'] : ($guesty_result['success'] ? 'Created' : 'Not created'),
+            $data['message']
+        );
+        $headers = [
+            'Reply-To: ' . $data['name'] . ' <' . $data['email'] . '>',
+        ];
+
+        $mail_sent = wp_mail($to, $subject, $body, $headers);
+
+        if (!$mail_sent && empty($guesty_result['success'])) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => 'We could not send the message. Please email us directly.',
+            ], 500);
+        }
+
+        return new WP_REST_Response([
+            'success' => true,
+            'message' => 'Message sent.',
+            'guestyContactCreated' => !empty($guesty_result['success']),
+        ], 200);
     }
 
     /**
@@ -525,11 +767,22 @@ class CC_Stays_Guesty_Sync
                 has_shortcode($post->post_content, 'cc_stays_homepage') ||
                 has_shortcode($post->post_content, 'cc_stays_homepage_sections') ||
                 has_shortcode($post->post_content, 'cc_stays_homepage_coastal') ||
-                has_shortcode($post->post_content, 'cc_stays_homepage_revamp')
+                has_shortcode($post->post_content, 'cc_stays_homepage_revamp') ||
+                has_shortcode($post->post_content, 'cc_stays_archive') ||
+                has_shortcode($post->post_content, 'cc_stays_about') ||
+                has_shortcode($post->post_content, 'cc_stays_about_revamp') ||
+                has_shortcode($post->post_content, 'cc_stays_journal') ||
+                has_shortcode($post->post_content, 'cc_stays_journal_revamp') ||
+                has_shortcode($post->post_content, 'cc_stays_contact') ||
+                has_shortcode($post->post_content, 'cc_stays_contact_revamp') ||
+                has_shortcode($post->post_content, 'cc_stays_destinations') ||
+                has_shortcode($post->post_content, 'cc_stays_destinations_revamp') ||
+                has_shortcode($post->post_content, 'cc_stays_experiences') ||
+                has_shortcode($post->post_content, 'cc_stays_experiences_revamp')
             );
         }
 
-        if (!is_singular('properties') && !is_page('checkout') && !is_front_page() && !is_page(['stays', 'properties']) && !$has_homepage_shortcode) {
+        if (!is_singular('properties') && !is_page('checkout') && !is_front_page() && !is_page(['stays', 'properties', 'about', 'blog', 'journal', 'contact', 'destinations', 'experiences']) && !$has_homepage_shortcode) {
             return;
         }
 
@@ -705,7 +958,7 @@ class CC_Stays_Guesty_Sync
             'book_direct_url' => '/about',
             'reviews_url' => '/reviews',
             'about_url' => '/about',
-            'owners_url' => '/list-with-us',
+            'owners_url' => 'https://ccstays.guestyowners.com/',
             'faq_url' => '/list-with-us/#faq',
             'contact_url' => '/contact',
         ], $atts, 'cc_stays_homepage');
@@ -749,7 +1002,7 @@ class CC_Stays_Guesty_Sync
             'book_direct_url' => '/about',
             'reviews_url' => '/reviews',
             'about_url' => '/about',
-            'owners_url' => '/list-with-us',
+            'owners_url' => 'https://ccstays.guestyowners.com/',
             'faq_url' => '/faq',
             'contact_url' => '/contact',
         ], $atts, 'cc_stays_homepage_coastal');
@@ -790,8 +1043,8 @@ class CC_Stays_Guesty_Sync
             'stays_url' => '/stays',
             'about_url' => '/about',
             'contact_url' => '/contact',
-            'owners_url' => '/list-with-us',
-            'partner_url' => '/list-with-us',
+            'owners_url' => 'https://ccstays.guestyowners.com/',
+            'partner_url' => 'https://partners.ccstays.com/',
             'privacy_url' => '/privacy-policy',
             'terms_url' => '/terms',
             'accessibility_url' => '/accessibility',
@@ -845,6 +1098,120 @@ class CC_Stays_Guesty_Sync
         ];
 
         return '<div class="cc-stays-react-homepage-revamp" data-links="' . esc_attr(wp_json_encode($links)) . '" data-images="' . esc_attr(wp_json_encode($images)) . '"></div>';
+    }
+
+    private function get_revamp_links($atts, $shortcode) {
+        $atts = shortcode_atts([
+            'home_url' => '/',
+            'stays_url' => '/stays',
+            'destinations_url' => '/destinations',
+            'experiences_url' => '/experiences',
+            'about_url' => '/about',
+            'journal_url' => '/journal',
+            'contact_url' => '/contact',
+            'owners_url' => 'https://ccstays.guestyowners.com/',
+            'partner_url' => 'https://partners.ccstays.com/',
+            'privacy_url' => '/privacy-policy',
+            'terms_url' => '/terms',
+            'accessibility_url' => '/accessibility',
+            'instagram_url' => 'https://www.instagram.com/ccstays',
+        ], $atts, $shortcode);
+
+        return [
+            'home' => esc_url_raw($atts['home_url']),
+            'stays' => esc_url_raw($atts['stays_url']),
+            'destinations' => esc_url_raw($atts['destinations_url']),
+            'experiences' => esc_url_raw($atts['experiences_url']),
+            'about' => esc_url_raw($atts['about_url']),
+            'journal' => esc_url_raw($atts['journal_url']),
+            'contact' => esc_url_raw($atts['contact_url']),
+            'owners' => esc_url_raw($atts['owners_url']),
+            'partner' => esc_url_raw($atts['partner_url']),
+            'privacy' => esc_url_raw($atts['privacy_url']),
+            'terms' => esc_url_raw($atts['terms_url']),
+            'accessibility' => esc_url_raw($atts['accessibility_url']),
+            'instagram' => esc_url_raw($atts['instagram_url']),
+        ];
+    }
+
+    private function get_revamp_images() {
+        $image_base = plugin_dir_url(__FILE__) . 'assets/home/';
+
+        return [
+            'logo' => 'https://ccstays.com/wp-content/uploads/2026/08/CC_Stays_logo.png',
+            'hero' => 'https://ccstays.com/wp-content/uploads/2026/03/ZDWUJy55RE2qNR5ucgho_MMVid111-v.mp4',
+            'storyOne' => 'https://ccstays.com/wp-content/uploads/2026/08/ccright.jpeg',
+            'storyTwo' => 'https://ccstays.com/wp-content/uploads/2026/04/Casa-Palma-1-31.png',
+            'storyInset' => 'https://ccstays.com/wp-content/uploads/2026/07/71BBE3AA-BE2C-4D05-8E98-150181B7DC9F-2.jpg',
+            'storyThree' => 'https://ccstays.com/wp-content/uploads/2026/07/9.jpg',
+            'journalOne' => 'https://ccstays.com/wp-content/uploads/2026/04/Bamboo-1-43.png',
+            'journalTwo' => 'https://ccstays.com/wp-content/uploads/2026/04/Isles-Villa-8.png',
+            'journalThree' => 'https://ccstays.com/wp-content/uploads/2026/07/villa-ban-5.jpg',
+            'propertyImages' => [
+                'bamboo' => [
+                    'https://ccstays.com/wp-content/uploads/2026/04/Bamboo-1-43.png',
+                    'https://ccstays.com/wp-content/uploads/2026/08/ccright.jpeg',
+                    'https://ccstays.com/wp-content/uploads/2026/07/71BBE3AA-BE2C-4D05-8E98-150181B7DC9F-2.jpg',
+                ],
+                'hidden' => [
+                    'https://ccstays.com/wp-content/uploads/2026/04/Isles-Villa-3.png',
+                    'https://ccstays.com/wp-content/uploads/2026/04/Isles-Villa-8.png',
+                    'https://ccstays.com/wp-content/uploads/2026/04/Isles-Villa-11.png',
+                ],
+                'villa' => [
+                    'https://ccstays.com/wp-content/uploads/2026/07/villa-ban-5.jpg',
+                    $image_base . 'villa-banana-pool-exterior.jpg',
+                    $image_base . 'villa-banana-game-room.jpg',
+                ],
+                'manatee' => [
+                    'https://ccstays.com/wp-content/uploads/2026/04/Manatee-1-40.png',
+                    'https://ccstays.com/wp-content/uploads/2026/04/Casa-Palma-1-31.png',
+                    'https://ccstays.com/wp-content/uploads/2026/04/Casa-Palma-1-6.png',
+                ],
+            ],
+        ];
+    }
+
+    public function render_stays_archive_widget($atts = []) {
+        $links = $this->get_revamp_links($atts, 'cc_stays_archive');
+        $images = $this->get_revamp_images();
+
+        return '<div id="cc-stays-react-archive" data-links="' . esc_attr(wp_json_encode($links)) . '" data-images="' . esc_attr(wp_json_encode($images)) . '"></div>';
+    }
+
+    public function render_about_page_widget($atts = []) {
+        $links = $this->get_revamp_links($atts, 'cc_stays_about');
+        $images = $this->get_revamp_images();
+
+        return '<div class="cc-stays-react-about" data-links="' . esc_attr(wp_json_encode($links)) . '" data-images="' . esc_attr(wp_json_encode($images)) . '"></div>';
+    }
+
+    public function render_journal_page_widget($atts = []) {
+        $links = $this->get_revamp_links($atts, 'cc_stays_journal');
+        $images = $this->get_revamp_images();
+
+        return '<div class="cc-stays-react-journal" data-links="' . esc_attr(wp_json_encode($links)) . '" data-images="' . esc_attr(wp_json_encode($images)) . '"></div>';
+    }
+
+    public function render_contact_page_widget($atts = []) {
+        $links = $this->get_revamp_links($atts, 'cc_stays_contact');
+        $images = $this->get_revamp_images();
+
+        return '<div class="cc-stays-react-contact" data-links="' . esc_attr(wp_json_encode($links)) . '" data-images="' . esc_attr(wp_json_encode($images)) . '"></div>';
+    }
+
+    public function render_destinations_page_widget($atts = []) {
+        $links = $this->get_revamp_links($atts, 'cc_stays_destinations');
+        $images = $this->get_revamp_images();
+
+        return '<div class="cc-stays-react-destinations" data-links="' . esc_attr(wp_json_encode($links)) . '" data-images="' . esc_attr(wp_json_encode($images)) . '"></div>';
+    }
+
+    public function render_experiences_page_widget($atts = []) {
+        $links = $this->get_revamp_links($atts, 'cc_stays_experiences');
+        $images = $this->get_revamp_images();
+
+        return '<div class="cc-stays-react-experiences" data-links="' . esc_attr(wp_json_encode($links)) . '" data-images="' . esc_attr(wp_json_encode($images)) . '"></div>';
     }
 
     public function get_stays_archive_data() {

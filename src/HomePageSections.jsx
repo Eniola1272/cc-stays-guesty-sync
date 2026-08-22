@@ -8,7 +8,7 @@ const DEFAULT_LINKS = {
   bookDirect: "/about",
   reviews: "/reviews",
   about: "/about",
-  owners: "/list-with-us",
+  owners: "https://ccstays.guestyowners.com/",
   faq: "/list-with-us/#faq",
   contact: "/contact",
 };

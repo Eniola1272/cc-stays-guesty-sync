@@ -4,10 +4,10 @@ import "./HomePageRevamp.css";
 const DEFAULT_LINKS = {
   home: "/",
   stays: "/stays",
-  destinations: "/stays",
-  experiences: "/stays",
+  destinations: "/destinations",
+  experiences: "/experiences",
   about: "/about",
-  journal: "/blog",
+  journal: "/journal",
   contact: "/contact",
   owners: "https://ccstays.guestyowners.com/",
   partner: "https://partners.ccstays.com/",
@@ -123,11 +123,11 @@ const uniqueImages = (...groups) => {
 };
 
 const CcWatermark = () => (
-  <svg className="cc-revamp-watermark" viewBox="0 0 420 420" aria-hidden="true">
-    <circle cx="210" cy="210" r="172" />
-    <path d="M190 156c-17-18-51-18-72 4-27 29-27 75 0 103 21 22 55 23 72 4" />
-    <path d="M276 156c-17-18-51-18-72 4-27 29-27 75 0 103 21 22 55 23 72 4" />
-    <path d="M210 135v150" />
+  <svg className="cc-revamp-watermark" viewBox="0 0 460.33 460.33" aria-hidden="true">
+    <path d="M354.66,304.51c21.89-.15,42.7-7.56,56.13-21.08h0v-6.35c-12.63,16.1-32.99,22.89-56.14,22.89-35.22,0-64.26-34.04-65.07-69.11-.8-34.41,22.78-69.86,65.07-70.54,30.07-.49,50.51,13.23,56.14,31.57v-19.04c-13.95-12.2-34.84-17.03-56.14-17.03-55.12,0-81.78,36.97-81.6,73.97.18,37.52,27.94,75.1,81.61,74.71Z" />
+    <path d="M187.28,283.43h0v-6.35c-12.63,16.1-32.99,22.89-56.14,22.89-35.22,0-64.26-34.04-65.07-69.11-.8-34.41,22.78-69.86,65.07-70.54,30.07-.49,50.51,13.23,56.14,31.57v-19.04c-13.95-12.2-34.84-17.03-56.14-17.03-55.12,0-81.78,36.97-81.6,73.97.18,37.52,27.94,75.1,81.61,74.71,21.89-.15,42.7-7.56,56.13-21.08Z" />
+    <path d="M230.17,460.33c127.12,0,230.17-103.05,230.17-230.17S357.28,0,230.17,0,0,103.05,0,230.17s103.05,230.17,230.17,230.17ZM6.88,236.09C3.78,110.09,104.2,22.46,225.81,20.58c120.4-1.86,223.48,79.19,227.72,202.49,2.9,84.3-43.16,159.37-120.93,194.77-69.16,31.49-149.87,29.26-216.19-5.65C49.74,377.08,8.73,311,6.88,236.09Z" />
+    <rect x="227.11" y="138.6" width="6.1" height="183.13" />
   </svg>
 );
 
@@ -545,7 +545,7 @@ const HomePageRevamp = ({ mountNode }) => {
       <section className="cc-revamp-trip-band">
         <CcWatermark />
         <h2 className="cc-revamp-white-text">Sometimes the stay <em>is</em> the trip.</h2>
-        <a href={links.stays}>Explore the Collection <span>→</span></a>
+        <a href={links.stays} >Explore the Collection <span>→</span></a>
       </section>
 
       <section className="cc-revamp-section cc-revamp-reviews">

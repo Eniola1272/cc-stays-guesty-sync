@@ -9,6 +9,7 @@ import AmenitiesSection from "./AmenitiesSection";
 import HomePageSections from "./HomePageSections";
 import HomePageCoastal from "./HomePageCoastal";
 import HomePageRevamp from "./HomePageRevamp";
+import { AboutPage, ContactPage, DestinationsPage, ExperiencesPage, JournalPage } from "./InteriorPages";
 
 // Wait for the DOM to load
 document.addEventListener("DOMContentLoaded", () => {
@@ -46,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const staysMount = document.getElementById('cc-stays-react-archive');
   if (staysMount) {
       const staysRoot = createRoot(staysMount);
-      staysRoot.render(<StaysPage />);
+      staysRoot.render(<StaysPage mountNode={staysMount} />);
   }
 
   // 6. Mount Property Amenities Sections
@@ -71,5 +72,35 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll('.cc-stays-react-homepage-revamp').forEach((homepageMount) => {
       const homepageRoot = createRoot(homepageMount);
       homepageRoot.render(<HomePageRevamp mountNode={homepageMount} />);
+  });
+
+  // 10. Mount About Page
+  document.querySelectorAll('.cc-stays-react-about').forEach((aboutMount) => {
+      const aboutRoot = createRoot(aboutMount);
+      aboutRoot.render(<AboutPage mountNode={aboutMount} />);
+  });
+
+  // 11. Mount Journal Page
+  document.querySelectorAll('.cc-stays-react-journal').forEach((journalMount) => {
+      const journalRoot = createRoot(journalMount);
+      journalRoot.render(<JournalPage mountNode={journalMount} />);
+  });
+
+  // 12. Mount Contact Page
+  document.querySelectorAll('.cc-stays-react-contact').forEach((contactMount) => {
+      const contactRoot = createRoot(contactMount);
+      contactRoot.render(<ContactPage mountNode={contactMount} />);
+  });
+
+  // 13. Mount Destinations Page
+  document.querySelectorAll('.cc-stays-react-destinations').forEach((destinationsMount) => {
+      const destinationsRoot = createRoot(destinationsMount);
+      destinationsRoot.render(<DestinationsPage mountNode={destinationsMount} />);
+  });
+
+  // 14. Mount Experiences Page
+  document.querySelectorAll('.cc-stays-react-experiences').forEach((experiencesMount) => {
+      const experiencesRoot = createRoot(experiencesMount);
+      experiencesRoot.render(<ExperiencesPage mountNode={experiencesMount} />);
   });
 });
