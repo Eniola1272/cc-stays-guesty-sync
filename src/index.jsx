@@ -10,6 +10,7 @@ import HomePageSections from "./HomePageSections";
 import HomePageCoastal from "./HomePageCoastal";
 import HomePageRevamp from "./HomePageRevamp";
 import { AboutPage, ContactPage, DestinationsPage, ExperiencesPage, JournalPage } from "./InteriorPages";
+import "./PropertySections.css";
 
 // Wait for the DOM to load
 document.addEventListener("DOMContentLoaded", () => {

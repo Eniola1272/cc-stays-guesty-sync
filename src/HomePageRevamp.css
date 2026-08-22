@@ -157,6 +157,18 @@
   height: auto;
 }
 
+.cc-revamp-brand svg {
+  width: 40px;
+  height: 40px;
+  display: block;
+  flex: 0 0 auto;
+}
+
+.cc-revamp-brand svg path,
+.cc-revamp-brand svg rect {
+  fill: currentColor;
+}
+
 .cc-revamp-brand span {
   font-size: 13px;
   font-weight: 600;
@@ -1148,6 +1160,11 @@
     width: 38px;
   }
 
+  .cc-revamp-brand svg {
+    width: 38px;
+    height: 38px;
+  }
+
   .cc-revamp-brand span {
     font-size: 11px;
     letter-spacing: 0.28em;
@@ -1244,6 +1261,11 @@
 
   .cc-revamp-brand img {
     width: 36px;
+  }
+
+  .cc-revamp-brand svg {
+    width: 36px;
+    height: 36px;
   }
 
   .cc-revamp-brand span {
@@ -1626,4 +1648,8 @@
 
 .cc-revamp-white-text {
   color: var(--revamp-cream) !important;
+}
+
+.cc-revamp-fade {
+  opacity: 0.7;
 }

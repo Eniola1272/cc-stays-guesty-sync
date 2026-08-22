@@ -58,6 +58,19 @@ class CC_Stays_Guesty_Sync
         add_shortcode('cc_stays_destinations_revamp', [$this, 'render_destinations_page_widget']);
         add_shortcode('cc_stays_experiences', [$this, 'render_experiences_page_widget']);
         add_shortcode('cc_stays_experiences_revamp', [$this, 'render_experiences_page_widget']);
+        add_shortcode('cc_stays_property_revamp', [$this, 'render_property_revamp_page']);
+        add_shortcode('cc_stays_property_hero', [$this, 'render_property_hero_section']);
+        add_shortcode('cc_stays_property_gallery', [$this, 'render_property_gallery_section']);
+        add_shortcode('cc_stays_property_overview', [$this, 'render_property_overview_section']);
+        add_shortcode('cc_stays_property_about', [$this, 'render_property_about_section']);
+        add_shortcode('cc_stays_property_highlights', [$this, 'render_property_highlights_section']);
+        add_shortcode('cc_stays_property_sleep', [$this, 'render_property_sleep_section']);
+        add_shortcode('cc_stays_property_amenities', [$this, 'render_property_amenities_section']);
+        add_shortcode('cc_stays_property_booking', [$this, 'render_property_booking_section']);
+        add_shortcode('cc_stays_property_reviews', [$this, 'render_property_reviews_section']);
+        add_shortcode('cc_stays_property_location', [$this, 'render_property_location_section']);
+        add_shortcode('cc_stays_property_rules', [$this, 'render_property_rules_section']);
+        add_shortcode('cc_stays_property_cta', [$this, 'render_property_cta_section']);
 
         // Register the Stays Archive App shortcode
         add_shortcode('cc_stays_archive', [$this, 'render_stays_archive_widget']);
@@ -190,6 +203,9 @@ class CC_Stays_Guesty_Sync
                 if (isset($listing['bathrooms'])) {
                     update_post_meta($post_id, 'bathrooms', $listing['bathrooms']);
                 }
+                if (isset($listing['beds'])) {
+                    update_post_meta($post_id, 'beds', intval($listing['beds']));
+                }
                 $guest_count = $listing['accommodates'] ?? $listing['personCapacity'] ?? $listing['maxOccupancy'] ?? null;
                 if (!empty($guest_count)) {
                     update_post_meta($post_id, 'guests', intval($guest_count));
@@ -204,9 +220,44 @@ class CC_Stays_Guesty_Sync
                 if (isset($listing['amenities']) && is_array($listing['amenities'])) {
                     update_post_meta($post_id, 'guesty_amenities', wp_json_encode($listing['amenities']));
                 }
+                update_post_meta($post_id, 'guesty_listing_raw', wp_json_encode($listing));
+
+                $image_urls = $this->extract_guesty_image_urls($listing);
+                if (!empty($image_urls)) {
+                    update_post_meta($post_id, 'guesty_images', wp_json_encode($image_urls));
+                    if (!has_post_thumbnail($post_id)) {
+                        $this->sideload_property_image($post_id, $image_urls[0], true);
+                    }
+                }
 
             }
         }
+    }
+
+    private function extract_guesty_image_urls($listing)
+    {
+        $sources = [];
+        foreach (['pictures', 'images', 'photos'] as $key) {
+            if (!empty($listing[$key]) && is_array($listing[$key])) {
+                $sources = array_merge($sources, $listing[$key]);
+            }
+        }
+
+        $urls = [];
+        foreach ($sources as $item) {
+            $url = '';
+            if (is_string($item)) {
+                $url = $item;
+            } elseif (is_array($item)) {
+                $url = $item['original'] ?? $item['large'] ?? $item['url'] ?? $item['thumbnail'] ?? $item['src'] ?? '';
+            }
+
+            if ($url && filter_var($url, FILTER_VALIDATE_URL)) {
+                $urls[] = esc_url_raw($url);
+            }
+        }
+
+        return array_values(array_unique($urls));
     }
 
     /**
@@ -778,7 +829,20 @@ class CC_Stays_Guesty_Sync
                 has_shortcode($post->post_content, 'cc_stays_destinations') ||
                 has_shortcode($post->post_content, 'cc_stays_destinations_revamp') ||
                 has_shortcode($post->post_content, 'cc_stays_experiences') ||
-                has_shortcode($post->post_content, 'cc_stays_experiences_revamp')
+                has_shortcode($post->post_content, 'cc_stays_experiences_revamp') ||
+                has_shortcode($post->post_content, 'cc_stays_property_revamp') ||
+                has_shortcode($post->post_content, 'cc_stays_property_hero') ||
+                has_shortcode($post->post_content, 'cc_stays_property_gallery') ||
+                has_shortcode($post->post_content, 'cc_stays_property_overview') ||
+                has_shortcode($post->post_content, 'cc_stays_property_about') ||
+                has_shortcode($post->post_content, 'cc_stays_property_highlights') ||
+                has_shortcode($post->post_content, 'cc_stays_property_sleep') ||
+                has_shortcode($post->post_content, 'cc_stays_property_amenities') ||
+                has_shortcode($post->post_content, 'cc_stays_property_booking') ||
+                has_shortcode($post->post_content, 'cc_stays_property_reviews') ||
+                has_shortcode($post->post_content, 'cc_stays_property_location') ||
+                has_shortcode($post->post_content, 'cc_stays_property_rules') ||
+                has_shortcode($post->post_content, 'cc_stays_property_cta')
             );
         }
 
@@ -1212,6 +1276,664 @@ class CC_Stays_Guesty_Sync
         $images = $this->get_revamp_images();
 
         return '<div class="cc-stays-react-experiences" data-links="' . esc_attr(wp_json_encode($links)) . '" data-images="' . esc_attr(wp_json_encode($images)) . '"></div>';
+    }
+
+    private function get_shortcode_property_id($atts = []) {
+        $atts = shortcode_atts([
+            'post_id' => 0,
+            'id' => 0,
+        ], $atts);
+
+        $post_id = absint($atts['post_id'] ?: $atts['id']);
+        if ($post_id) {
+            return $post_id;
+        }
+
+        if (is_singular('properties')) {
+            return get_the_ID();
+        }
+
+        return 0;
+    }
+
+    private function cc_get_meta_first($post_id, $keys, $fallback = '') {
+        foreach ($keys as $key) {
+            $value = get_post_meta($post_id, $key, true);
+            if ($value !== '' && $value !== null && $value !== []) {
+                return $value;
+            }
+        }
+
+        return $fallback;
+    }
+
+    private function cc_get_meta_array($post_id, $keys, $fallback = []) {
+        $value = $this->cc_get_meta_first($post_id, $keys, null);
+        if ($value === null || $value === '') {
+            return $fallback;
+        }
+
+        if (is_array($value)) {
+            return array_values(array_filter($value));
+        }
+
+        $decoded = json_decode($value, true);
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            return array_values(array_filter($decoded));
+        }
+
+        if (is_string($value)) {
+            return array_values(array_filter(array_map('trim', preg_split('/[\r\n]+/', $value))));
+        }
+
+        return $fallback;
+    }
+
+    private function cc_get_meta_rows($post_id, $keys, $fallback = [], $columns = []) {
+        $value = $this->cc_get_meta_first($post_id, $keys, null);
+        if ($value === null || $value === '') {
+            return $fallback;
+        }
+
+        if (is_array($value)) {
+            return array_values(array_filter($value));
+        }
+
+        $decoded = json_decode($value, true);
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            return array_values(array_filter($decoded));
+        }
+
+        $rows = array_filter(array_map('trim', preg_split('/[\r\n]+/', (string) $value)));
+        $items = [];
+        foreach ($rows as $row) {
+            $parts = array_map('trim', explode('|', $row));
+            $item = [];
+            foreach ($columns as $index => $column) {
+                $item[$column] = $parts[$index] ?? '';
+            }
+            if (!empty(array_filter($item))) {
+                $items[] = $item;
+            }
+        }
+
+        return $items ?: $fallback;
+    }
+
+    private function get_section_property_gallery($post_id) {
+        $gallery = $this->cc_get_meta_array($post_id, ['cc_property_gallery', 'property_gallery', 'guesty_images'], []);
+        $featured = get_the_post_thumbnail_url($post_id, 'full');
+
+        if ($featured) {
+            array_unshift($gallery, $featured);
+        }
+
+        $images = [];
+        foreach ($gallery as $image) {
+            if (is_array($image)) {
+                $image = $image['url'] ?? $image['src'] ?? $image['original'] ?? '';
+            }
+            if ($image && filter_var($image, FILTER_VALIDATE_URL)) {
+                $images[] = esc_url_raw($image);
+            }
+        }
+
+        return array_values(array_unique($images));
+    }
+
+    private function get_property_section_data($post_id) {
+        if (!$post_id || get_post_type($post_id) !== 'properties') {
+            return null;
+        }
+
+        $bedrooms = (int) (get_post_meta($post_id, 'bedrooms', true) ?: 1);
+        $description = trim(wp_strip_all_tags(get_post_field('post_content', $post_id)));
+        $reviews = $this->cc_get_meta_rows($post_id, ['cc_property_reviews', 'property_reviews'], [], ['name', 'date', 'quote', 'rating']);
+        $fallback_highlights = [
+            ['title' => 'Designed for the stay', 'copy' => 'Spaces arranged for settling in, gathering, and unwinding.', 'icon' => 'sparkle'],
+            ['title' => 'Ready when you arrive', 'copy' => 'Smooth check-in, clear instructions, and essentials in place.', 'icon' => 'key'],
+            ['title' => 'Help when you need it', 'copy' => 'Local support before and during your trip.', 'icon' => 'bell'],
+        ];
+        $fallback_sleeping = [];
+        for ($index = 1; $index <= max(1, $bedrooms); $index++) {
+            $fallback_sleeping[] = ['name' => 'Bedroom ' . $index, 'bed' => 'Comfortable bed', 'image' => ''];
+        }
+
+        return [
+            'id' => $post_id,
+            'title' => get_the_title($post_id),
+            'url' => get_permalink($post_id),
+            'listing_id' => get_post_meta($post_id, 'guesty_listing_id', true),
+            'city' => get_post_meta($post_id, 'location_city', true) ?: '',
+            'region' => $this->cc_get_meta_first($post_id, ['location_region', 'location_state', 'state'], ''),
+            'subtitle' => $this->cc_get_meta_first($post_id, ['cc_property_subtitle', 'property_subtitle'], ''),
+            'intro' => $this->cc_get_meta_first($post_id, ['cc_property_intro', 'property_intro'], $description),
+            'description' => $description,
+            'gallery' => $this->get_section_property_gallery($post_id),
+            'guests' => (int) (get_post_meta($post_id, 'guests', true) ?: 2),
+            'bedrooms' => $bedrooms,
+            'beds' => (int) ($this->cc_get_meta_first($post_id, ['cc_property_beds', 'beds'], $bedrooms) ?: $bedrooms),
+            'bathrooms' => get_post_meta($post_id, 'bathrooms', true) ?: 1,
+            'nightly_rate' => get_post_meta($post_id, 'nightly_rate', true) ?: '',
+            'min_nights' => get_post_meta($post_id, 'min_nights', true) ?: '2',
+            'rating' => $this->cc_get_meta_first($post_id, ['cc_property_rating', 'rating', 'review_rating'], ''),
+            'review_count' => (int) ($this->cc_get_meta_first($post_id, ['cc_property_review_count', 'review_count'], count($reviews)) ?: count($reviews)),
+            'highlights' => $this->cc_get_meta_rows($post_id, ['cc_property_highlights', 'property_highlights'], $fallback_highlights, ['title', 'copy', 'icon']),
+            'sleeping' => $this->cc_get_meta_rows($post_id, ['cc_property_sleeping', 'property_sleeping'], $fallback_sleeping, ['name', 'bed', 'image']),
+            'reviews' => $reviews,
+            'lat' => floatval(get_post_meta($post_id, 'latitude', true)),
+            'lng' => floatval(get_post_meta($post_id, 'longitude', true)),
+            'location_blurb' => $this->cc_get_meta_first($post_id, ['cc_property_location_blurb', 'property_location_blurb'], 'The exact address is shared after booking.'),
+            'location_notes' => $this->cc_get_meta_rows($post_id, ['cc_property_location_notes', 'property_location_notes'], [], ['title', 'detail']),
+            'rules' => $this->cc_get_meta_array($post_id, ['cc_property_rules', 'property_rules'], ['Check-in after 4:00 PM', 'Checkout before 10:00 AM', 'No smoking']),
+            'safety' => $this->cc_get_meta_array($post_id, ['cc_property_safety', 'property_safety'], ['Smoke alarm', 'Carbon monoxide alarm']),
+            'cancellation' => $this->cc_get_meta_first($post_id, ['cc_property_cancellation', 'property_cancellation'], 'Cancellation terms are shown during checkout before you request to book.'),
+            'license' => $this->cc_get_meta_first($post_id, ['cc_property_license', 'property_license'], ''),
+        ];
+    }
+
+    private function property_missing_shortcode_message() {
+        return '<p class="cc-property-section-note">This property section needs to be placed on a single property page.</p>';
+    }
+
+    private function property_stat_label($value, $singular, $plural = '') {
+        $number = floatval($value);
+        $label = ($number == 1.0) ? $singular : ($plural ?: $singular . 's');
+        return esc_html($value . ' ' . $label);
+    }
+
+    private function property_location_label($property) {
+        return esc_html(implode(', ', array_filter([$property['city'], $property['region']])));
+    }
+
+    private function property_short_title($title) {
+        $words = preg_split('/\s+/', trim(wp_strip_all_tags((string) $title)));
+        $words = array_values(array_filter($words, 'strlen'));
+
+        if (count($words) <= 2) {
+            return trim((string) $title);
+        }
+
+        return implode(' ', array_slice($words, 0, 2));
+    }
+
+    private function render_property_read_more($content) {
+        $content = trim((string) $content);
+        if ($content === '') {
+            return '';
+        }
+
+        return '<div class="cc-property-read-more" data-expanded="false"><div class="cc-property-read-more-copy">' . wp_kses_post(wpautop($content)) . '</div><button type="button" class="cc-property-read-more-toggle" aria-expanded="false">Read more →</button></div>' . $this->property_read_more_script();
+    }
+
+    private function property_read_more_script() {
+        return '<script>(function(){if(window.ccPropertyReadMoreReady)return;window.ccPropertyReadMoreReady=true;function refresh(){document.querySelectorAll(".cc-property-read-more").forEach(function(root){var copy=root.querySelector(".cc-property-read-more-copy");var button=root.querySelector(".cc-property-read-more-toggle");if(!copy||!button)return;button.hidden=copy.scrollHeight<=copy.clientHeight+2;});}document.addEventListener("click",function(event){var button=event.target.closest(".cc-property-read-more-toggle");if(!button)return;var root=button.closest(".cc-property-read-more");if(!root)return;var expanded=root.getAttribute("data-expanded")==="true";root.setAttribute("data-expanded",expanded?"false":"true");button.setAttribute("aria-expanded",expanded?"false":"true");button.textContent=expanded?"Read more →":"Show less";});if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",refresh);}else{requestAnimationFrame(refresh);}window.addEventListener("resize",refresh);})();</script>';
+    }
+
+    private function property_icon_svg($name = 'sparkle') {
+        $icons = [
+            'key' => '<circle cx="8" cy="15" r="3"/><path d="m10.2 12.8 7-7"/><path d="m15.5 7.5 2 2"/><path d="m13.7 9.3 2 2"/>',
+            'bell' => '<path d="M6.8 10.5a5.2 5.2 0 0 1 10.4 0c0 5 2 5.8 2 5.8H4.8s2-.8 2-5.8Z"/><path d="M10 19a2.2 2.2 0 0 0 4 0"/>',
+            'home' => '<path d="m3.5 11 8.5-7 8.5 7"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M10 20v-5h4v5"/>',
+            'bed' => '<path d="M4 11V5"/><path d="M20 13v6"/><path d="M4 19v-8h12a4 4 0 0 1 4 4v4"/><path d="M4 15h16"/><path d="M7 9h4"/>',
+            'sparkle' => '<path d="M12 3.5 14.1 9l5.4 2-5.4 2L12 18.5 9.9 13l-5.4-2 5.4-2L12 3.5Z"/><path d="M18 4v3"/><path d="M19.5 5.5h-3"/>',
+        ];
+
+        return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . ($icons[$name] ?? $icons['sparkle']) . '</svg>';
+    }
+
+    public function render_property_hero_section($atts = []) {
+        $property = $this->get_property_section_data($this->get_shortcode_property_id($atts));
+        if (!$property) {
+            return $this->property_missing_shortcode_message();
+        }
+
+        ob_start();
+        ?>
+        <section class="cc-property-section-shell cc-property-hero-section">
+            <div>
+                <p class="cc-property-eyebrow">CC Stays Residence</p>
+                <h1><?php echo esc_html($this->property_short_title($property['title'])); ?></h1>
+                <p class="cc-property-location-line"><?php echo $this->property_location_label($property); ?></p>
+                <p class="cc-property-stat-line">
+                    <?php echo $this->property_stat_label($property['guests'], 'guest'); ?> ·
+                    <?php echo $this->property_stat_label($property['bedrooms'], 'bedroom'); ?> ·
+                    <?php echo $this->property_stat_label($property['beds'], 'bed'); ?> ·
+                    <?php echo $this->property_stat_label($property['bathrooms'], 'bath'); ?>
+                </p>
+            </div>
+            <?php if ($property['rating']) : ?>
+                <span class="cc-property-rating-pill">★ <?php echo esc_html($property['rating']); ?></span>
+            <?php endif; ?>
+        </section>
+        <?php
+        return ob_get_clean();
+    }
+
+    public function render_property_gallery_section($atts = []) {
+        $property = $this->get_property_section_data($this->get_shortcode_property_id($atts));
+        if (!$property) {
+            return $this->property_missing_shortcode_message();
+        }
+        $images = $property['gallery'];
+        if (empty($images)) {
+            $images = ['https://via.placeholder.com/1400x900?text=CC+Stays'];
+        }
+        $visible = array_slice(array_pad($images, 5, $images[0]), 0, 5);
+
+        ob_start();
+        ?>
+        <section class="cc-property-section-shell">
+            <div class="cc-property-gallery-grid">
+                <?php foreach ($visible as $index => $image) : ?>
+                    <a class="<?php echo $index === 0 ? 'primary' : ''; ?>" href="<?php echo esc_url($image); ?>" target="_blank" rel="noopener">
+                        <img src="<?php echo esc_url($image); ?>" alt="" loading="<?php echo $index === 0 ? 'eager' : 'lazy'; ?>">
+                    </a>
+                <?php endforeach; ?>
+                <a class="cc-property-gallery-button" href="<?php echo esc_url($visible[0]); ?>" target="_blank" rel="noopener">Show photos</a>
+            </div>
+        </section>
+        <?php
+        return ob_get_clean();
+    }
+
+    public function render_property_overview_section($atts = []) {
+        $property = $this->get_property_section_data($this->get_shortcode_property_id($atts));
+        if (!$property) {
+            return $this->property_missing_shortcode_message();
+        }
+
+        ob_start();
+        ?>
+        <section class="cc-property-section-shell cc-property-overview-section">
+            <div>
+                <h2><?php echo esc_html($property['subtitle'] ?: $property['title'] . ' by CC Stays'); ?></h2>
+                <p><?php echo $this->property_stat_label($property['guests'], 'guest'); ?> · <?php echo $this->property_stat_label($property['bedrooms'], 'bedroom'); ?> · <?php echo $this->property_stat_label($property['bathrooms'], 'bath'); ?></p>
+            </div>
+            <div class="cc-property-residence-card">
+                <?php echo $this->property_icon_svg('home'); ?>
+                <div>
+                    <strong>A CC Stays Residence</strong>
+                    <span>Guest-first homes with hotel-level standards.</span>
+                </div>
+            </div>
+        </section>
+        <?php
+        return ob_get_clean();
+    }
+
+    public function render_property_about_section($atts = []) {
+        $property = $this->get_property_section_data($this->get_shortcode_property_id($atts));
+        if (!$property) {
+            return $this->property_missing_shortcode_message();
+        }
+
+        return '<section class="cc-property-section-shell cc-property-copy-section"><h2>About this stay</h2>' . $this->render_property_read_more($property['intro']) . '</section>';
+    }
+
+    public function render_property_highlights_section($atts = []) {
+        $property = $this->get_property_section_data($this->get_shortcode_property_id($atts));
+        if (!$property) {
+            return $this->property_missing_shortcode_message();
+        }
+
+        ob_start();
+        ?>
+        <section class="cc-property-section-shell">
+            <div class="cc-property-highlight-grid">
+                <?php foreach ($property['highlights'] as $item) : ?>
+                    <article>
+                        <?php echo $this->property_icon_svg($item['icon'] ?? 'sparkle'); ?>
+                        <h3><?php echo esc_html($item['title'] ?? 'CC Stays'); ?></h3>
+                        <p><?php echo esc_html($item['copy'] ?? ''); ?></p>
+                    </article>
+                <?php endforeach; ?>
+            </div>
+        </section>
+        <?php
+        return ob_get_clean();
+    }
+
+    public function render_property_sleep_section($atts = []) {
+        $property = $this->get_property_section_data($this->get_shortcode_property_id($atts));
+        if (!$property) {
+            return $this->property_missing_shortcode_message();
+        }
+
+        ob_start();
+        ?>
+        <section class="cc-property-section-shell cc-property-sleep-section">
+            <h2>Where you'll sleep</h2>
+            <div class="cc-property-sleep-rail">
+                <?php foreach ($property['sleeping'] as $room) : ?>
+                    <article>
+                        <?php if (!empty($room['image'])) : ?>
+                            <img src="<?php echo esc_url($room['image']); ?>" alt="">
+                        <?php else : ?>
+                            <div class="cc-property-sleep-placeholder"><?php echo $this->property_icon_svg('bed'); ?></div>
+                        <?php endif; ?>
+                        <h3><?php echo esc_html($room['name'] ?? 'Bedroom'); ?></h3>
+                        <p><?php echo esc_html($room['bed'] ?? 'Comfortable bed'); ?></p>
+                    </article>
+                <?php endforeach; ?>
+            </div>
+        </section>
+        <?php
+        return ob_get_clean();
+    }
+
+    public function render_property_amenities_section($atts = []) {
+        return '<section class="cc-property-section-shell">' . $this->render_amenities_widget() . '</section>';
+    }
+
+    public function render_property_booking_section($atts = []) {
+        return '<section class="cc-property-section-shell cc-property-booking-section">' . $this->render_booking_widget() . '</section>';
+    }
+
+    public function render_property_reviews_section($atts = []) {
+        $property = $this->get_property_section_data($this->get_shortcode_property_id($atts));
+        if (!$property) {
+            return $this->property_missing_shortcode_message();
+        }
+
+        ob_start();
+        ?>
+        <section class="cc-property-section-shell cc-property-reviews-section">
+            <p class="cc-property-eyebrow">What guests say</p>
+            <h2><?php echo $property['rating'] ? esc_html($property['rating']) . ' guest rating' : 'Guest reviews'; ?></h2>
+            <?php if ($property['review_count']) : ?><p><?php echo esc_html($property['review_count']); ?>+ guest reviews</p><?php endif; ?>
+            <div class="cc-property-review-rail">
+                <?php foreach (array_slice($property['reviews'], 0, 6) as $review) : ?>
+                    <article>
+                        <div>★★★★★</div>
+                        <p>“<?php echo esc_html($review['quote'] ?? ''); ?>”</p>
+                        <strong><?php echo esc_html($review['name'] ?? 'Guest'); ?></strong>
+                        <span><?php echo esc_html($review['date'] ?? $property['title']); ?></span>
+                    </article>
+                <?php endforeach; ?>
+            </div>
+        </section>
+        <?php
+        return ob_get_clean();
+    }
+
+    public function render_property_location_section($atts = []) {
+        $property = $this->get_property_section_data($this->get_shortcode_property_id($atts));
+        if (!$property) {
+            return $this->property_missing_shortcode_message();
+        }
+
+        $map_src = ($property['lat'] && $property['lng']) ? 'https://maps.google.com/maps?q=' . rawurlencode($property['lat'] . ',' . $property['lng']) . '&z=13&output=embed' : '';
+        ob_start();
+        ?>
+        <section class="cc-property-section-shell cc-property-location-section">
+            <h2>Where you'll be</h2>
+            <p><?php echo esc_html($property['location_blurb']); ?></p>
+            <div class="cc-property-map-box">
+                <?php if ($map_src) : ?>
+                    <iframe title="<?php echo esc_attr($property['title']); ?> map" src="<?php echo esc_url($map_src); ?>" loading="lazy"></iframe>
+                <?php else : ?>
+                    <span>Map location coming soon.</span>
+                <?php endif; ?>
+            </div>
+        </section>
+        <?php
+        return ob_get_clean();
+    }
+
+    public function render_property_rules_section($atts = []) {
+        $property = $this->get_property_section_data($this->get_shortcode_property_id($atts));
+        if (!$property) {
+            return $this->property_missing_shortcode_message();
+        }
+
+        ob_start();
+        ?>
+        <section class="cc-property-section-shell cc-property-rules-section">
+            <h2>Things to know</h2>
+            <div>
+                <article><h3>House rules</h3><?php foreach ($property['rules'] as $rule) : ?><p><?php echo esc_html($rule); ?></p><?php endforeach; ?></article>
+                <article><h3>Safety</h3><?php foreach ($property['safety'] as $item) : ?><p><?php echo esc_html($item); ?></p><?php endforeach; ?></article>
+                <article><h3>Cancellation</h3><p><?php echo esc_html($property['cancellation']); ?></p><?php if ($property['license']) : ?><p>License: <?php echo esc_html($property['license']); ?></p><?php endif; ?></article>
+            </div>
+        </section>
+        <?php
+        return ob_get_clean();
+    }
+
+    public function render_property_cta_section($atts = []) {
+        $links = $this->get_revamp_links($atts, 'cc_stays_property_cta');
+        return '<section class="cc-property-final-cta"><p class="cc-property-eyebrow">Book With CC Stays</p><h2>Take the trip.<br>We’ll take care of the <em>stay.</em></h2><a href="' . esc_url($links['stays']) . '">Explore the collection →</a></section>';
+    }
+
+    private function property_cc_logo_svg($class = '') {
+        return '<svg class="' . esc_attr($class) . '" viewBox="0 0 460.33 460.33" fill="currentColor" aria-hidden="true"><path d="M354.66,304.51c21.89-.15,42.7-7.56,56.13-21.08v-6.35c-12.63,16.1-32.99,22.89-56.14,22.89-35.22,0-64.26-34.04-65.07-69.11-.8-34.41,22.78-69.86,65.07-70.54,30.07-.49,50.51,13.23,56.14,31.57v-19.04c-13.95-12.2-34.84-17.03-56.14-17.03-55.12,0-81.78,36.97-81.6,73.97.18,37.52,27.94,75.1,81.61,74.71Z"/><path d="M187.28,283.43v-6.35c-12.63,16.1-32.99,22.89-56.14,22.89-35.22,0-64.26-34.04-65.07-69.11-.8-34.41,22.78-69.86,65.07-70.54,30.07-.49,50.51,13.23,56.14,31.57v-19.04c-13.95-12.2-34.84-17.03-56.14-17.03-55.12,0-81.78,36.97-81.6,73.97.18,37.52,27.94,75.1,81.61,74.71,21.89-.15,42.7-7.56,56.13-21.08Z"/><path d="M230.17,460.33c127.12,0,230.17-103.05,230.17-230.17S357.28,0,230.17,0,0,103.05,0,230.17s103.05,230.17,230.17,230.17ZM6.88,236.09C3.78,110.09,104.2,22.46,225.81,20.58c120.4-1.86,223.48,79.19,227.72,202.49,2.9,84.3-43.16,159.37-120.93,194.77-69.16,31.49-149.87,29.26-216.19-5.65C49.74,377.08,8.73,311,6.88,236.09Z"/><rect x="227.11" y="138.6" width="6.1" height="183.13"/></svg>';
+    }
+
+    private function get_property_flat_amenities($post_id) {
+        $amenities_json = $this->get_property_amenities_json($post_id);
+        $amenities = $amenities_json ? json_decode($amenities_json, true) : [];
+        $flat = [];
+
+        if (is_array($amenities)) {
+            foreach ($amenities as $amenity) {
+                if (is_string($amenity)) {
+                    $flat[] = $amenity;
+                } elseif (is_array($amenity)) {
+                    $name = $amenity['title'] ?? $amenity['name'] ?? $amenity['amenity'] ?? '';
+                    if ($name) {
+                        $flat[] = $name;
+                    }
+                }
+            }
+        }
+
+        if (empty($flat)) {
+            $flat = ['Fast WiFi', 'Full kitchen', 'Fresh linens', 'Coffee maker', 'Air conditioning', 'Washer', 'Dryer', 'Outdoor space'];
+        }
+
+        return array_values(array_unique(array_filter(array_map('trim', $flat))));
+    }
+
+    private function render_property_full_header($links) {
+        ob_start();
+        ?>
+        <header class="cc-property-full-nav">
+            <div class="cc-property-full-wrap cc-property-full-nav-inner">
+                <a class="cc-property-full-brand" href="<?php echo esc_url($links['home']); ?>">
+                    <?php echo $this->property_cc_logo_svg(); ?>
+                    <span>CC Stays</span>
+                </a>
+                <nav aria-label="Property page navigation">
+                    <a href="<?php echo esc_url($links['stays']); ?>">Stays</a>
+                    <a href="<?php echo esc_url($links['about']); ?>">About Us</a>
+                    <a href="<?php echo esc_url($links['contact']); ?>">Contact</a>
+                    <a href="<?php echo esc_url($links['partner']); ?>">Partner With Us ↗</a>
+                    <a class="muted" href="<?php echo esc_url($links['owners']); ?>">Owners ↗</a>
+                </nav>
+            </div>
+        </header>
+        <?php
+        return ob_get_clean();
+    }
+
+    private function render_property_full_footer($links) {
+        ob_start();
+        ?>
+        <footer class="cc-property-full-footer">
+            <div class="cc-property-full-wrap cc-property-full-footer-grid">
+                <div class="cc-property-full-footer-brand">
+                    <?php echo $this->property_cc_logo_svg(); ?>
+                    <span>STAYS</span>
+                    <p>Stay somewhere you'll remember.</p>
+                </div>
+                <nav><h5>Stay</h5><a href="<?php echo esc_url($links['stays']); ?>">All Stays</a><a href="<?php echo esc_url($links['destinations']); ?>">Destinations</a><a href="<?php echo esc_url($links['experiences']); ?>">Experiences</a></nav>
+                <nav><h5>CC Stays</h5><a href="<?php echo esc_url($links['about']); ?>">About Us</a><a href="<?php echo esc_url($links['journal']); ?>">The Journal</a><a href="<?php echo esc_url($links['contact']); ?>">Contact</a></nav>
+                <nav><h5>Partners</h5><a href="<?php echo esc_url($links['partner']); ?>">Partner With Us ↗</a><a href="<?php echo esc_url($links['owners']); ?>">Owners ↗</a></nav>
+                <nav><h5>Follow</h5><a href="<?php echo esc_url($links['instagram']); ?>">Instagram</a></nav>
+            </div>
+            <div class="cc-property-full-wrap cc-property-full-footer-bottom">
+                <span>© 2026 CC Stays. All rights reserved.</span>
+                <span><a href="<?php echo esc_url($links['privacy']); ?>">Privacy</a><a href="<?php echo esc_url($links['terms']); ?>">Terms</a><a href="<?php echo esc_url($links['accessibility']); ?>">Accessibility</a></span>
+            </div>
+        </footer>
+        <?php
+        return ob_get_clean();
+    }
+
+    public function render_property_revamp_page($atts = []) {
+        $property = $this->get_property_section_data($this->get_shortcode_property_id($atts));
+        if (!$property) {
+            return $this->property_missing_shortcode_message();
+        }
+
+        $links = $this->get_revamp_links($atts, 'cc_stays_property_revamp');
+        $images = $property['gallery'];
+        if (empty($images)) {
+            $images = ['https://via.placeholder.com/1400x900?text=CC+Stays'];
+        }
+        $visible_images = array_slice(array_pad($images, 5, $images[0]), 0, 5);
+        $amenities = $this->get_property_flat_amenities($property['id']);
+        $rate = $property['nightly_rate'] ? '$' . esc_html(number_format((float) $property['nightly_rate'])) : '';
+        $map_src = ($property['lat'] && $property['lng']) ? 'https://maps.google.com/maps?q=' . rawurlencode($property['lat'] . ',' . $property['lng']) . '&z=13&output=embed' : '';
+
+        ob_start();
+        ?>
+        <div class="cc-property-composed-page cc-property-full-page">
+            <?php echo $this->render_property_full_header($links); ?>
+            <main>
+                <div class="cc-property-full-wrap">
+                    <section class="cc-property-full-hero">
+                        <div>
+                            <h1><?php echo esc_html($this->property_short_title($property['title'])); ?></h1>
+                            <p>
+                                <?php echo $this->property_location_label($property); ?>
+                                <?php if ($property['rating']) : ?>
+                                    <span>★ <?php echo esc_html($property['rating']); ?><?php echo $property['review_count'] ? ' · ' . esc_html($property['review_count']) . ' reviews' : ''; ?></span>
+                                <?php endif; ?>
+                            </p>
+                        </div>
+                        <a class="cc-property-share-link" href="<?php echo esc_url($property['url']); ?>">Share</a>
+                    </section>
+
+                    <section class="cc-property-full-gallery" aria-label="<?php echo esc_attr($property['title']); ?> photos">
+                        <?php foreach ($visible_images as $index => $image) : ?>
+                            <a class="<?php echo $index === 0 ? 'primary' : ''; ?>" href="<?php echo esc_url($image); ?>" target="_blank" rel="noopener">
+                                <img src="<?php echo esc_url($image); ?>" alt="" loading="<?php echo $index === 0 ? 'eager' : 'lazy'; ?>">
+                            </a>
+                        <?php endforeach; ?>
+                        <a class="cc-property-full-gallery-button" href="<?php echo esc_url($visible_images[0]); ?>" target="_blank" rel="noopener">Show all photos</a>
+                    </section>
+                </div>
+
+                <div class="cc-property-full-wrap cc-property-full-layout">
+                    <div class="cc-property-full-main">
+                        <section class="cc-property-full-section cc-property-full-overview">
+                            <h2><?php echo esc_html($property['subtitle'] ?: $property['title'] . ' · ' . $this->property_location_label($property)); ?></h2>
+                            <p><?php echo $this->property_stat_label($property['guests'], 'guest'); ?> · <?php echo $this->property_stat_label($property['bedrooms'], 'bedroom'); ?> · <?php echo $this->property_stat_label($property['beds'], 'bed'); ?> · <?php echo $this->property_stat_label($property['bathrooms'], 'bath'); ?></p>
+                            <div class="cc-property-full-residence">
+                                <?php echo $this->property_cc_logo_svg(); ?>
+                                <div><strong>A CC Stays Residence</strong><span>Selected for comfort, character, and the way it feels to actually stay there.</span></div>
+                            </div>
+                        </section>
+
+                        <section class="cc-property-full-section cc-property-full-about">
+                            <h2>About this stay</h2>
+                            <?php echo $this->render_property_read_more($property['intro']); ?>
+                        </section>
+
+                        <section class="cc-property-full-section">
+                            <div class="cc-property-full-highlights">
+                                <?php foreach (array_slice($property['highlights'], 0, 3) as $item) : ?>
+                                    <article>
+                                        <span><?php echo $this->property_icon_svg($item['icon'] ?? 'sparkle'); ?></span>
+                                        <div><h3><?php echo esc_html($item['title'] ?? 'CC Stays'); ?></h3><p><?php echo esc_html($item['copy'] ?? ''); ?></p></div>
+                                    </article>
+                                <?php endforeach; ?>
+                            </div>
+                        </section>
+
+                        <section class="cc-property-full-section cc-property-full-sleep">
+                            <h2>Where you'll sleep</h2>
+                            <div class="cc-property-full-sleep-rail">
+                                <?php foreach ($property['sleeping'] as $room) : ?>
+                                    <article>
+                                        <?php if (!empty($room['image'])) : ?>
+                                            <img src="<?php echo esc_url($room['image']); ?>" alt="">
+                                        <?php else : ?>
+                                            <div class="cc-property-full-placeholder"><?php echo $this->property_icon_svg('bed'); ?></div>
+                                        <?php endif; ?>
+                                        <h3><?php echo esc_html($room['name'] ?? 'Bedroom'); ?></h3>
+                                        <p><?php echo esc_html($room['bed'] ?? 'Comfortable bed'); ?></p>
+                                    </article>
+                                <?php endforeach; ?>
+                            </div>
+                        </section>
+
+                        <section class="cc-property-full-section cc-property-full-amenities">
+                            <h2>What this stay offers</h2>
+                            <div>
+                                <?php foreach (array_slice($amenities, 0, 10) as $amenity) : ?>
+                                    <p><span>✓</span><?php echo esc_html($amenity); ?></p>
+                                <?php endforeach; ?>
+                            </div>
+                            <a class="cc-property-full-outline" href="#cc-property-amenities">Show all <?php echo esc_html(count($amenities)); ?> amenities</a>
+                        </section>
+
+                        <?php if (!empty($property['reviews']) || $property['rating']) : ?>
+                            <section class="cc-property-full-section cc-property-full-reviews">
+                                <h2><?php echo $property['rating'] ? '★ ' . esc_html($property['rating']) . ($property['review_count'] ? ' · ' . esc_html($property['review_count']) . ' reviews' : '') : 'Guest reviews'; ?></h2>
+                                <div>
+                                    <?php foreach (array_slice($property['reviews'], 0, 4) as $review) : ?>
+                                        <article><span>★★★★★</span><p>“<?php echo esc_html($review['quote'] ?? ''); ?>”</p><strong><?php echo esc_html($review['name'] ?? 'Guest'); ?></strong><small><?php echo esc_html($review['date'] ?? $property['title']); ?></small></article>
+                                    <?php endforeach; ?>
+                                </div>
+                            </section>
+                        <?php endif; ?>
+
+                        <section class="cc-property-full-section cc-property-full-promise">
+                            <h2>The CC Stays Promise</h2>
+                            <strong>Book with confidence.</strong>
+                            <a href="<?php echo esc_url($links['contact']); ?>">Read more →</a>
+                        </section>
+
+                        <section class="cc-property-full-section cc-property-full-location">
+                            <h2>Where you'll be</h2>
+                            <strong><?php echo $this->property_location_label($property); ?></strong>
+                            <div class="cc-property-full-map">
+                                <?php if ($map_src) : ?>
+                                    <iframe title="<?php echo esc_attr($property['title']); ?> map" src="<?php echo esc_url($map_src); ?>" loading="lazy"></iframe>
+                                <?php else : ?>
+                                    <span>Map location coming soon.</span>
+                                <?php endif; ?>
+                            </div>
+                            <p><?php echo esc_html($property['location_blurb']); ?></p>
+                        </section>
+
+                        <section class="cc-property-full-section cc-property-full-rules">
+                            <h2>Things to know</h2>
+                            <div>
+                                <article><h3>House rules</h3><?php foreach ($property['rules'] as $rule) : ?><p><?php echo esc_html($rule); ?></p><?php endforeach; ?></article>
+                                <article><h3>Safety & property</h3><?php foreach ($property['safety'] as $item) : ?><p><?php echo esc_html($item); ?></p><?php endforeach; ?></article>
+                                <article><h3>Cancellation</h3><p><?php echo esc_html($property['cancellation']); ?></p></article>
+                            </div>
+                        </section>
+                    </div>
+
+                    <aside class="cc-property-full-aside">
+                        <div class="cc-property-full-book-card">
+                            <?php if ($rate) : ?><h2><?php echo $rate; ?> <span>/ night</span></h2><?php endif; ?>
+                            <?php echo $this->render_booking_widget(); ?>
+                            <p>You won't be charged yet.</p>
+                            <a href="<?php echo esc_url($links['contact']); ?>">The CC Stays Promise · Book with confidence →</a>
+                        </div>
+                    </aside>
+                </div>
+            </main>
+            <?php echo $this->render_property_full_footer($links); ?>
+        </div>
+        <?php
+        return ob_get_clean();
     }
 
     public function get_stays_archive_data() {

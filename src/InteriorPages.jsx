@@ -271,7 +271,7 @@ export const ExperiencesPage = ({ mountNode }) => {
           <ExactKick center>In the meantime</ExactKick>
           <h2>Planning <em className="cc-exact-accent">something?</em></h2>
           <p className="cc-exact-lede">Tell us what you have in mind. We&apos;ll help where we can.</p>
-          <a className="cc-exact-btn cc-exact-btn-primary" href={`${links.contact}?reason=concierge`}>Ask CC Stays <span>→</span></a>
+          <a className="cc-exact-btn cc-exact-btn-primary cc-revamp-white-text" href={`${links.contact}?reason=concierge`}>Ask CC Stays <span>→</span></a>
         </div>
       </section>
       <ExactFooter links={links} />
@@ -329,7 +329,7 @@ export const AboutPage = ({ mountNode }) => {
 
       <section className="cc-exact-close-spread">
         <div className="cc-exact-wrap cc-exact-centered">
-          <h2>Different places.<br />One way of <em className="cc-exact-accent">staying.</em></h2>
+          <h2>Different places.<br />One way of <em className="cc-exact-accent-green">staying.</em></h2>
           <a className="cc-exact-btn cc-exact-btn-primary cc-revamp-white-text" href={links.stays}>Explore the Collection <span>→</span></a>
         </div>
       </section>

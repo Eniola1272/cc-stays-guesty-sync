@@ -346,7 +346,15 @@ const PropertyCard = ({ property }) => {
       <div className="cc-exact-gal">
         {images.length ? (
           <div className="cc-exact-gal-track" ref={trackRef} onScroll={() => requestAnimationFrame(updateActive)}>
-            {images.map((src, index) => <img src={src} alt={`${property.title} photo ${index + 1}`} loading="lazy" key={src} />)}
+            {images.map((src, index) => (
+              <img
+                className={index === active ? "is-active" : ""}
+                src={src}
+                alt={`${property.title} photo ${index + 1}`}
+                loading="lazy"
+                key={src}
+              />
+            ))}
           </div>
         ) : <Placeholder />}
         {images.length > 1 && (

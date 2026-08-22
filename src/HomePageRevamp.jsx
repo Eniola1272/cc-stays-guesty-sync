@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { CcMono } from "./ExactLayout";
 import "./HomePageRevamp.css";
 
 const DEFAULT_LINKS = {
@@ -133,8 +134,14 @@ const CcWatermark = () => (
 
 const LogoMark = ({ logo, compact = false }) => (
   <span className={`cc-revamp-brand ${compact ? "cc-revamp-brand--compact" : ""}`}>
-    {logo ? <img src={logo} alt="CC Stays" /> : null}
-    {/* {!compact && <span>CC Stays</span>}  */}
+    {compact && logo ? (
+      <img src={logo} alt="CC Stays" />
+    ) : (
+      <>
+        <CcMono />
+        <span>CC Stays</span>
+      </>
+    )}
   </span>
 );
 
@@ -617,7 +624,7 @@ const HomePageRevamp = ({ mountNode }) => {
             <nav>
               <strong>Partners</strong>
               <a href={links.partner}>Partner With Us ↗</a>
-              <a href={links.owners}>Owners ↗</a>
+              <a className="cc-revamp-fade" href={links.owners}>Owners ↗</a>
             </nav>
             <nav>
               <strong>Follow</strong>

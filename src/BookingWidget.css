@@ -1,11 +1,12 @@
 @import url("https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600;700&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=IBM+Plex+Mono:wght@400;500&display=swap");
 
 :root {
+  --revamp-ink: #232019;
   --cc-white: #ffffff;
   --cc-base: #fafafa;
   --cc-whisper: #f4f2ed;
-  --cc-forest: #36543b;
-  --cc-forest-deep: #263b29;
+  --cc-forest: var(--revamp-ink);
+  --cc-forest-deep: var(--revamp-ink);
   --cc-ink: #292929;
   --cc-mist: #a6bfbf;
   --cc-brass: #a98a5c;
@@ -13,7 +14,7 @@
   --cc-line-dark: rgba(250, 250, 250, 0.18);
   --cc-muted: rgba(41, 41, 41, 0.56);
   --cc-muted-dark: rgba(250, 250, 250, 0.62);
-  --cc-green-dark: var(--cc-forest);
+  --cc-green-dark: var(--revamp-ink);
   --cc-text-dark: var(--cc-ink);
   --cc-text-light: var(--cc-muted);
   --cc-border-light: var(--cc-line);

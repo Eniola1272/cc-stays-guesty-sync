@@ -137,7 +137,7 @@ export const ExactFooter = ({ links = DEFAULT_EXACT_LINKS }) => (
       <nav>
         <h5>Partners</h5>
         <a href={links.partner}>Partner With Us ↗</a>
-        <a href={links.owners}>Owners ↗</a>
+        <a className="cc-revamp-fade" href={links.owners}>Owners ↗</a>
       </nav>
       <nav>
         <h5>Follow</h5>
