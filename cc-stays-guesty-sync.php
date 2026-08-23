@@ -1415,25 +1415,55 @@ class CC_Stays_Guesty_Sync
         return $items ?: $fallback;
     }
 
+    private function cc_get_image_url_from_value($image) {
+        if (is_array($image)) {
+            $image = $image['url'] ?? $image['src'] ?? $image['original'] ?? $image['sizes']['large'] ?? $image['ID'] ?? $image['id'] ?? '';
+        }
+
+        if (is_numeric($image)) {
+            $image = wp_get_attachment_image_url((int) $image, 'full');
+        }
+
+        return $image && filter_var($image, FILTER_VALIDATE_URL) ? esc_url_raw($image) : '';
+    }
+
+    private function cc_get_property_gallery_box_images($post_id) {
+        $images = [];
+
+        for ($index = 1; $index <= 4; $index++) {
+            $image = $this->cc_get_meta_first($post_id, [
+                'cc_property_image_' . $index,
+                'property_image_' . $index,
+                'gallery_image_' . $index,
+                'image_' . $index,
+            ], '');
+
+            $url = $this->cc_get_image_url_from_value($image);
+            if ($url) {
+                $images[] = $url;
+            }
+        }
+
+        return $images;
+    }
+
     private function get_section_property_gallery($post_id) {
         $gallery = $this->cc_get_meta_array($post_id, ['cc_property_gallery', 'property_gallery', 'guesty_images'], []);
         $featured = get_the_post_thumbnail_url($post_id, 'full');
+        $box_images = $this->cc_get_property_gallery_box_images($post_id);
 
-        if ($featured) {
-            array_unshift($gallery, $featured);
-        }
-
-        $images = [];
+        $fallback_gallery = [];
         foreach ($gallery as $image) {
-            if (is_array($image)) {
-                $image = $image['url'] ?? $image['src'] ?? $image['original'] ?? '';
-            }
-            if ($image && filter_var($image, FILTER_VALIDATE_URL)) {
-                $images[] = esc_url_raw($image);
+            $url = $this->cc_get_image_url_from_value($image);
+            if ($url) {
+                $fallback_gallery[] = $url;
             }
         }
 
-        return array_values(array_unique($images));
+        $primary = $featured ?: ($fallback_gallery[0] ?? ($box_images[0] ?? ''));
+        $images = $box_images ? array_merge([$primary], $box_images) : array_merge([$primary], $fallback_gallery);
+
+        return array_values(array_unique(array_filter($images)));
     }
 
     private function get_property_section_data($post_id) {
