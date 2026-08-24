@@ -524,11 +524,11 @@
 }
 
 .cc-revamp-review-rail {
-  scrollbar-width: none;
+  /* scrollbar-width: none; */
 }
 
 .cc-revamp-review-rail::-webkit-scrollbar {
-  display: none;
+  /* display: none; */
 }
 
 .cc-revamp-rail::-webkit-scrollbar {
@@ -537,12 +537,12 @@
 
 .cc-revamp-rail::-webkit-scrollbar-track {
   border-radius: 999px;
-  background: rgba(68, 96, 122, 0.1);
+  background: rgba(221, 212, 194, 0.1);
 }
 
 .cc-revamp-rail::-webkit-scrollbar-thumb {
   border-radius: 999px;
-  background: rgba(68, 96, 122, 0.42);
+  background: rgb(221, 212, 194);
 }
 
 .cc-revamp-card {

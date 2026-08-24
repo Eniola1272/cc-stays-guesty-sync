@@ -3,7 +3,7 @@
   max-width: 880px;
   padding: 18px 0;
   color: #222;
-  font-family: var(--cc-font-primary, "Archivo", sans-serif);
+  font-family: var(--cc-font-primary, "Instrument Sans", sans-serif);
 }
 
 .cc-amenities-section h2 {
@@ -38,7 +38,7 @@
   box-sizing: border-box;
   color: rgb(122, 122, 122);
   display: block;
-  font-family: var(--cc-font-primary, "Archivo", sans-serif);
+  font-family: var(--cc-font-primary, "Instrument Sans", sans-serif);
   font-size: 16px;
   font-style: normal;
   font-weight: 400;

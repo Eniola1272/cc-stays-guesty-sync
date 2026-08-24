@@ -19,9 +19,9 @@ class CC_Stays_Guesty_Sync
 
     public function __construct()
     {
-        // Create a manual trigger button in the WP Admin bar for testing
-        add_action('admin_bar_menu', [$this, 'add_sync_button'], 999);
-        add_action('admin_init', [$this, 'handle_manual_sync']);
+        // Keep destructive sync actions out of the top admin bar.
+        add_action('admin_menu', [$this, 'register_sync_admin_page']);
+        add_action('admin_post_cc_stays_sync_guesty', [$this, 'handle_manual_sync']);
 
         // Register custom REST API endpoints
         add_action('rest_api_init', [$this, 'register_booking_endpoints']);
@@ -293,24 +293,83 @@ class CC_Stays_Guesty_Sync
     }
 
     /**
-     * Testing UI: Adds a 'Sync Guesty' button to the top WordPress Admin bar
+     * Admin UI: Moves the Guesty sync behind a deliberate dashboard page.
      */
-    public function add_sync_button($wp_admin_bar)
+    public function register_sync_admin_page()
     {
-        $wp_admin_bar->add_node([
-            'id' => 'sync_guesty_api',
-            'title' => '🔄 Sync Guesty Properties',
-            'href' => admin_url('?sync_guesty=true'),
-        ]);
+        add_submenu_page(
+            'edit.php?post_type=properties',
+            'Guesty Sync',
+            'Guesty Sync',
+            'manage_options',
+            'cc-stays-guesty-sync',
+            [$this, 'render_sync_admin_page']
+        );
+    }
+
+    public function render_sync_admin_page()
+    {
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+
+        $status = isset($_GET['sync_status']) ? sanitize_key($_GET['sync_status']) : '';
+        ?>
+        <div class="wrap">
+            <h1>Guesty Sync</h1>
+
+            <?php if ($status === 'success') : ?>
+                <div class="notice notice-success is-dismissible">
+                    <p>Guesty properties synced successfully.</p>
+                </div>
+            <?php elseif ($status === 'confirm_required') : ?>
+                <div class="notice notice-error is-dismissible">
+                    <p>Please confirm that you understand this sync can overwrite customized property data.</p>
+                </div>
+            <?php endif; ?>
+
+            <div class="card" style="max-width: 760px;">
+                <h2>Manual Guesty Property Sync</h2>
+                <p>
+                    This action pulls listing data from Guesty and updates matching WordPress properties.
+                    It can overwrite customized fields that were previously synced from Guesty.
+                </p>
+                <p><strong>Use this only when you intentionally want to refresh Guesty-backed property data.</strong></p>
+
+                <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+                    <?php wp_nonce_field('cc_stays_sync_guesty', 'cc_stays_sync_nonce'); ?>
+                    <input type="hidden" name="action" value="cc_stays_sync_guesty">
+
+                    <p>
+                        <label>
+                            <input type="checkbox" name="confirm_custom_data_risk" value="1" required>
+                            I understand this can overwrite customized property data.
+                        </label>
+                    </p>
+
+                    <?php submit_button('Run Guesty Sync', 'delete'); ?>
+                </form>
+            </div>
+        </div>
+        <?php
     }
 
     public function handle_manual_sync()
     {
-        if (isset($_GET['sync_guesty']) && $_GET['sync_guesty'] === 'true' && current_user_can('manage_options')) {
-            $this->sync_properties_to_wp();
-            wp_redirect(admin_url('edit.php?post_type=properties&sync_status=success'));
+        if (!current_user_can('manage_options')) {
+            wp_die('You do not have permission to sync Guesty properties.');
+        }
+
+        check_admin_referer('cc_stays_sync_guesty', 'cc_stays_sync_nonce');
+
+        if (empty($_POST['confirm_custom_data_risk'])) {
+            wp_redirect(admin_url('edit.php?post_type=properties&page=cc-stays-guesty-sync&sync_status=confirm_required'));
             exit;
         }
+
+        $this->sync_properties_to_wp();
+        wp_redirect(admin_url('edit.php?post_type=properties&page=cc-stays-guesty-sync&sync_status=success'));
+        exit;
     }
 
     /**
@@ -1585,8 +1644,42 @@ class CC_Stays_Guesty_Sync
             'bell' => '<path d="M6.8 10.5a5.2 5.2 0 0 1 10.4 0c0 5 2 5.8 2 5.8H4.8s2-.8 2-5.8Z"/><path d="M10 19a2.2 2.2 0 0 0 4 0"/>',
             'home' => '<path d="m3.5 11 8.5-7 8.5 7"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M10 20v-5h4v5"/>',
             'bed' => '<path d="M4 11V5"/><path d="M20 13v6"/><path d="M4 19v-8h12a4 4 0 0 1 4 4v4"/><path d="M4 15h16"/><path d="M7 9h4"/>',
+            'waves' => '<path d="M3 8c2.2 0 2.2 1.7 4.4 1.7S9.6 8 11.8 8s2.2 1.7 4.4 1.7S18.4 8 21 8"/><path d="M3 13c2.2 0 2.2 1.7 4.4 1.7s2.2-1.7 4.4-1.7 2.2 1.7 4.4 1.7S18.4 13 21 13"/><path d="M3 18c2.2 0 2.2 1.7 4.4 1.7s2.2-1.7 4.4-1.7 2.2 1.7 4.4 1.7S18.4 18 21 18"/>',
+            'sofa' => '<path d="M7 11V8a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v3"/><path d="M5 12h14a2.5 2.5 0 0 1 2.5 2.5V19h-19v-4.5A2.5 2.5 0 0 1 5 12Z"/><path d="M4 19v2"/><path d="M20 19v2"/><path d="M7 12v4"/><path d="M17 12v4"/>',
+            'sun' => '<circle cx="12" cy="12" r="3.5"/><path d="M12 2.5v3"/><path d="M12 18.5v3"/><path d="M2.5 12h3"/><path d="M18.5 12h3"/><path d="m5.3 5.3 2.1 2.1"/><path d="m16.6 16.6 2.1 2.1"/><path d="m18.7 5.3-2.1 2.1"/><path d="m7.4 16.6-2.1 2.1"/>',
+            'pool' => '<path d="M8 15V6a3 3 0 0 1 6 0"/><path d="M14 15V6a3 3 0 0 1 6 0"/><path d="M6 11h14"/><path d="M6 15h14"/><path d="M3 19c2.2 0 2.2 1.6 4.4 1.6s2.2-1.6 4.4-1.6 2.2 1.6 4.4 1.6S18.4 19 21 19"/>',
+            'utensils' => '<path d="M7 4v8"/><path d="M11 4v8"/><path d="M9 4v17"/><path d="M17 4c2.3 1.7 3.5 4.5 3.5 8.5H17V21"/>',
+            'map-pin' => '<path d="M19 10.5c0 5.2-7 10.5-7 10.5S5 15.7 5 10.5a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10.5" r="2.2"/>',
+            'target' => '<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.2"/><path d="M12 5V3"/><path d="M12 21v-2"/><path d="M5 12H3"/><path d="M21 12h-2"/>',
+            'flag' => '<path d="M8 21V4"/><path d="M8 5h9l-1.6 3L17 11H8"/><path d="M6 21h4"/>',
             'sparkle' => '<path d="M12 3.5 14.1 9l5.4 2-5.4 2L12 18.5 9.9 13l-5.4-2 5.4-2L12 3.5Z"/><path d="M18 4v3"/><path d="M19.5 5.5h-3"/>',
         ];
+        $aliases = [
+            'water' => 'waves',
+            'waterfront' => 'waves',
+            'wave' => 'waves',
+            'couch' => 'sofa',
+            'comfort' => 'sofa',
+            'sunset' => 'sun',
+            'sunny' => 'sun',
+            'swimming' => 'pool',
+            'heated-pool' => 'pool',
+            'dining' => 'utensils',
+            'outdoor-dining' => 'utensils',
+            'pizza' => 'utensils',
+            'location' => 'map-pin',
+            'pin' => 'map-pin',
+            'map' => 'map-pin',
+            'pool-table' => 'target',
+            'game' => 'target',
+            'games' => 'target',
+            'putt' => 'flag',
+            'putt-putt' => 'flag',
+            'golf' => 'flag',
+        ];
+        $name = strtolower(trim((string) $name));
+        $name = str_replace([' ', '_'], '-', $name);
+        $name = $aliases[$name] ?? $name;
 
         return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . ($icons[$name] ?? $icons['sparkle']) . '</svg>';
     }

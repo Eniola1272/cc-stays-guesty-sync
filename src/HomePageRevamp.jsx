@@ -733,7 +733,7 @@ const HomePageRevamp = ({ mountNode }) => {
               Across the collection, from guests who came back different.
             </p>
           </div>
-          <div className="cc-revamp-review-rail">
+          <div className="cc-revamp-review-rail cc-revamp-rail">
             {REVIEWS.map((review) => (
               <a
                 href={propertyUrl(review.property)}

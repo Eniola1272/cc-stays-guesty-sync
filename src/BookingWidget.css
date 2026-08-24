@@ -19,8 +19,8 @@
   --cc-text-light: var(--cc-muted);
   --cc-border-light: var(--cc-line);
   --cc-bg-light: var(--cc-white);
-  --cc-font-primary: "Archivo", sans-serif;
-  --cc-font-serif: "Bodoni Moda", serif;
+  --cc-font-primary: "Instrument Sans", sans-serif;
+  --cc-font-serif: "Instrument Serif", serif;
   --cc-font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
 }
 

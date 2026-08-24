@@ -10,9 +10,15 @@
   --home-brass: var(--cc-brass, #a98a5c);
   --home-line: var(--cc-line, rgba(41, 41, 41, 0.14));
   --home-muted: var(--cc-muted, rgba(41, 41, 41, 0.56));
-  --home-display: var(--cc-font-serif, "Bodoni Moda", serif);
-  --home-body: var(--cc-font-primary, "Archivo", sans-serif);
-  --home-mono: var(--cc-font-mono, "IBM Plex Mono", ui-monospace, Menlo, monospace);
+  --home-display: var(--cc-font-serif, "Instrument Serif", serif);
+  --home-body: var(--cc-font-primary, "Instrument Sans", sans-serif);
+  --home-mono: var(
+    --cc-font-mono,
+    "IBM Plex Mono",
+    ui-monospace,
+    Menlo,
+    monospace
+  );
   background: var(--home-white);
   color: var(--home-ink);
   font-family: var(--home-body);
@@ -55,10 +61,24 @@
   z-index: 0;
   aspect-ratio: auto !important;
   overflow: hidden;
-  background:
-    radial-gradient(120% 70% at 62% 88%, rgba(214, 228, 220, 0.42), rgba(214, 228, 220, 0) 52%),
-    radial-gradient(60% 40% at 18% 34%, rgba(233, 196, 132, 0.34), rgba(233, 196, 132, 0) 60%),
-    linear-gradient(180deg, #182427 0%, #223434 34%, #33514a 52%, #2a4740 66%, #1d2f2c 100%);
+  background: radial-gradient(
+      120% 70% at 62% 88%,
+      rgba(214, 228, 220, 0.42),
+      rgba(214, 228, 220, 0) 52%
+    ),
+    radial-gradient(
+      60% 40% at 18% 34%,
+      rgba(233, 196, 132, 0.34),
+      rgba(233, 196, 132, 0) 60%
+    ),
+    linear-gradient(
+      180deg,
+      #182427 0%,
+      #223434 34%,
+      #33514a 52%,
+      #2a4740 66%,
+      #1d2f2c 100%
+    );
   background-position: center 58%;
   background-size: cover;
 }
@@ -177,7 +197,9 @@
   margin-left: auto;
   background: rgba(250, 250, 250, 0.96);
   transform-origin: center;
-  transition: transform 0.22s ease, opacity 0.18s ease;
+  transition:
+    transform 0.22s ease,
+    opacity 0.18s ease;
 }
 
 .cc-home-menu-button span + span {
@@ -210,7 +232,9 @@
   opacity: 0;
   pointer-events: none;
   transform: translateY(-8px);
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
   backdrop-filter: blur(16px);
 }
 
@@ -384,8 +408,11 @@
   display: block;
   width: 100%;
   overflow: hidden;
-  background:
-    radial-gradient(80% 60% at 50% 82%, rgba(166, 191, 191, 0.55), rgba(166, 191, 191, 0) 60%),
+  background: radial-gradient(
+      80% 60% at 50% 82%,
+      rgba(166, 191, 191, 0.55),
+      rgba(166, 191, 191, 0) 60%
+    ),
     linear-gradient(180deg, #b9c7c4 0%, #8ca6a2 46%, #4e6c64 100%);
   background-position: center;
   background-size: cover !important;
@@ -1065,7 +1092,11 @@
   position: absolute;
   inset: 0;
   z-index: 2;
-  background: linear-gradient(180deg, rgba(20, 26, 22, 0.42), rgba(20, 26, 22, 0.66));
+  background: linear-gradient(
+    180deg,
+    rgba(20, 26, 22, 0.42),
+    rgba(20, 26, 22, 0.66)
+  );
 }
 
 .cc-home-final-content {
