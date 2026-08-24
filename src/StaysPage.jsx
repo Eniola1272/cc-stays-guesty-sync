@@ -418,7 +418,7 @@ const StaysPage = ({ mountNode }) => {
         bathrooms: numberOr(synced.bathrooms, fallback.bathrooms),
         price: numberOr(synced.price, fallback.price),
         url: synced.url || links.stays,
-        images: uniqueImages(synced.image, images.propertyImages?.[fallback.key] || []).slice(0, 3),
+        images: uniqueImages(synced.images || [], synced.image, images.propertyImages?.[fallback.key] || []).slice(0, 3),
       };
     });
 
@@ -437,7 +437,7 @@ const StaysPage = ({ mountNode }) => {
           bathrooms: numberOr(property.bathrooms, 1),
           price: numberOr(property.price, 0),
           url: property.url || links.stays,
-          images: uniqueImages(property.image).slice(0, 3),
+          images: uniqueImages(property.images || [], property.image).slice(0, 3),
           tags: property.pets ? ["Pet friendly"] : [],
         };
       });

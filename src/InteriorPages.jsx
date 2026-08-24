@@ -330,7 +330,7 @@ export const AboutPage = ({ mountNode }) => {
       <section className="cc-exact-close-spread">
         <div className="cc-exact-wrap cc-exact-centered">
           <h2>Different places.<br />One way of <em className="cc-exact-accent-green">staying.</em></h2>
-          <a className="cc-exact-btn cc-exact-btn-primary cc-revamp-white-text" href={links.stays}>Explore the Collection <span>→</span></a>
+          <a className="cc-exact-btn cc-exact-btn-primary" href={links.stays}>Explore the Collection <span>→</span></a>
         </div>
       </section>
       <ExactFooter links={links} />

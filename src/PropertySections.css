@@ -602,11 +602,120 @@
   color: rgba(32, 29, 23, 0.56);
 }
 
-.cc-property-full-book-card > a {
+.cc-property-full-book-card .btn-text {
   display: inline-flex;
-  font-weight: 800;
-  text-decoration: underline;
-  text-underline-offset: 8px;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0 0 2px;
+  border: 0;
+  border-bottom: 1px solid currentColor;
+  background: none;
+  color: inherit;
+  font-family: var(--revamp-sans);
+  font-size: inherit;
+  font-weight: 500;
+  line-height: 1.35;
+  cursor: pointer;
+  transition: color 0.2s, gap 0.25s var(--ease);
+}
+
+.cc-property-full-book-card .btn-text:hover {
+  gap: 0.75em;
+}
+
+.cc-property-full-book-card .small {
+  font-size: 0.85rem;
+}
+
+.cc-property-book-promise {
+  color: rgba(32, 29, 23, 0.62);
+}
+
+.cc-property-promise-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.cc-property-promise-modal[hidden] {
+  display: none;
+}
+
+.cc-property-promise-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(35, 32, 25, 0.46);
+  backdrop-filter: blur(8px);
+}
+
+.cc-property-promise-modal .panel {
+  position: relative;
+  z-index: 1;
+  width: min(560px, 100%);
+  max-height: min(720px, calc(100vh - 48px));
+  overflow: auto;
+  padding: 42px;
+  border: 1px solid rgba(32, 29, 23, 0.12);
+  border-radius: 20px;
+  background: #fffaf1;
+  box-shadow: 0 28px 90px rgba(32, 29, 23, 0.28);
+  color: #242019;
+}
+
+.cc-property-promise-modal .modal-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  display: grid;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid rgba(32, 29, 23, 0.12);
+  border-radius: 50%;
+  background: rgba(244, 236, 223, 0.72);
+  color: #242019;
+  cursor: pointer;
+}
+
+.cc-property-promise-modal h3 {
+  margin: 0;
+  color: #242019;
+  font: 400 34px/1.05 var(--revamp-serif, "Bodoni Moda", serif);
+}
+
+.cc-property-promise-modal .muted {
+  color: rgba(32, 29, 23, 0.6);
+}
+
+.cc-property-promise-modal > .panel > .muted {
+  margin: 0.4rem 0 1.4rem;
+}
+
+.cc-property-promise-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.cc-property-promise-list b {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: #242019;
+  font: 800 16px/1.3 var(--revamp-sans);
+}
+
+.cc-property-promise-list p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.cc-property-promise-open {
+  overflow: hidden;
 }
 
 .cc-property-full-footer {
@@ -877,6 +986,20 @@
   .cc-property-full-book-card {
     padding: 24px 20px;
     border-radius: 16px;
+  }
+
+  .cc-property-promise-modal {
+    padding: 18px;
+  }
+
+  .cc-property-promise-modal .panel {
+    max-height: calc(100vh - 36px);
+    padding: 34px 24px 28px;
+    border-radius: 16px;
+  }
+
+  .cc-property-promise-modal h3 {
+    font-size: 28px;
   }
 
   .cc-property-full-footer {

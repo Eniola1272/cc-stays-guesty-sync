@@ -1555,6 +1555,30 @@ class CC_Stays_Guesty_Sync
         return '<script>(function(){if(window.ccPropertyReadMoreReady)return;window.ccPropertyReadMoreReady=true;function refresh(){document.querySelectorAll(".cc-property-read-more").forEach(function(root){var copy=root.querySelector(".cc-property-read-more-copy");var button=root.querySelector(".cc-property-read-more-toggle");if(!copy||!button)return;button.hidden=copy.scrollHeight<=copy.clientHeight+2;});}document.addEventListener("click",function(event){var button=event.target.closest(".cc-property-read-more-toggle");if(!button)return;var root=button.closest(".cc-property-read-more");if(!root)return;var expanded=root.getAttribute("data-expanded")==="true";root.setAttribute("data-expanded",expanded?"false":"true");button.setAttribute("aria-expanded",expanded?"false":"true");button.textContent=expanded?"Read more →":"Show less";});if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",refresh);}else{requestAnimationFrame(refresh);}window.addEventListener("resize",refresh);})();</script>';
     }
 
+    private function property_promise_modal() {
+        ob_start();
+        ?>
+        <div class="cc-property-promise-modal" data-promise-modal hidden>
+            <div class="cc-property-promise-backdrop" data-promise-close></div>
+            <div class="panel" role="dialog" aria-modal="true" aria-labelledby="cc-property-promise-title">
+                <button class="modal-close" type="button" data-promise-close aria-label="Close">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"></path></svg>
+                </button>
+                <h3 id="cc-property-promise-title">The CC Stays Promise</h3>
+                <p class="muted">Book with confidence.</p>
+                <div class="cc-property-promise-list">
+                    <div><b>A home ready for you</b><p class="muted">We prepare and check the residence before arrival so you can settle in immediately.</p></div>
+                    <div><b>What you booked is what you should expect</b><p class="muted">The listing, major amenities, and property information should accurately represent the home you reserved.</p></div>
+                    <div><b>Real help during your stay</b><p class="muted">Our concierge is available when you need recommendations, help with the residence, or support during your trip.</p></div>
+                    <div><b>If something isn't right</b><p class="muted">Tell us. We'll respond and work to make it right.</p></div>
+                </div>
+            </div>
+        </div>
+        <script>(function(){if(window.ccPropertyPromiseReady)return;window.ccPropertyPromiseReady=true;var lastTrigger=null;function modal(){return document.querySelector("[data-promise-modal]");}function open(trigger){var root=modal();if(!root)return;lastTrigger=trigger;root.hidden=false;document.documentElement.classList.add("cc-property-promise-open");var close=root.querySelector("[data-promise-close]");if(close)close.focus();}function close(){var root=modal();if(!root||root.hidden)return;root.hidden=true;document.documentElement.classList.remove("cc-property-promise-open");if(lastTrigger&&lastTrigger.focus)lastTrigger.focus();}document.addEventListener("click",function(event){var opener=event.target.closest("[data-promise-open]");if(opener){event.preventDefault();open(opener);return;}if(event.target.closest("[data-promise-close]")){event.preventDefault();close();}});document.addEventListener("keydown",function(event){if(event.key==="Escape")close();});})();</script>
+        <?php
+        return ob_get_clean();
+    }
+
     private function property_icon_svg($name = 'sparkle') {
         $icons = [
             'key' => '<circle cx="8" cy="15" r="3"/><path d="m10.2 12.8 7-7"/><path d="m15.5 7.5 2 2"/><path d="m13.7 9.3 2 2"/>',
@@ -2010,8 +2034,9 @@ class CC_Stays_Guesty_Sync
                             <?php if ($rate) : ?><h2><?php echo $rate; ?> <span>/ night</span></h2><?php endif; ?>
                             <?php echo $this->render_booking_widget(); ?>
                             <p>You won't be charged yet.</p>
-                            <a href="<?php echo esc_url($links['contact']); ?>">The CC Stays Promise · Book with confidence →</a>
+                            <button class="cc-property-book-promise btn-text small" type="button" data-promise-open>The CC Stays Promise · Book with confidence →</button>
                         </div>
+                        <?php echo $this->property_promise_modal(); ?>
                     </aside>
                 </div>
             </main>
@@ -2032,6 +2057,7 @@ class CC_Stays_Guesty_Sync
         foreach ($properties as $prop) {
             $post_id = $prop->ID;
             $image_url = get_the_post_thumbnail_url($post_id, 'large');
+            $gallery_images = $this->get_section_property_gallery($post_id);
             
             $raw_content  = get_post_field('post_content', $post_id);
             $description  = wp_trim_words(strip_tags($raw_content), 20, '...');
@@ -2042,6 +2068,7 @@ class CC_Stays_Guesty_Sync
                 'title'       => $prop->post_title,
                 'url'         => get_permalink($post_id),
                 'image'       => $image_url ? $image_url : 'https://via.placeholder.com/400x250?text=No+Image',
+                'images'      => $gallery_images,
                 'city'        => get_post_meta($post_id, 'location_city', true) ?: 'Florida',
                 'guests'      => (int) (get_post_meta($post_id, 'guests', true) ?: 2),
                 'bedrooms'    => (int) (get_post_meta($post_id, 'bedrooms', true) ?: 1),
