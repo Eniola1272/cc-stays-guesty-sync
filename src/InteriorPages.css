@@ -299,10 +299,6 @@
   font-size: clamp(2.35rem, 6vw, 5.8rem);
 }
 
-.cc-exact-close-spread .cc-exact-btn {
-  margin-top: 2.6rem;
-}
-
 .cc-exact-journal-hero {
   padding-bottom: clamp(5rem, 12vw, 9rem);
 }
