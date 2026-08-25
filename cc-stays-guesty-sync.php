@@ -2251,6 +2251,7 @@ class CC_Stays_Guesty_Sync
         $amenity_groups = $this->get_property_grouped_amenities($property['id']);
         $rate = $property['nightly_rate'] ? '$' . esc_html(number_format((float) $property['nightly_rate'])) : '';
         $map_src = ($property['lat'] && $property['lng']) ? 'https://maps.google.com/maps?q=' . rawurlencode($property['lat'] . ',' . $property['lng']) . '&z=13&output=embed' : '';
+        $concierge_url = add_query_arg('reason', 'concierge', $links['contact']);
 
         ob_start();
         ?>
@@ -2386,6 +2387,13 @@ class CC_Stays_Guesty_Sync
                                 <?php endif; ?>
                             </div>
                             <p><?php echo esc_html($property['location_blurb']); ?></p>
+                        </section>
+
+                        <section class="cc-property-full-section cc-property-full-concierge">
+                            <p class="cc-property-eyebrow">24/7 Concierge</p>
+                            <h2>Need something? Ask us.</h2>
+                            <p>White-glove help throughout your stay.</p>
+                            <a class="btn-text" href="<?php echo esc_url($concierge_url); ?>">Ask CC Stays <span>→</span></a>
                         </section>
 
                         <section class="cc-property-full-section cc-property-full-rules">

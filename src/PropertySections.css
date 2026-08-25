@@ -507,9 +507,10 @@
   display: inline-flex;
   align-items: center;
   margin-top: 16px;
-  font: 500 18px/1 var(--revamp-sans);
+  font: 500 16px/1 var(--revamp-sans);
   text-decoration: underline;
   text-underline-offset: 8px;
+  transition: gap 0.3s ease, color 0.3s ease;
 }
 
 .cc-property-full-promise a:hover {
@@ -538,6 +539,49 @@
   display: grid;
   place-items: center;
   color: rgba(32, 29, 23, 0.6);
+}
+
+.cc-property-full-concierge {
+  margin-top: 2rem;
+  padding: 1.6rem 1.8rem;
+  border-bottom: 0;
+  border-radius: 16px;
+  background: #eadfcd;
+}
+
+.cc-property-full-concierge .cc-property-eyebrow {
+  margin-bottom: 0.6rem;
+}
+
+.cc-property-full-concierge h2 {
+  margin: 0 0 0.25rem;
+  color: #242019;
+  font: 500 1.35rem/1.15 var(--revamp-serif, "Instrument Serif", serif);
+}
+
+.cc-property-full-concierge p:not(.cc-property-eyebrow) {
+  margin: 0 0 1rem;
+  color: rgba(32, 29, 23, 0.6);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.cc-property-full-concierge .btn-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding-bottom: 2px;
+  border-bottom: 1px solid currentColor;
+  color: #242019;
+  font: 700 16px/1.35 var(--revamp-sans);
+  text-decoration: none;
+  transition:
+    color 0.2s,
+    gap 0.25s var(--ease);
+}
+
+.cc-property-full-concierge .btn-text:hover {
+  gap: 0.75em;
 }
 
 .cc-property-full-rules {
