@@ -110,7 +110,7 @@
 .cc-property-full-hero h1,
 .cc-property-full-main h2,
 .cc-property-full-footer-brand span {
-  font-family: var(--cc-serif, "Bodoni Moda", serif);
+  font-family: var(--cc-serif, "Instrument Serif", serif);
   font-weight: 500;
   letter-spacing: 0;
 }
@@ -519,7 +519,9 @@
   font: 500 16px/1 var(--revamp-sans);
   text-decoration: underline;
   text-underline-offset: 8px;
-  transition: gap 0.3s ease, color 0.3s ease;
+  transition:
+    gap 0.3s ease,
+    color 0.3s ease;
 }
 
 .cc-property-full-promise a:hover {
@@ -1068,7 +1070,7 @@
   }
 
   .cc-property-full-hero h1 {
-    font-size: clamp(48px, 16vw, 68px);
+    font-size: 35px;
     line-height: 0.92;
   }
 

@@ -488,7 +488,9 @@ const PropertyCard = ({ property }) => {
         <div className="cc-revamp-card-row">
           <h3>{property.title}</h3>
           {property.rating ? (
-            <span className="cc-revamp-rating">★ {property.rating}</span>
+            <span className="cc-revamp-rating">
+              ★ <span>{property.rating}</span>
+            </span>
           ) : (
             <span className="cc-revamp-badge">{property.badge}</span>
           )}
@@ -634,7 +636,12 @@ const HomePageRevamp = ({ mountNode }) => {
               onClick={() => setMenuOpen(false)}
               aria-label="Close menu"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+              >
                 <path d="M5 5l14 14M19 5L5 19" />
               </svg>
             </button>
@@ -724,7 +731,10 @@ const HomePageRevamp = ({ mountNode }) => {
             </div>
           </div>
 
-          <div className="cc-revamp-story cc-revamp-story--arch">
+          <div
+            id="comfort-everywhere"
+            className="cc-revamp-story cc-revamp-story--arch"
+          >
             <div className="cc-revamp-story-copy">
               <div className="cc-revamp-eyebrow2">Comfort, Everywhere</div>
               <h3>Made to feel as good as it looks.</h3>
@@ -740,9 +750,14 @@ const HomePageRevamp = ({ mountNode }) => {
           </div>
 
           <div className="cc-revamp-story cc-revamp-story--split">
-            <img src={images.storyThree} alt="" loading="lazy" />
+            <img
+              className="border-radius-18"
+              src={images.storyThree}
+              alt=""
+              loading="lazy"
+            />
             <div className="cc-revamp-story-copy">
-              <div className="cc-revamp-eyebrow">
+              <div className="cc-revamp-eyebrow2">
                 Hospitality That Travels With You
               </div>
               <h3>Cared for, the entire way.</h3>

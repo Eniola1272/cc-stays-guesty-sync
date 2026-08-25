@@ -814,20 +814,32 @@
 .cc-exact-footer {
   background: #211e18;
   color: rgba(244, 239, 229, 0.72);
-  padding: 76px 0 32px;
+  padding: 78px 0 38px;
 }
 
 .cc-exact-foot-top {
   display: grid;
-  grid-template-columns: minmax(220px, 1.4fr) repeat(4, minmax(120px, 1fr));
-  gap: 48px;
+  grid-template-columns: minmax(300px, 1fr) repeat(4, max-content);
+  gap: clamp(44px, 5vw, 86px);
+  align-items: start;
+}
+
+.cc-exact-foot-logo .cc-exact-full-logo svg {
+  width: 118px;
+  height: 118px;
+}
+
+.cc-exact-foot-logo .cc-exact-full-logo span {
+  font-size: 2.55rem;
 }
 
 .cc-exact-foot-logo p {
-  max-width: 270px;
-  margin: 24px 0 0;
+  max-width: 290px;
+  margin: 26px 0 0;
+  color: var(--cream);
   font-family: var(--serif);
-  font-size: 22px;
+  font-size: 23px;
+  line-height: 1.15;
 }
 
 .cc-exact-footer nav {
@@ -837,11 +849,11 @@
 }
 
 .cc-exact-footer h5 {
-  margin: 0 0 8px;
-  color: rgba(244, 239, 229, 0.46);
+  margin: 0 0 12px;
+  color: rgba(244, 239, 229, 0.42);
   font-family: var(--sans);
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.22em;
   text-transform: uppercase;
 }
@@ -854,7 +866,7 @@
   display: flex;
   justify-content: space-between;
   gap: 24px;
-  margin-top: 56px;
+  margin-top: 72px;
   padding-top: 28px;
   border-top: 1px solid rgba(244, 239, 229, 0.12);
   color: rgba(244, 239, 229, 0.5);

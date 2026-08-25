@@ -54,64 +54,91 @@ const DESTINATIONS = [
     name: "Fort Lauderdale",
     state: "Florida",
     region: "Greater Fort Lauderdale",
-    tagline:
-      "Canals, beaches, dining, and easy access to every kind of South Florida stay.",
+    tagline: "Beaches, boats, and the easiest kind of sunshine.",
+  },
+  {
+    slug: "flagler-village",
+    name: "Flagler Village",
+    state: "Florida",
+    region: "Greater Fort Lauderdale",
+    tagline: "Murals, makers, and Fort Lauderdale's creative side.",
   },
   {
     slug: "las-olas",
     name: "Las Olas",
     state: "Florida",
     region: "Greater Fort Lauderdale",
-    tagline:
-      "Walkable dinners, galleries, cafes, and a polished city-by-the-water feel.",
+    tagline: "The boulevard between downtown and the beach.",
   },
   {
     slug: "fort-lauderdale-beach",
     name: "Fort Lauderdale Beach",
     state: "Florida",
     region: "Greater Fort Lauderdale",
-    tagline:
-      "Beach days, waterfront restaurants, and warm evenings close to the sand.",
+    tagline: "The wave wall, the promenade, and miles of open sand.",
+  },
+  {
+    slug: "lauderdale-by-the-sea",
+    name: "Lauderdale-by-the-Sea",
+    state: "Florida",
+    region: "Greater Fort Lauderdale",
+    tagline: "A small beach town that never went high-rise.",
   },
   {
     slug: "wilton-manors",
     name: "Wilton Manors",
     state: "Florida",
     region: "Greater Fort Lauderdale",
-    tagline:
-      "Lively, welcoming, and close to nightlife, dining, and central Fort Lauderdale.",
+    tagline: "The Island City. Walkable, colorful, and close to everything.",
+  },
+  {
+    slug: "oakland-park",
+    name: "Oakland Park",
+    state: "Florida",
+    region: "Greater Fort Lauderdale",
+    tagline: "Breweries, food, and a neighborhood on the rise.",
   },
   {
     slug: "pompano-beach",
     name: "Pompano Beach",
     state: "Florida",
     region: "Greater Fort Lauderdale",
-    tagline:
-      "Laid-back beach energy with boating, dining, and room for a slower morning.",
+    tagline: "A fishing town growing into its waterfront.",
   },
   {
     slug: "blue-ridge",
     name: "Blue Ridge",
     state: "Georgia",
     region: "North Georgia Mountains",
-    tagline:
-      "Mountain air, quiet cabins, downtown charm, trails, wineries, and lake days.",
+    tagline: "Mountain air, trout streams, and a storybook downtown.",
+  },
+  {
+    slug: "blairsville",
+    name: "Blairsville",
+    state: "Georgia",
+    region: "North Georgia Mountains",
+    tagline: "Waterfalls, vineyards, and the top of Georgia.",
   },
   {
     slug: "ellijay",
     name: "Ellijay",
     state: "Georgia",
     region: "North Georgia Mountains",
-    tagline:
-      "Apple country, vineyards, rivers, and a softer kind of mountain weekend.",
+    tagline: "Georgia's apple capital, with trails in every direction.",
+  },
+  {
+    slug: "dahlonega",
+    name: "Dahlonega",
+    state: "Georgia",
+    region: "North Georgia Mountains",
+    tagline: "Gold rush history in the heart of wine country.",
   },
   {
     slug: "helen",
     name: "Helen",
     state: "Georgia",
     region: "North Georgia Mountains",
-    tagline:
-      "Alpine-style streets, tubing, hiking, and an easy base for North Georgia exploring.",
+    tagline: "A Bavarian village on the Chattahoochee.",
   },
 ];
 
@@ -200,46 +227,60 @@ const ExperienceIcon = ({ name }) => {
 
 export const DestinationsPage = ({ mountNode }) => {
   const { links } = useMountData(mountNode);
-  const groups = ["Greater Fort Lauderdale", "North Georgia Mountains"];
+  const groups = [
+    {
+      title: "Greater Fort Lauderdale",
+      region: "Greater Fort Lauderdale",
+    },
+    {
+      title: "The North Georgia Mountains",
+      region: "North Georgia Mountains",
+    },
+  ];
 
   return (
     <main className="cc-exact cc-exact-interior">
       <ExactHeader links={links} />
       <div className="cc-exact-page-pad cc-exact-dest-hero">
-        <div className="cc-exact-wrap cc-exact-dest-intro">
+        <div className="cc-exact-wrap cc-exact-dest-wrap cc-exact-dest-intro">
           <ExactKick>Destinations</ExactKick>
           <h1>
-            Where to <em className="cc-exact-accent">next?</em>
+            Where to next<em className="cc-exact-accent">?</em>
           </h1>
           <p className="cc-exact-lede">
-            Choose the setting. We&apos;ll help you find the stay that fits it.
+            Every CC Stays destination comes with local knowledge built in.
+            Guides to the neighborhoods we know, and homes worth the trip.
           </p>
         </div>
       </div>
 
       <section className="cc-exact-section cc-exact-section-tight">
-        <div className="cc-exact-wrap">
+        <div className="cc-exact-wrap cc-exact-dest-wrap">
           {groups.map((group) => (
-            <div className="cc-exact-dest-group" key={group}>
-              <ExactKick>{group}</ExactKick>
+            <div className="cc-exact-dest-group" key={group.region}>
+              <ExactKick>{group.title}</ExactKick>
               <div className="cc-exact-dest-grid">
                 {DESTINATIONS.filter(
-                  (destination) => destination.region === group,
+                  (destination) => destination.region === group.region,
                 ).map((destination) => (
                   <a
                     className="cc-exact-dest-card"
                     href={destinationHref(links, destination.slug)}
                     key={destination.slug}
                   >
-                    <span className="cc-exact-dc-region">
-                      {destination.state}
-                    </span>
-                    <span className="cc-exact-dc-name">{destination.name}</span>
-                    <span className="cc-exact-dc-copy">
-                      {destination.tagline}
+                    <span className="cc-exact-dc-body">
+                      <span className="cc-exact-dc-region">
+                        {destination.state}
+                      </span>
+                      <span className="cc-exact-dc-name">
+                        {destination.name}
+                      </span>
+                      <span className="cc-exact-dc-copy">
+                        {destination.tagline}
+                      </span>
                     </span>
                     <span className="cc-exact-dc-link">
-                      Explore stays <span>→</span>
+                      Explore {destination.name} <span>→</span>
                     </span>
                   </a>
                 ))}
@@ -249,7 +290,7 @@ export const DestinationsPage = ({ mountNode }) => {
         </div>
       </section>
 
-      <section className="cc-exact-section cc-exact-cream2">
+      <section className="cc-exact-section cc-exact-cream2 cc-exact-dest-cta">
         <div className="cc-exact-wrap cc-exact-centered">
           <ExactKick center>Experiences</ExactKick>
           <h2>
@@ -320,13 +361,14 @@ export const ExperiencesPage = ({ mountNode }) => {
         <div className="cc-exact-wrap cc-exact-centered">
           <ExactKick center>In the meantime</ExactKick>
           <h2>
-            Planning <em className="cc-exact-accent">something?</em>
+            Planning something<em className="cc-exact-accent">?</em>
           </h2>
           <p className="cc-exact-lede">
             Tell us what you have in mind. We&apos;ll help where we can.
           </p>
           <a
-            className="cc-exact-btn cc-exact-btn-primary cc-revamp-white-text"
+            id="ask-cc-stays-experiences"
+            className="cc-exact-btn cc-exact-btn-primary"
             href={`${links.contact}?reason=concierge`}
           >
             Ask CC Stays <span>→</span>
@@ -363,7 +405,9 @@ export const AboutPage = ({ mountNode }) => {
         <div className="cc-exact-wrap">
           <div className="cc-exact-letter">
             <CcWatermark className="cc-exact-letter-stamp" />
-            <ExactKick>A note from us</ExactKick>
+            <span id="note-from-us-green-about">
+              <ExactKick>A note from us</ExactKick>
+            </span>
             <p>
               CC Stays started with a simple belief: where you stay can change
               the entire trip.
@@ -627,9 +671,8 @@ export const ContactPage = ({ mountNode }) => {
             How can we <em className="cc-exact-accent">help?</em>
           </h1>
           <p className="cc-exact-lede">
-            Questions before you book, help planning a stay, or anything else we
-            should know. Send a note and we&apos;ll point you in the right
-            direction.
+            Questions before your stay, help planning your trip, or something
+            you need while you&apos;re here. We&apos;re happy to help.
           </p>
         </div>
       </div>
@@ -669,7 +712,9 @@ export const ContactPage = ({ mountNode }) => {
 
               <div className="cc-exact-f-row">
                 <label className="cc-exact-f-field">
-                  <span>Phone</span>
+                  <span style={{ color: "var(--muted)" }}>
+                    Phone <span style={{ fontWeight: 400 }}>(optional)</span>
+                  </span>
                   <input
                     name="phone"
                     value={form.phone}
@@ -740,13 +785,8 @@ export const ContactPage = ({ mountNode }) => {
                 matters most. We&apos;ll help match you with the right stay.
               </p>
             </div>
-            <div className="cc-exact-partner-box">
-              <ExactKick>Owners</ExactKick>
-              <h2>Have a home for CC Stays?</h2>
-              <p>
-                Our partner page explains how we design, operate, and position
-                high-end vacation rentals.
-              </p>
+            <div className="cc-partner-box">
+              <p>Own a property or want to work with CC Stays?</p>
               <a className="cc-exact-btn-text" href={links.partner}>
                 Partner With Us <span>↗</span>
               </a>
