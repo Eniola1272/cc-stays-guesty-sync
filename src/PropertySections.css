@@ -454,8 +454,17 @@
   padding: 0 26px;
   border: 1px solid rgba(32, 29, 23, 0.55);
   border-radius: 8px;
+  background: transparent;
   color: #242019;
   font: 600 16px/1 var(--revamp-sans);
+  cursor: pointer;
+}
+
+.cc-property-full-outline:hover,
+.cc-property-full-outline:focus,
+.cc-property-full-outline:active {
+  background: rgba(255, 250, 241, 0.58);
+  color: #242019;
 }
 
 .cc-property-full-reviews h2 {
@@ -573,7 +582,7 @@
   padding-bottom: 2px;
   border-bottom: 1px solid currentColor;
   color: #242019;
-  font: 700 16px/1.35 var(--revamp-sans);
+  font: 500 16px/1.35 var(--revamp-sans);
   text-decoration: none;
   transition:
     color 0.2s,
@@ -772,6 +781,137 @@
 }
 
 .cc-property-promise-open {
+  overflow: hidden;
+}
+
+.cc-property-amenities-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.cc-property-amenities-modal[hidden] {
+  display: none;
+}
+
+.cc-property-amenities-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(35, 32, 25, 0.46);
+  backdrop-filter: blur(8px);
+}
+
+.cc-property-amenities-modal .panel {
+  position: relative;
+  z-index: 1;
+  width: min(720px, 100%);
+  max-height: min(780px, calc(100vh - 48px));
+  overflow: auto;
+  padding: 44px;
+  border: 1px solid rgba(32, 29, 23, 0.12);
+  border-radius: 20px;
+  background: #fffaf1;
+  box-shadow: 0 28px 90px rgba(32, 29, 23, 0.28);
+  color: #242019;
+}
+
+.cc-property-amenities-modal .modal-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  display: grid;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid rgba(32, 29, 23, 0.12);
+  border-radius: 50%;
+  background: rgba(244, 236, 223, 0.72);
+  color: #242019;
+  cursor: pointer;
+}
+
+.cc-property-amenities-modal .modal-close svg {
+  width: 16px;
+  height: 16px;
+}
+
+.cc-property-amenities-modal h3 {
+  margin: 0;
+  color: #242019;
+  font: 400 38px/1.05 var(--revamp-serif, "Instrument Serif", serif);
+}
+
+.cc-property-amenities-modal .muted {
+  margin: 0.4rem 0 1.6rem;
+  color: rgba(32, 29, 23, 0.6);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.cc-property-amenities-groups {
+  display: grid;
+  gap: 2rem;
+}
+
+.cc-property-amenities-groups section {
+  min-width: 0;
+}
+
+.cc-property-amenities-groups h4 {
+  margin: 0 0 0.85rem;
+  color: #242019;
+  font: 600 18px/1.25 var(--revamp-sans);
+}
+
+.cc-property-amenities-groups ul {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cc-property-amenities-groups li {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+  padding: 18px 0;
+  border-top: 1px solid rgba(32, 29, 23, 0.12);
+}
+
+.cc-property-amenities-groups li > span {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  color: #232019;
+}
+
+.cc-property-amenities-groups li svg {
+  display: block;
+  width: 26px;
+  height: 26px;
+  stroke-width: 1.55;
+}
+
+.cc-property-amenities-groups b {
+  display: block;
+  color: #242019;
+  font: 600 16px/1.35 var(--revamp-sans);
+}
+
+.cc-property-amenities-groups li p {
+  margin: 0.3rem 0 0;
+  color: rgba(32, 29, 23, 0.6);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.cc-property-amenities-open {
   overflow: hidden;
 }
 
@@ -1059,6 +1199,40 @@
 
   .cc-property-promise-modal h3 {
     font-size: 28px;
+  }
+
+  .cc-property-amenities-modal {
+    padding: 18px;
+  }
+
+  .cc-property-amenities-modal .panel {
+    max-height: calc(100vh - 36px);
+    padding: 34px 24px 28px;
+    border-radius: 16px;
+  }
+
+  .cc-property-amenities-modal h3 {
+    font-size: 30px;
+  }
+
+  .cc-property-amenities-groups {
+    gap: 1.7rem;
+  }
+
+  .cc-property-amenities-groups li {
+    grid-template-columns: 28px minmax(0, 1fr);
+    gap: 14px;
+    padding: 16px 0;
+  }
+
+  .cc-property-amenities-groups li > span {
+    width: 28px;
+    height: 28px;
+  }
+
+  .cc-property-amenities-groups li svg {
+    width: 23px;
+    height: 23px;
   }
 
   .cc-property-full-footer {

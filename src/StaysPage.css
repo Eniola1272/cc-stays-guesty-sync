@@ -286,6 +286,12 @@
   cursor: pointer;
 }
 
+.cc-exact-menu-btn:hover,
+.cc-exact-menu-btn:focus,
+.cc-exact-menu-btn:active {
+  background: transparent;
+}
+
 .cc-exact-menu-btn svg {
   width: 22px;
   height: 22px;
@@ -330,6 +336,18 @@
   font-family: var(--serif);
   font-size: 2.2rem;
   line-height: 1;
+}
+
+.cc-exact-drawer-links a small {
+  margin-left: 0.4em;
+  color: var(--ink-soft);
+  font-family: var(--sans);
+  font-size: 1rem;
+  vertical-align: middle;
+}
+
+.cc-exact-drawer .cc-exact-menu-btn {
+  display: inline-flex;
 }
 
 .cc-exact-drawer-cta {

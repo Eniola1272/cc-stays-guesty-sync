@@ -79,6 +79,11 @@ export const ExactHeader = ({ links = DEFAULT_EXACT_LINKS, solid = true }) => {
     ["Partner With Us ↗", links.partner],
     ["Owners ↗", links.owners],
   ];
+  const drawerLinks = nav.map(([label, href]) => ({
+    href,
+    isExternal: label.includes("↗"),
+    label: label.replace("↗", "").trim(),
+  }));
 
   return (
     <>
@@ -107,7 +112,17 @@ export const ExactHeader = ({ links = DEFAULT_EXACT_LINKS, solid = true }) => {
           </button>
         </div>
         <nav className="cc-exact-drawer-links" aria-label="Menu">
-          {nav.map(([label, href]) => <a href={href} key={label} onClick={() => setOpen(false)}>{label}</a>)}
+          {drawerLinks.map(({ label, href, isExternal }) => (
+            <a
+              href={href}
+              key={label}
+              onClick={() => setOpen(false)}
+              {...(isExternal ? { target: "_blank", rel: "noopener" } : {})}
+            >
+              {label}
+              {isExternal ? <small>↗</small> : null}
+            </a>
+          ))}
         </nav>
         <a className="cc-exact-btn cc-exact-btn-primary cc-exact-drawer-cta" href={links.stays} onClick={() => setOpen(false)}>Find a Stay</a>
       </div>

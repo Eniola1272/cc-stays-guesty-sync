@@ -1784,6 +1784,35 @@ class CC_Stays_Guesty_Sync
         return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . ($icons[$name] ?? $icons['sparkle']) . '</svg>';
     }
 
+    private function property_amenity_icon_key($label)
+    {
+        $label = strtolower(trim((string) $label));
+
+        $matches = [
+            'waves' => ['water', 'waterfront', 'dock', 'lake', 'pond', 'river'],
+            'pool' => ['pool', 'swim', 'hot tub', 'jacuzzi'],
+            'utensils' => ['kitchen', 'dining', 'dinnerware', 'dish', 'grill', 'bbq', 'barbecue', 'oven', 'stove', 'microwave', 'refrigerator', 'freezer', 'toaster', 'blender', 'coffee', 'espresso', 'cookware', 'baking'],
+            'sofa' => ['sofa', 'couch', 'living', 'lounge', 'workspace', 'chair'],
+            'bed' => ['bed', 'linen', 'pillow', 'blanket', 'sleep'],
+            'sun' => ['sun', 'patio', 'outdoor', 'balcony', 'yard', 'garden', 'beach', 'essentials'],
+            'bell' => ['alarm', 'detector', 'security', 'camera', 'smoke', 'carbon', 'safe'],
+            'home' => ['air conditioning', 'air-conditioning', 'heat', 'heating', 'fan', 'washer', 'dryer', 'laundry', 'cleaning', 'shampoo', 'conditioner', 'soap', 'towel', 'bath', 'bathtub', 'shower', 'wifi', 'wi-fi', 'internet', 'tv', 'parking'],
+            'flag' => ['golf', 'putt', 'putting'],
+            'target' => ['game', 'arcade', 'pool table', 'ping pong', 'board game'],
+            'map-pin' => ['location', 'central', 'minutes'],
+        ];
+
+        foreach ($matches as $icon => $needles) {
+            foreach ($needles as $needle) {
+                if ($needle !== '' && strpos($label, $needle) !== false) {
+                    return $icon;
+                }
+            }
+        }
+
+        return 'sparkle';
+    }
+
     public function render_property_hero_section($atts = [])
     {
         $property = $this->get_property_section_data($this->get_shortcode_property_id($atts));
@@ -2151,7 +2180,7 @@ class CC_Stays_Guesty_Sync
                             <ul>
                                 <?php foreach ($items as $item): ?>
                                     <li>
-                                        <span><?php echo $this->property_icon_svg($item['name'] ?? 'sparkle'); ?></span>
+                                        <span><?php echo $this->property_icon_svg($this->property_amenity_icon_key($item['name'] ?? '')); ?></span>
                                         <div>
                                             <b><?php echo esc_html($item['name'] ?? 'Amenity'); ?></b>
                                             <?php if (!empty($item['description'])): ?>

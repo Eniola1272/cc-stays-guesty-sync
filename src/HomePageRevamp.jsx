@@ -577,6 +577,11 @@ const HomePageRevamp = ({ mountNode }) => {
     ["Partner With Us ↗", links.partner],
     ["Owners ↗", links.owners],
   ];
+  const drawerLinks = navLinks.map(([label, href]) => ({
+    href,
+    isExternal: label.includes("↗"),
+    label: label.replace("↗", "").trim(),
+  }));
 
   return (
     <main className="cc-revamp">
@@ -602,19 +607,60 @@ const HomePageRevamp = ({ mountNode }) => {
           <button
             className="cc-revamp-menu-button"
             type="button"
-            onClick={() => setMenuOpen((open) => !open)}
-            aria-label="Toggle navigation"
+            onClick={() => setMenuOpen(true)}
+            aria-label="Open menu"
+            aria-expanded={isMenuOpen}
           >
+            <span />
             <span />
             <span />
           </button>
         </header>
-        <div className={`cc-revamp-drawer ${isMenuOpen ? "is-open" : ""}`}>
-          {navLinks.map(([label, href]) => (
-            <a href={href} key={label} onClick={() => setMenuOpen(false)}>
-              {label}
+        <div
+          className={`cc-revamp-drawer ${isMenuOpen ? "is-open" : ""}`}
+          aria-label="Menu"
+        >
+          <div className="cc-revamp-drawer-top">
+            <a
+              href={links.home}
+              aria-label="CC Stays home"
+              onClick={() => setMenuOpen(false)}
+            >
+              <LogoMark logo={images.logo} />
             </a>
-          ))}
+            <button
+              className="cc-revamp-menu-button cc-revamp-menu-button--close"
+              type="button"
+              onClick={() => setMenuOpen(false)}
+              aria-label="Close menu"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                <path d="M5 5l14 14M19 5L5 19" />
+              </svg>
+            </button>
+          </div>
+          <nav className="cc-revamp-drawer-links" aria-label="Menu">
+            {drawerLinks.map(({ label, href, isExternal }) => (
+              <a
+                href={href}
+                key={label}
+                onClick={() => setMenuOpen(false)}
+                {...(isExternal ? { target: "_blank", rel: "noopener" } : {})}
+              >
+                {label}
+                {isExternal ? <small>↗</small> : null}
+              </a>
+            ))}
+          </nav>
+          <div className="cc-revamp-drawer-cta">
+            <a
+              className="cc-revamp-button cc-revamp-white-text"
+              href={links.stays}
+              onClick={() => setMenuOpen(false)}
+            >
+              Find a Stay
+            </a>
+          </div>
         </div>
         <div className="cc-revamp-hero-inner cc-revamp-wrap">
           <h1>
