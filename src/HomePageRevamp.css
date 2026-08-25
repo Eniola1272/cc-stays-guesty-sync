@@ -1049,8 +1049,9 @@
 
 .cc-revamp-footer-grid {
   display: grid;
-  grid-template-columns: minmax(250px, 2.2fr) repeat(4, minmax(120px, 1fr));
-  gap: 48px;
+  grid-template-columns: minmax(300px, 1fr) repeat(4, max-content);
+  gap: clamp(44px, 5vw, 86px);
+  align-items: start;
 }
 
 .cc-revamp-footer p {

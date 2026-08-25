@@ -783,8 +783,9 @@
 
 .cc-property-full-footer-grid {
   display: grid;
-  grid-template-columns: minmax(300px, 1.5fr) repeat(4, minmax(120px, 1fr));
-  gap: 58px;
+  grid-template-columns: minmax(300px, 1fr) repeat(4, max-content);
+  gap: clamp(44px, 5vw, 86px);
+  align-items: start;
 }
 
 .cc-property-full-footer-brand svg {
