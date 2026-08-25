@@ -819,12 +819,17 @@ class CC_Stays_Guesty_Sync
     /**
      * Render the Airbnb-style amenities section via shortcode.
      */
-    public function render_amenities_widget()
+    public function render_amenities_widget($atts = [])
     {
-        if (!is_singular('properties'))
-            return '';
+        $post_id = $this->get_shortcode_property_id($atts);
+        if (!$post_id && is_singular('properties')) {
+            $post_id = get_the_ID();
+        }
 
-        $post_id = get_the_ID();
+        if (!$post_id || get_post_type($post_id) !== 'properties') {
+            return '';
+        }
+
         $amenities_json = $this->get_property_amenities_json($post_id);
 
         return '<div class="cc-stays-react-amenities" data-amenities="' . esc_attr($amenities_json) . '"></div>';
@@ -879,6 +884,7 @@ class CC_Stays_Guesty_Sync
                 has_shortcode($post->post_content, 'cc_stays_homepage_coastal') ||
                 has_shortcode($post->post_content, 'cc_stays_homepage_revamp') ||
                 has_shortcode($post->post_content, 'cc_stays_archive') ||
+                has_shortcode($post->post_content, 'cc_stays_amenities') ||
                 has_shortcode($post->post_content, 'cc_stays_about') ||
                 has_shortcode($post->post_content, 'cc_stays_about_revamp') ||
                 has_shortcode($post->post_content, 'cc_stays_journal') ||
@@ -1525,6 +1531,48 @@ class CC_Stays_Guesty_Sync
         return array_values(array_unique(array_filter($images)));
     }
 
+    private function cc_get_property_sleeping_rows($post_id, $bedrooms, $fallback = []) {
+        $row_data = $this->cc_get_meta_rows($post_id, ['cc_property_sleeping', 'property_sleeping'], [], ['name', 'bed', 'image']);
+        if (!empty($row_data)) {
+            return array_map(function ($row) {
+                $row['image'] = $this->cc_get_image_url_from_value($row['image'] ?? '');
+                return $row;
+            }, $row_data);
+        }
+
+        $rooms = [];
+        $limit = max(1, min(12, (int) $bedrooms ?: 1));
+        for ($index = 1; $index <= $limit; $index++) {
+            $image = $this->cc_get_meta_first($post_id, [
+                'bedroom_' . $index,
+                'bedroom_' . $index . '_image',
+                'cc_property_bedroom_' . $index,
+                'property_bedroom_' . $index,
+            ], '');
+            $name = $this->cc_get_meta_first($post_id, [
+                'bedroom_' . $index . '_name',
+                'bedroom_' . $index . '_title',
+                'bedroom_' . $index . '_label',
+            ], '');
+            $bed = $this->cc_get_meta_first($post_id, [
+                'bedroom_' . $index . '_bed',
+                'bedroom_' . $index . '_beds',
+                'bedroom_' . $index . '_description',
+            ], '');
+
+            $image_url = $this->cc_get_image_url_from_value($image);
+            if ($image_url || $name || $bed) {
+                $rooms[] = [
+                    'name' => $name ?: 'Bedroom ' . $index,
+                    'bed' => $bed ?: 'Comfortable bed',
+                    'image' => $image_url,
+                ];
+            }
+        }
+
+        return $rooms ?: $fallback;
+    }
+
     private function get_property_section_data($post_id) {
         if (!$post_id || get_post_type($post_id) !== 'properties') {
             return null;
@@ -1563,7 +1611,7 @@ class CC_Stays_Guesty_Sync
             'rating' => $this->cc_get_meta_first($post_id, ['cc_property_rating', 'rating', 'review_rating'], ''),
             'review_count' => (int) ($this->cc_get_meta_first($post_id, ['cc_property_review_count', 'review_count'], count($reviews)) ?: count($reviews)),
             'highlights' => $this->cc_get_meta_rows($post_id, ['cc_property_highlights', 'property_highlights'], $fallback_highlights, ['title', 'copy', 'icon']),
-            'sleeping' => $this->cc_get_meta_rows($post_id, ['cc_property_sleeping', 'property_sleeping'], $fallback_sleeping, ['name', 'bed', 'image']),
+            'sleeping' => $this->cc_get_property_sleeping_rows($post_id, $bedrooms, $fallback_sleeping),
             'reviews' => $reviews,
             'lat' => floatval(get_post_meta($post_id, 'latitude', true)),
             'lng' => floatval(get_post_meta($post_id, 'longitude', true)),
@@ -1825,7 +1873,12 @@ class CC_Stays_Guesty_Sync
     }
 
     public function render_property_amenities_section($atts = []) {
-        return '<section class="cc-property-section-shell">' . $this->render_amenities_widget() . '</section>';
+        $property = $this->get_property_section_data($this->get_shortcode_property_id($atts));
+        if (!$property) {
+            return $this->property_missing_shortcode_message();
+        }
+
+        return '<section class="cc-property-section-shell">' . $this->render_amenities_widget(['post_id' => $property['id']]) . '</section>';
     }
 
     public function render_property_booking_section($atts = []) {
@@ -1937,6 +1990,96 @@ class CC_Stays_Guesty_Sync
         return array_values(array_unique(array_filter(array_map('trim', $flat))));
     }
 
+    private function get_property_grouped_amenities($post_id) {
+        $amenities_json = $this->get_property_amenities_json($post_id);
+        $amenities = $amenities_json ? json_decode($amenities_json, true) : [];
+        $groups = [];
+
+        if (is_array($amenities)) {
+            $is_assoc = array_keys($amenities) !== range(0, count($amenities) - 1);
+            if ($is_assoc) {
+                foreach ($amenities as $category => $items) {
+                    foreach ((array) $items as $item) {
+                        $name = is_array($item) ? ($item['title'] ?? $item['name'] ?? $item['amenity'] ?? '') : $item;
+                        $description = is_array($item) ? ($item['description'] ?? $item['subtitle'] ?? $item['details'] ?? '') : '';
+                        if ($name) {
+                            $groups[$this->title_case_label($category)][] = [
+                                'name' => trim((string) $name),
+                                'description' => trim((string) $description),
+                            ];
+                        }
+                    }
+                }
+            } else {
+                foreach ($amenities as $item) {
+                    $name = is_array($item) ? ($item['title'] ?? $item['name'] ?? $item['amenity'] ?? '') : $item;
+                    $description = is_array($item) ? ($item['description'] ?? $item['subtitle'] ?? $item['details'] ?? '') : '';
+                    $category = is_array($item) ? ($item['category'] ?? $item['group'] ?? $item['section'] ?? '') : '';
+                    if ($name) {
+                        $groups[$this->title_case_label($category ?: 'Amenities')][] = [
+                            'name' => trim((string) preg_replace('/^Unavailable:\s*/i', '', $name)),
+                            'description' => trim((string) $description),
+                        ];
+                    }
+                }
+            }
+        }
+
+        if (empty($groups)) {
+            $groups['Amenities'] = array_map(function ($amenity) {
+                return ['name' => $amenity, 'description' => ''];
+            }, $this->get_property_flat_amenities($post_id));
+        }
+
+        return array_filter($groups);
+    }
+
+    private function title_case_label($value) {
+        $value = trim(preg_replace('/[\s_-]+/', ' ', (string) $value));
+        return $value === '' ? 'Amenities' : ucwords(strtolower($value));
+    }
+
+    private function property_amenities_modal($groups) {
+        $total = 0;
+        foreach ($groups as $items) {
+            $total += count($items);
+        }
+
+        ob_start();
+        ?>
+        <div class="cc-property-amenities-modal" data-amenities-modal hidden>
+            <div class="cc-property-amenities-backdrop" data-amenities-close></div>
+            <div class="panel" role="dialog" aria-modal="true" aria-labelledby="cc-property-amenities-title">
+                <button class="modal-close" type="button" data-amenities-close aria-label="Close">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"></path></svg>
+                </button>
+                <h3 id="cc-property-amenities-title">What this stay offers</h3>
+                <p class="muted"><?php echo esc_html($total); ?> amenities available.</p>
+                <div class="cc-property-amenities-groups">
+                    <?php foreach ($groups as $title => $items) : ?>
+                        <section>
+                            <h4><?php echo esc_html($title); ?></h4>
+                            <ul>
+                                <?php foreach ($items as $item) : ?>
+                                    <li>
+                                        <span><?php echo $this->property_icon_svg($item['name'] ?? 'sparkle'); ?></span>
+                                        <div>
+                                            <b><?php echo esc_html($item['name'] ?? 'Amenity'); ?></b>
+                                            <?php if (!empty($item['description'])) : ?><p><?php echo esc_html($item['description']); ?></p><?php endif; ?>
+                                        </div>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </section>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
+        <script>(function(){if(window.ccPropertyAmenitiesReady)return;window.ccPropertyAmenitiesReady=true;var lastTrigger=null;function modal(){return document.querySelector("[data-amenities-modal]");}function open(trigger){var root=modal();if(!root)return;lastTrigger=trigger;root.hidden=false;document.documentElement.classList.add("cc-property-amenities-open");var close=root.querySelector("[data-amenities-close]");if(close)close.focus();}function close(){var root=modal();if(!root||root.hidden)return;root.hidden=true;document.documentElement.classList.remove("cc-property-amenities-open");if(lastTrigger&&lastTrigger.focus)lastTrigger.focus();}document.addEventListener("click",function(event){var opener=event.target.closest("[data-amenities-open]");if(opener){event.preventDefault();open(opener);return;}if(event.target.closest("[data-amenities-close]")){event.preventDefault();close();}});document.addEventListener("keydown",function(event){if(event.key==="Escape")close();});})();</script>
+        <?php
+        return ob_get_clean();
+    }
+
     private function render_property_full_header($links) {
         ob_start();
         ?>
@@ -1996,6 +2139,7 @@ class CC_Stays_Guesty_Sync
         }
         $visible_images = array_slice(array_pad($images, 5, $images[0]), 0, 5);
         $amenities = $this->get_property_flat_amenities($property['id']);
+        $amenity_groups = $this->get_property_grouped_amenities($property['id']);
         $rate = $property['nightly_rate'] ? '$' . esc_html(number_format((float) $property['nightly_rate'])) : '';
         $map_src = ($property['lat'] && $property['lng']) ? 'https://maps.google.com/maps?q=' . rawurlencode($property['lat'] . ',' . $property['lng']) . '&z=13&output=embed' : '';
 
@@ -2079,7 +2223,8 @@ class CC_Stays_Guesty_Sync
                                     <p><span>✓</span><?php echo esc_html($amenity); ?></p>
                                 <?php endforeach; ?>
                             </div>
-                            <a class="cc-property-full-outline" href="#cc-property-amenities">Show all <?php echo esc_html(count($amenities)); ?> amenities</a>
+                            <button class="cc-property-full-outline" type="button" data-amenities-open>Show all <?php echo esc_html(count($amenities)); ?> amenities</button>
+                            <?php echo $this->property_amenities_modal($amenity_groups); ?>
                         </section>
 
                         <?php if (!empty($property['reviews']) || $property['rating']) : ?>

@@ -4,6 +4,10 @@
   --cc-prop-ink: #201d17;
   --cc-prop-blue: #203645;
   --revamp-ink: #232019;
+  --revamp-serif: "Instrument Serif", serif;
+  --revamp-sans: "Instrument Sans", sans-serif;
+  --cc-serif: "Instrument Serif", serif;
+  --cc-revamp-body: "Instrument Sans", sans-serif;
   --cc-prop-green: var(--revamp-ink);
   --cc-prop-paper: #f7f1e6;
   --cc-prop-cream: #ebe3d2;
@@ -106,7 +110,7 @@
 .cc-property-full-hero h1,
 .cc-property-full-main h2,
 .cc-property-full-footer-brand span {
-  font-family: var(--cc-serif, "Bodoni Moda", serif);
+  font-family: var(--cc-serif, "Instrument Serif", serif);
   font-weight: 500;
   letter-spacing: 0;
 }
@@ -449,8 +453,14 @@
   padding: 0 26px;
   border: 1px solid rgba(32, 29, 23, 0.55);
   border-radius: 8px;
+  background: transparent;
   color: #242019;
   font: 800 16px/1 var(--revamp-sans);
+  cursor: pointer;
+}
+
+.cc-property-full-outline:hover {
+  background: rgba(255, 250, 241, 0.56);
 }
 
 .cc-property-full-reviews h2 {
@@ -564,7 +574,7 @@
 .cc-property-full-book-card h2 {
   margin: 0 0 26px;
   color: #242019;
-  font: 400 28px/1 var(--revamp-serif, "Bodoni Moda", serif);
+  font: 400 28px/1 var(--revamp-serif, "Instrument Serif", serif);
 }
 
 .cc-property-full-book-card h2 span {
@@ -631,7 +641,8 @@
   color: rgba(32, 29, 23, 0.62);
 }
 
-.cc-property-promise-modal {
+.cc-property-promise-modal,
+.cc-property-amenities-modal {
   position: fixed;
   inset: 0;
   z-index: 99999;
@@ -640,18 +651,21 @@
   padding: 24px;
 }
 
-.cc-property-promise-modal[hidden] {
+.cc-property-promise-modal[hidden],
+.cc-property-amenities-modal[hidden] {
   display: none;
 }
 
-.cc-property-promise-backdrop {
+.cc-property-promise-backdrop,
+.cc-property-amenities-backdrop {
   position: absolute;
   inset: 0;
   background: rgba(35, 32, 25, 0.46);
   backdrop-filter: blur(8px);
 }
 
-.cc-property-promise-modal .panel {
+.cc-property-promise-modal .panel,
+.cc-property-amenities-modal .panel {
   position: relative;
   z-index: 1;
   width: min(560px, 100%);
@@ -665,7 +679,12 @@
   color: #242019;
 }
 
-.cc-property-promise-modal .modal-close {
+.cc-property-amenities-modal .panel {
+  width: min(760px, 100%);
+}
+
+.cc-property-promise-modal .modal-close,
+.cc-property-amenities-modal .modal-close {
   position: absolute;
   top: 18px;
   right: 18px;
@@ -681,17 +700,20 @@
   cursor: pointer;
 }
 
-.cc-property-promise-modal h3 {
+.cc-property-promise-modal h3,
+.cc-property-amenities-modal h3 {
   margin: 0;
   color: #242019;
-  font: 400 34px/1.05 var(--revamp-serif, "Bodoni Moda", serif);
+  font: 400 34px/1.05 var(--revamp-serif, "Instrument Serif", serif);
 }
 
-.cc-property-promise-modal .muted {
+.cc-property-promise-modal .muted,
+.cc-property-amenities-modal .muted {
   color: rgba(32, 29, 23, 0.6);
 }
 
-.cc-property-promise-modal > .panel > .muted {
+.cc-property-promise-modal > .panel > .muted,
+.cc-property-amenities-modal > .panel > .muted {
   margin: 0.4rem 0 1.4rem;
 }
 
@@ -714,8 +736,59 @@
   line-height: 1.65;
 }
 
-.cc-property-promise-open {
+.cc-property-promise-open,
+.cc-property-amenities-open {
   overflow: hidden;
+}
+
+.cc-property-amenities-groups {
+  display: grid;
+  gap: 34px;
+}
+
+.cc-property-amenities-groups h4 {
+  margin: 0 0 12px;
+  color: #242019;
+  font: 800 18px/1.25 var(--revamp-sans);
+}
+
+.cc-property-amenities-groups ul {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cc-property-amenities-groups li {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 18px;
+  padding: 18px 0;
+  border-top: 1px solid rgba(32, 29, 23, 0.12);
+}
+
+.cc-property-amenities-groups li > span {
+  display: grid;
+  place-items: center;
+  color: #51758f;
+}
+
+.cc-property-amenities-groups svg {
+  width: 25px;
+  height: 25px;
+}
+
+.cc-property-amenities-groups b {
+  display: block;
+  color: #242019;
+  font: 700 16px/1.35 var(--revamp-sans);
+}
+
+.cc-property-amenities-groups p {
+  margin: 5px 0 0;
+  color: rgba(32, 29, 23, 0.58);
+  font-size: 14px;
+  line-height: 1.55;
 }
 
 .cc-property-full-footer {
@@ -746,7 +819,7 @@
 
 .cc-property-full-footer-brand p {
   margin: 30px 0 0;
-  font: 500 24px/1.25 var(--cc-serif, "Bodoni Moda", serif);
+  font: 500 24px/1.25 var(--cc-serif, "Instrument Serif", serif);
 }
 
 .cc-property-full-footer nav {
@@ -1070,7 +1143,7 @@
 .cc-property-rules-section h2,
 .cc-property-final-cta h2 {
   margin: 0;
-  font-family: var(--cc-serif, "Bodoni Moda", serif);
+  font-family: var(--cc-serif, "Instrument Serif", serif);
   font-weight: 500;
   letter-spacing: 0;
 }
@@ -1210,7 +1283,7 @@
 }
 
 .cc-property-residence-card strong {
-  font-family: var(--cc-serif, "Bodoni Moda", serif);
+  font-family: var(--cc-serif, "Instrument Serif", serif);
   font-size: 24px;
   font-weight: 500;
 }
@@ -1244,7 +1317,7 @@
 .cc-property-sleep-rail h3,
 .cc-property-rules-section h3 {
   margin: 18px 0 8px;
-  font-family: var(--cc-serif, "Bodoni Moda", serif);
+  font-family: var(--cc-serif, "Instrument Serif", serif);
   font-size: 28px;
   font-weight: 500;
   line-height: 1.05;

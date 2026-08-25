@@ -379,7 +379,7 @@ const SearchBar = ({ showLocation = true }) => {
                 marginBottom: "16px",
                 boxSizing: "border-box",
                 color: "#292929",
-    fontFamily: '"Archivo", sans-serif',
+                fontFamily: '"Instrument Sans", sans-serif',
               }}
             />
             <div
@@ -489,7 +489,7 @@ const SearchBar = ({ showLocation = true }) => {
                 marginBottom: "16px",
                 boxSizing: "border-box",
                 color: "#292929",
-                fontFamily: '"Archivo", sans-serif',
+                fontFamily: '"Instrument Sans", sans-serif',
               }}
             />
             <div

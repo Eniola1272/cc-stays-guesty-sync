@@ -15,7 +15,10 @@ const readMountData = (mountNode) => {
 
   if (mountNode?.dataset?.links) {
     try {
-      links = { ...DEFAULT_EXACT_LINKS, ...JSON.parse(mountNode.dataset.links) };
+      links = {
+        ...DEFAULT_EXACT_LINKS,
+        ...JSON.parse(mountNode.dataset.links),
+      };
     } catch {
       links = DEFAULT_EXACT_LINKS;
     }
@@ -23,7 +26,10 @@ const readMountData = (mountNode) => {
 
   if (mountNode?.dataset?.images) {
     try {
-      images = { ...DEFAULT_EXACT_IMAGES, ...JSON.parse(mountNode.dataset.images) };
+      images = {
+        ...DEFAULT_EXACT_IMAGES,
+        ...JSON.parse(mountNode.dataset.images),
+      };
     } catch {
       images = DEFAULT_EXACT_IMAGES;
     }
@@ -48,56 +54,64 @@ const DESTINATIONS = [
     name: "Fort Lauderdale",
     state: "Florida",
     region: "Greater Fort Lauderdale",
-    tagline: "Canals, beaches, dining, and easy access to every kind of South Florida stay.",
+    tagline:
+      "Canals, beaches, dining, and easy access to every kind of South Florida stay.",
   },
   {
     slug: "las-olas",
     name: "Las Olas",
     state: "Florida",
     region: "Greater Fort Lauderdale",
-    tagline: "Walkable dinners, galleries, cafes, and a polished city-by-the-water feel.",
+    tagline:
+      "Walkable dinners, galleries, cafes, and a polished city-by-the-water feel.",
   },
   {
     slug: "fort-lauderdale-beach",
     name: "Fort Lauderdale Beach",
     state: "Florida",
     region: "Greater Fort Lauderdale",
-    tagline: "Beach days, waterfront restaurants, and warm evenings close to the sand.",
+    tagline:
+      "Beach days, waterfront restaurants, and warm evenings close to the sand.",
   },
   {
     slug: "wilton-manors",
     name: "Wilton Manors",
     state: "Florida",
     region: "Greater Fort Lauderdale",
-    tagline: "Lively, welcoming, and close to nightlife, dining, and central Fort Lauderdale.",
+    tagline:
+      "Lively, welcoming, and close to nightlife, dining, and central Fort Lauderdale.",
   },
   {
     slug: "pompano-beach",
     name: "Pompano Beach",
     state: "Florida",
     region: "Greater Fort Lauderdale",
-    tagline: "Laid-back beach energy with boating, dining, and room for a slower morning.",
+    tagline:
+      "Laid-back beach energy with boating, dining, and room for a slower morning.",
   },
   {
     slug: "blue-ridge",
     name: "Blue Ridge",
     state: "Georgia",
     region: "North Georgia Mountains",
-    tagline: "Mountain air, quiet cabins, downtown charm, trails, wineries, and lake days.",
+    tagline:
+      "Mountain air, quiet cabins, downtown charm, trails, wineries, and lake days.",
   },
   {
     slug: "ellijay",
     name: "Ellijay",
     state: "Georgia",
     region: "North Georgia Mountains",
-    tagline: "Apple country, vineyards, rivers, and a softer kind of mountain weekend.",
+    tagline:
+      "Apple country, vineyards, rivers, and a softer kind of mountain weekend.",
   },
   {
     slug: "helen",
     name: "Helen",
     state: "Georgia",
     region: "North Georgia Mountains",
-    tagline: "Alpine-style streets, tubing, hiking, and an easy base for North Georgia exploring.",
+    tagline:
+      "Alpine-style streets, tubing, hiking, and an easy base for North Georgia exploring.",
   },
 ];
 
@@ -134,7 +148,8 @@ const EXPERIENCES = [
   },
 ];
 
-const destinationHref = (links, slug) => `${links.stays}?destination=${encodeURIComponent(slug)}`;
+const destinationHref = (links, slug) =>
+  `${links.stays}?destination=${encodeURIComponent(slug)}`;
 
 const ExperienceIcon = ({ name }) => {
   const paths = {
@@ -193,8 +208,12 @@ export const DestinationsPage = ({ mountNode }) => {
       <div className="cc-exact-page-pad cc-exact-dest-hero">
         <div className="cc-exact-wrap cc-exact-dest-intro">
           <ExactKick>Destinations</ExactKick>
-          <h1>Where to <em className="cc-exact-accent">next?</em></h1>
-          <p className="cc-exact-lede">Choose the setting. We&apos;ll help you find the stay that fits it.</p>
+          <h1>
+            Where to <em className="cc-exact-accent">next?</em>
+          </h1>
+          <p className="cc-exact-lede">
+            Choose the setting. We&apos;ll help you find the stay that fits it.
+          </p>
         </div>
       </div>
 
@@ -204,12 +223,24 @@ export const DestinationsPage = ({ mountNode }) => {
             <div className="cc-exact-dest-group" key={group}>
               <ExactKick>{group}</ExactKick>
               <div className="cc-exact-dest-grid">
-                {DESTINATIONS.filter((destination) => destination.region === group).map((destination) => (
-                  <a className="cc-exact-dest-card" href={destinationHref(links, destination.slug)} key={destination.slug}>
-                    <span className="cc-exact-dc-region">{destination.state}</span>
+                {DESTINATIONS.filter(
+                  (destination) => destination.region === group,
+                ).map((destination) => (
+                  <a
+                    className="cc-exact-dest-card"
+                    href={destinationHref(links, destination.slug)}
+                    key={destination.slug}
+                  >
+                    <span className="cc-exact-dc-region">
+                      {destination.state}
+                    </span>
                     <span className="cc-exact-dc-name">{destination.name}</span>
-                    <span className="cc-exact-dc-copy">{destination.tagline}</span>
-                    <span className="cc-exact-dc-link">Explore stays <span>→</span></span>
+                    <span className="cc-exact-dc-copy">
+                      {destination.tagline}
+                    </span>
+                    <span className="cc-exact-dc-link">
+                      Explore stays <span>→</span>
+                    </span>
                   </a>
                 ))}
               </div>
@@ -221,9 +252,15 @@ export const DestinationsPage = ({ mountNode }) => {
       <section className="cc-exact-section cc-exact-cream2">
         <div className="cc-exact-wrap cc-exact-centered">
           <ExactKick center>Experiences</ExactKick>
-          <h2>Make the trip an <em className="cc-exact-accent">occasion.</em></h2>
-          <p className="cc-exact-lede">Boats, cars, excursions, and plans made for you.</p>
-          <a className="cc-exact-btn-text" href={links.experiences}>Explore experiences <span>→</span></a>
+          <h2>
+            Make the trip an <em className="cc-exact-accent">occasion.</em>
+          </h2>
+          <p className="cc-exact-lede">
+            Boats, cars, excursions, and plans made for you.
+          </p>
+          <a className="cc-exact-btn-text" href={links.experiences}>
+            Explore experiences <span>→</span>
+          </a>
         </div>
       </section>
       <ExactFooter links={links} />
@@ -240,8 +277,13 @@ export const ExperiencesPage = ({ mountNode }) => {
       <div className="cc-exact-page-pad cc-exact-exp-hero">
         <div className="cc-exact-wrap cc-exact-dest-intro">
           <ExactKick>Experiences</ExactKick>
-          <h1>Make the trip an <em className="cc-exact-accent">occasion.</em></h1>
-          <p className="cc-exact-lede">A stay is only the beginning. Add the details that make the whole trip feel handled.</p>
+          <h1>
+            Make the trip an <em className="cc-exact-accent">occasion.</em>
+          </h1>
+          <p className="cc-exact-lede">
+            A stay is only the beginning. Add the details that make the whole
+            trip feel handled.
+          </p>
         </div>
       </div>
 
@@ -250,12 +292,20 @@ export const ExperiencesPage = ({ mountNode }) => {
           <div className="cc-exact-exp-grid">
             {EXPERIENCES.map((experience) => (
               <article className="cc-exact-exp-card" key={experience.title}>
-                <span className="cc-exact-exp-icon"><ExperienceIcon name={experience.icon} /></span>
+                <span className="cc-exact-exp-icon">
+                  <ExperienceIcon name={experience.icon} />
+                </span>
                 <div>
                   <div className="cc-exact-exp-head">
                     <h2>{experience.title}</h2>
-                    <span className={`cc-exact-dc-chip ${experience.status === "now" ? "cc-exact-chip-now" : ""}`}>
-                      {experience.status === "now" ? "Available now" : "Coming soon"}
+                    <span
+                      className={`cc-exact-dc-chip ${
+                        experience.status === "now" ? "cc-exact-chip-now" : ""
+                      }`}
+                    >
+                      {experience.status === "now"
+                        ? "Available now"
+                        : "Coming soon"}
                     </span>
                   </div>
                   <p>{experience.copy}</p>
@@ -269,9 +319,18 @@ export const ExperiencesPage = ({ mountNode }) => {
       <section className="cc-exact-section cc-exact-cream2">
         <div className="cc-exact-wrap cc-exact-centered">
           <ExactKick center>In the meantime</ExactKick>
-          <h2>Planning <em className="cc-exact-accent">something?</em></h2>
-          <p className="cc-exact-lede">Tell us what you have in mind. We&apos;ll help where we can.</p>
-          <a className="cc-exact-btn cc-exact-btn-primary cc-revamp-white-text" href={`${links.contact}?reason=concierge`}>Ask CC Stays <span>→</span></a>
+          <h2>
+            Planning <em className="cc-exact-accent">something?</em>
+          </h2>
+          <p className="cc-exact-lede">
+            Tell us what you have in mind. We&apos;ll help where we can.
+          </p>
+          <a
+            className="cc-exact-btn cc-exact-btn-primary cc-revamp-white-text"
+            href={`${links.contact}?reason=concierge`}
+          >
+            Ask CC Stays <span>→</span>
+          </a>
         </div>
       </section>
       <ExactFooter links={links} />
@@ -288,8 +347,15 @@ export const AboutPage = ({ mountNode }) => {
       <div className="cc-exact-page-pad cc-exact-about-hero">
         <div className="cc-exact-wrap cc-exact-about-hero-copy">
           <ExactKick>About CC Stays</ExactKick>
-          <h1>Built around a better<br />way to <em className="cc-exact-accent">stay.</em></h1>
-          <p className="cc-exact-lede">CC Stays is a collection of private residences with the comfort of home and the care of great hospitality.</p>
+          <h1>
+            Built around a better
+            <br />
+            way to <em className="cc-exact-accent">stay.</em>
+          </h1>
+          <p className="cc-exact-lede">
+            CC Stays is a collection of private residences with the comfort of
+            home and the care of great hospitality.
+          </p>
         </div>
       </div>
 
@@ -298,9 +364,20 @@ export const AboutPage = ({ mountNode }) => {
           <div className="cc-exact-letter">
             <CcWatermark className="cc-exact-letter-stamp" />
             <ExactKick>A note from us</ExactKick>
-            <p>CC Stays started with a simple belief: where you stay can change the entire trip.</p>
-            <p>We wanted the privacy and freedom of a home without giving up the thoughtfulness, consistency, and care you expect from great hospitality.</p>
-            <p>Our goal is to build a collection of residences you can book with confidence. Different homes and different destinations, all with a standard you recognize.</p>
+            <p>
+              CC Stays started with a simple belief: where you stay can change
+              the entire trip.
+            </p>
+            <p>
+              We wanted the privacy and freedom of a home without giving up the
+              thoughtfulness, consistency, and care you expect from great
+              hospitality.
+            </p>
+            <p>
+              Our goal is to build a collection of residences you can book with
+              confidence. Different homes and different destinations, all with a
+              standard you recognize.
+            </p>
             <p className="cc-exact-letter-close">See you out there,</p>
             <span className="cc-exact-letter-sig">Chandler + Catherinne</span>
           </div>
@@ -309,11 +386,31 @@ export const AboutPage = ({ mountNode }) => {
 
       <section className="cc-exact-section">
         <div className="cc-exact-wrap">
-          <div className="cc-exact-build-kick"><ExactKick>What We&apos;re Building</ExactKick></div>
+          <div className="cc-exact-build-kick">
+            <ExactKick>What We&apos;re Building</ExactKick>
+          </div>
           <div className="cc-exact-build-grid">
-            <div><h3>A better home</h3><p>Residences selected for comfort, character, amenities, and the way they actually feel to stay in.</p></div>
-            <div><h3>A recognizable standard</h3><p>Thoughtful essentials, comfortable beds, easy arrival, and homes prepared with care.</p></div>
-            <div><h3>Hospitality that follows you</h3><p>From local recommendations to help during the stay, our concierge is only a message away.</p></div>
+            <div>
+              <h3>A better home</h3>
+              <p>
+                Residences selected for comfort, character, amenities, and the
+                way they actually feel to stay in.
+              </p>
+            </div>
+            <div>
+              <h3>A recognizable standard</h3>
+              <p>
+                Thoughtful essentials, comfortable beds, easy arrival, and homes
+                prepared with care.
+              </p>
+            </div>
+            <div>
+              <h3>Hospitality that follows you</h3>
+              <p>
+                From local recommendations to help during the stay, our
+                concierge is only a message away.
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -321,16 +418,33 @@ export const AboutPage = ({ mountNode }) => {
       <section className="cc-exact-section cc-exact-cream2">
         <div className="cc-exact-wrap cc-exact-centered">
           <ExactKick center>White-Glove Concierge</ExactKick>
-          <h2>Your trip, <em className="cc-exact-accent">better.</em></h2>
+          <h2>
+            Your trip, <em className="cc-exact-accent">better.</em>
+          </h2>
           <p className="cc-exact-lede">Need something? Ask us.</p>
-          <a className="cc-exact-btn-text" href={`${links.contact}?reason=concierge`}>Ask CC Stays <span>→</span></a>
+          <a
+            className="cc-exact-btn-text"
+            href={`${links.contact}?reason=concierge`}
+          >
+            Ask CC Stays <span>→</span>
+          </a>
         </div>
       </section>
 
       <section className="cc-exact-close-spread">
         <div className="cc-exact-wrap cc-exact-centered">
-          <h2>Different places.<br />One way of <em className="cc-exact-accent-green">staying.</em></h2>
-          <a className="cc-exact-btn cc-exact-btn-primary" href={links.stays}>Explore the Collection <span>→</span></a>
+          <h2>
+            Different places.
+            <br />
+            One way of <em className="cc-exact-accent-green">staying.</em>
+          </h2>
+          <a
+            id="explore-the-collection-about"
+            className="cc-exact-btn cc-exact-btn-primary"
+            href={links.stays}
+          >
+            Explore the Collection <span>→</span>
+          </a>
         </div>
       </section>
       <ExactFooter links={links} />
@@ -351,7 +465,11 @@ export const JournalPage = ({ mountNode }) => {
     const input = event.currentTarget.querySelector("input");
     const email = input?.value.trim() || "";
     if (!email || !email.includes("@")) {
-      setStatus({ loading: false, message: "", error: "Please enter a valid email." });
+      setStatus({
+        loading: false,
+        message: "",
+        error: "Please enter a valid email.",
+      });
       return;
     }
 
@@ -370,7 +488,11 @@ export const JournalPage = ({ mountNode }) => {
       }
 
       input.value = "";
-      setStatus({ loading: false, message: data.message || "You're on the list.", error: "" });
+      setStatus({
+        loading: false,
+        message: data.message || "You're on the list.",
+        error: "",
+      });
     } catch (error) {
       setStatus({
         loading: false,
@@ -386,16 +508,36 @@ export const JournalPage = ({ mountNode }) => {
       <div className="cc-exact-page-pad cc-exact-journal-hero">
         <div className="cc-exact-wrap cc-exact-centered">
           <ExactKick center>The Journal</ExactKick>
-          <h1>Stories worth the <em className="cc-exact-accent">stay.</em></h1>
-          <p className="cc-exact-lede">Destination guides, home stories, and the art of staying well. The first issue is on its way.</p>
+          <h1>
+            Stories worth the <em className="cc-exact-accent">stay.</em>
+          </h1>
+          <p className="cc-exact-lede">
+            Destination guides, home stories, and the art of staying well. The
+            first issue is on its way.
+          </p>
           <form className="cc-exact-jn-form" onSubmit={submit} noValidate>
-            <input type="email" placeholder="Your email" aria-label="Email address" required />
-            <button className="cc-exact-btn cc-exact-btn-primary" type="submit" disabled={status.loading}>
+            <input
+              type="email"
+              placeholder="Your email"
+              aria-label="Email address"
+              required
+            />
+            <button
+              className="cc-exact-btn cc-exact-btn-primary"
+              type="submit"
+              disabled={status.loading}
+            >
               {status.loading ? "Saving..." : "Notify me"}
             </button>
           </form>
-          <p className={`cc-exact-small ${status.error ? "cc-exact-form-error" : "cc-exact-muted"}`}>
-            {status.error || status.message || "No noise. Just the good stuff, occasionally."}
+          <p
+            className={`cc-exact-small ${
+              status.error ? "cc-exact-form-error" : "cc-exact-muted"
+            }`}
+          >
+            {status.error ||
+              status.message ||
+              "No noise. Just the good stuff, occasionally."}
           </p>
         </div>
       </div>
@@ -481,8 +623,14 @@ export const ContactPage = ({ mountNode }) => {
       <div className="cc-exact-page-pad cc-exact-contact-hero">
         <div className="cc-exact-wrap cc-exact-contact-intro">
           <ExactKick>Contact CC Stays</ExactKick>
-          <h1>How can we <em className="cc-exact-accent">help?</em></h1>
-          <p className="cc-exact-lede">Questions before you book, help planning a stay, or anything else we should know. Send a note and we&apos;ll point you in the right direction.</p>
+          <h1>
+            How can we <em className="cc-exact-accent">help?</em>
+          </h1>
+          <p className="cc-exact-lede">
+            Questions before you book, help planning a stay, or anything else we
+            should know. Send a note and we&apos;ll point you in the right
+            direction.
+          </p>
         </div>
       </div>
 
@@ -498,22 +646,45 @@ export const ContactPage = ({ mountNode }) => {
               <div className="cc-exact-f-row">
                 <label className="cc-exact-f-field">
                   <span>Name</span>
-                  <input name="name" value={form.name} onChange={updateField} autoComplete="name" required />
+                  <input
+                    name="name"
+                    value={form.name}
+                    onChange={updateField}
+                    autoComplete="name"
+                    required
+                  />
                 </label>
                 <label className="cc-exact-f-field">
                   <span>Email</span>
-                  <input name="email" type="email" value={form.email} onChange={updateField} autoComplete="email" required />
+                  <input
+                    name="email"
+                    type="email"
+                    value={form.email}
+                    onChange={updateField}
+                    autoComplete="email"
+                    required
+                  />
                 </label>
               </div>
 
               <div className="cc-exact-f-row">
                 <label className="cc-exact-f-field">
                   <span>Phone</span>
-                  <input name="phone" value={form.phone} onChange={updateField} autoComplete="tel" />
+                  <input
+                    name="phone"
+                    value={form.phone}
+                    onChange={updateField}
+                    autoComplete="tel"
+                  />
                 </label>
                 <label className="cc-exact-f-field">
                   <span>Reason</span>
-                  <select name="reason" value={form.reason} onChange={updateField} required>
+                  <select
+                    name="reason"
+                    value={form.reason}
+                    onChange={updateField}
+                    required
+                  >
                     <option value="">Choose one</option>
                     <option>Booking question</option>
                     <option>Trip planning / recommendations</option>
@@ -527,16 +698,34 @@ export const ContactPage = ({ mountNode }) => {
 
               <label className="cc-exact-f-field">
                 <span>Message</span>
-                <textarea name="message" value={form.message} onChange={updateField} rows={7} required />
+                <textarea
+                  name="message"
+                  value={form.message}
+                  onChange={updateField}
+                  rows={7}
+                  required
+                />
               </label>
 
               <label className="cc-exact-honeypot" aria-hidden="true">
                 <span>Website</span>
-                <input name="website" value={form.website} onChange={updateField} tabIndex={-1} autoComplete="off" />
+                <input
+                  name="website"
+                  value={form.website}
+                  onChange={updateField}
+                  tabIndex={-1}
+                  autoComplete="off"
+                />
               </label>
 
-              {status.error && <p className="cc-exact-form-error">{status.error}</p>}
-              <button className="cc-exact-btn cc-exact-btn-primary" type="submit" disabled={status.loading}>
+              {status.error && (
+                <p className="cc-exact-form-error">{status.error}</p>
+              )}
+              <button
+                className="cc-exact-btn cc-exact-btn-primary"
+                type="submit"
+                disabled={status.loading}
+              >
                 {status.loading ? "Sending..." : "Send message"}
               </button>
             </form>
@@ -546,13 +735,21 @@ export const ContactPage = ({ mountNode }) => {
             <div className="cc-exact-concierge-box">
               <ExactKick>Concierge</ExactKick>
               <h2>Need help choosing?</h2>
-              <p>Tell us who&apos;s coming, the kind of trip you want, and what matters most. We&apos;ll help match you with the right stay.</p>
+              <p>
+                Tell us who&apos;s coming, the kind of trip you want, and what
+                matters most. We&apos;ll help match you with the right stay.
+              </p>
             </div>
             <div className="cc-exact-partner-box">
               <ExactKick>Owners</ExactKick>
               <h2>Have a home for CC Stays?</h2>
-              <p>Our partner page explains how we design, operate, and position high-end vacation rentals.</p>
-              <a className="cc-exact-btn-text" href={links.partner}>Partner With Us <span>↗</span></a>
+              <p>
+                Our partner page explains how we design, operate, and position
+                high-end vacation rentals.
+              </p>
+              <a className="cc-exact-btn-text" href={links.partner}>
+                Partner With Us <span>↗</span>
+              </a>
             </div>
           </aside>
         </div>

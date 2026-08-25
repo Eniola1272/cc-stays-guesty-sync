@@ -118,7 +118,10 @@
   color: inherit;
   padding: 1.65rem 1.7rem 1.45rem;
   text-decoration: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 }
 
 .cc-exact-dest-card:hover {
@@ -405,7 +408,9 @@
   letter-spacing: 0;
   line-height: 1.4;
   text-transform: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .cc-exact-f-field input,
@@ -543,4 +548,8 @@
   .cc-exact-form .cc-exact-btn {
     width: 100%;
   }
+}
+
+#explore-the-collection-about {
+  color: #ffffff;
 }
