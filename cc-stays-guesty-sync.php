@@ -1540,6 +1540,33 @@ class CC_Stays_Guesty_Sync
         return $images;
     }
 
+    private function cc_get_property_gallery_page_url($post_id, $title)
+    {
+        $acf_url = $this->cc_get_meta_first($post_id, [
+            'gallery_page',
+            'cc_property_gallery_page',
+            'property_gallery_page',
+        ], '');
+
+        if (is_array($acf_url)) {
+            $acf_url = $acf_url['url'] ?? '';
+        }
+
+        if ($acf_url && filter_var($acf_url, FILTER_VALIDATE_URL)) {
+            return esc_url_raw($acf_url);
+        }
+
+        $slug = sanitize_title($this->property_short_title($title));
+        $known_gallery_slugs = [
+            'bamboo-bliss' => 'bamboo-bliss-gallery',
+            'hidden-waters' => 'hidden-waters-gallery',
+            'villa-banana' => 'villa-banana-gallery',
+            'manatee-manors' => 'manatee-manors-gallery',
+        ];
+
+        return home_url('/' . ($known_gallery_slugs[$slug] ?? $slug . '-gallery') . '/');
+    }
+
     private function get_section_property_gallery($post_id)
     {
         $gallery = $this->cc_get_meta_array($post_id, ['cc_property_gallery', 'property_gallery', 'guesty_images'], []);
@@ -1633,6 +1660,7 @@ class CC_Stays_Guesty_Sync
             'intro' => $this->cc_get_meta_first($post_id, ['cc_property_intro', 'property_intro'], $description),
             'description' => $description,
             'gallery' => $this->get_section_property_gallery($post_id),
+            'gallery_page' => $this->cc_get_property_gallery_page_url($post_id, get_the_title($post_id)),
             'guests' => (int) (get_post_meta($post_id, 'guests', true) ?: 2),
             'bedrooms' => $bedrooms,
             'beds' => (int) ($this->cc_get_meta_first($post_id, ['cc_property_beds', 'beds'], $bedrooms) ?: $bedrooms),
@@ -1864,8 +1892,7 @@ class CC_Stays_Guesty_Sync
                         <img src="<?php echo esc_url($image); ?>" alt="" loading="<?php echo $index === 0 ? 'eager' : 'lazy'; ?>">
                     </a>
                 <?php endforeach; ?>
-                <a class="cc-property-gallery-button" href="<?php echo esc_url($visible[0]); ?>" target="_blank"
-                    rel="noopener">Show photos</a>
+                <a class="cc-property-gallery-button" href="<?php echo esc_url($property['gallery_page']); ?>">Show photos</a>
             </div>
         </section>
         <?php
@@ -2217,10 +2244,47 @@ class CC_Stays_Guesty_Sync
                     <a href="<?php echo esc_url($links['partner']); ?>">Partner With Us ↗</a>
                     <a class="muted" href="<?php echo esc_url($links['owners']); ?>">Owners ↗</a>
                 </nav>
+                <button class="cc-property-menu-btn" type="button" data-property-menu-open aria-label="Open menu">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+                        stroke-linecap="round">
+                        <path d="M3 7h18M3 12h18M3 17h18"></path>
+                    </svg>
+                </button>
             </div>
         </header>
+        <div class="cc-property-drawer" data-property-drawer aria-label="Menu" aria-hidden="true">
+            <div class="cc-property-drawer-top">
+                <a class="cc-property-full-brand" href="<?php echo esc_url($links['home']); ?>" data-property-menu-close>
+                    <?php echo $this->property_cc_logo_svg(); ?>
+                    <span>CC Stays</span>
+                </a>
+                <button class="cc-property-menu-btn" type="button" data-property-menu-close aria-label="Close menu">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+                        stroke-linecap="round">
+                        <path d="M5 5l14 14M19 5L5 19"></path>
+                    </svg>
+                </button>
+            </div>
+            <nav class="cc-property-drawer-links" aria-label="Menu">
+                <a href="<?php echo esc_url($links['stays']); ?>" data-property-menu-close>Stays</a>
+                <a href="<?php echo esc_url($links['about']); ?>" data-property-menu-close>About Us</a>
+                <a href="<?php echo esc_url($links['contact']); ?>" data-property-menu-close>Contact</a>
+                <a href="<?php echo esc_url($links['partner']); ?>" target="_blank" rel="noopener">Partner With Us
+                    <small>↗</small></a>
+                <a href="<?php echo esc_url($links['owners']); ?>" target="_blank" rel="noopener">Owners
+                    <small>↗</small></a>
+            </nav>
+            <a class="cc-property-drawer-cta" href="<?php echo esc_url($links['stays']); ?>" data-property-menu-close>Find a
+                Stay</a>
+        </div>
+        <?php echo $this->property_mobile_menu_script(); ?>
         <?php
         return ob_get_clean();
+    }
+
+    private function property_mobile_menu_script()
+    {
+        return '<script>(function(){if(window.ccPropertyMobileMenuReady)return;window.ccPropertyMobileMenuReady=true;function getDrawer(){return document.querySelector("[data-property-drawer]");}function openDrawer(){var drawer=getDrawer();if(!drawer)return;drawer.classList.add("open");drawer.setAttribute("aria-hidden","false");document.documentElement.classList.add("cc-property-menu-open");}function closeDrawer(){var drawer=getDrawer();if(!drawer)return;drawer.classList.remove("open");drawer.setAttribute("aria-hidden","true");document.documentElement.classList.remove("cc-property-menu-open");}document.addEventListener("click",function(event){if(event.target.closest("[data-property-menu-open]")){event.preventDefault();openDrawer();return;}if(event.target.closest("[data-property-menu-close]")){closeDrawer();}});document.addEventListener("keydown",function(event){if(event.key==="Escape")closeDrawer();});})();</script>';
     }
 
     private function render_property_full_footer($links)
@@ -2310,8 +2374,8 @@ class CC_Stays_Guesty_Sync
                                     loading="<?php echo $index === 0 ? 'eager' : 'lazy'; ?>">
                             </a>
                         <?php endforeach; ?>
-                        <a class="cc-property-full-gallery-button" href="<?php echo esc_url($visible_images[0]); ?>"
-                            target="_blank" rel="noopener">Show all photos</a>
+                        <a class="cc-property-full-gallery-button" href="<?php echo esc_url($property['gallery_page']); ?>">Show all
+                            photos</a>
                     </section>
                 </div>
 
@@ -2401,7 +2465,7 @@ class CC_Stays_Guesty_Sync
                         <section class="cc-property-full-section cc-property-full-promise">
                             <h2>The CC Stays Promise</h2>
                             <strong>Book with confidence.</strong>
-                            <a href="<?php echo esc_url($links['contact']); ?>">Read more <span>→</span></a>
+                            <a href="#cc-property-promise-title" data-promise-open>Read more <span>→</span></a>
                         </section>
 
                         <section class="cc-property-full-section cc-property-full-location">

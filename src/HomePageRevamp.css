@@ -133,7 +133,7 @@
 
 .cc-revamp-watermark {
   position: absolute;
-  width: min(64vw, 760px);
+  width: 610px;
   height: auto;
   color: currentColor;
   opacity: 0.055;
@@ -236,9 +236,9 @@
 }
 
 .cc-revamp-hero > .cc-revamp-watermark {
+  bottom: -132px;
+  right: -99px;
   z-index: 1;
-  right: -190px;
-  bottom: 12px;
 }
 
 .cc-revamp-nav {
@@ -901,9 +901,9 @@
 }
 
 .cc-revamp-trip-band .cc-revamp-watermark {
-  opacity: 0.06;
-  right: -118px;
-  top: -96px;
+  opacity: 0.05;
+  right: -99px;
+  top: -65px;
 }
 
 .cc-revamp-trip-band h2 {
@@ -1424,10 +1424,10 @@
   }
 
   .cc-revamp-hero > .cc-revamp-watermark {
-    right: -172px;
-    bottom: 8px;
-    width: 420px;
+    bottom: -68px;
     opacity: 0.04;
+    right: -51px;
+    width: 314px;
   }
 
   .cc-revamp-hero-inner {
@@ -1638,9 +1638,9 @@
   }
 
   .cc-revamp-trip-band .cc-revamp-watermark {
-    right: -170px;
-    top: -70px;
-    width: 360px;
+    right: -50px;
+    top: -1px;
+    width: 200px;
   }
 
   .cc-revamp-trip-band h2 {

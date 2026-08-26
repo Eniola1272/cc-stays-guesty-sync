@@ -275,7 +275,7 @@
 
 .cc-exact-menu-btn {
   display: none;
-  width: 42px;
+  /* width: 42px; */
   height: 42px;
   align-items: center;
   justify-content: center;
@@ -1061,19 +1061,18 @@
 
   .cc-exact-stay-grid {
     display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: 82%;
-    grid-template-columns: none;
-    gap: 1.25rem;
-    overflow-x: auto;
-    padding-bottom: 1.2rem;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: thin;
-    scrollbar-color: var(--line) transparent;
+    grid-auto-flow: row;
+    grid-auto-columns: initial;
+    grid-template-columns: 1fr;
+    gap: 2.4rem;
+    overflow: visible;
+    padding-bottom: 0;
+    scroll-snap-type: none;
+    scrollbar-width: auto;
   }
 
   .cc-exact-p-card {
-    scroll-snap-align: start;
+    scroll-snap-align: none;
   }
 
   .cc-exact-foot-top {
