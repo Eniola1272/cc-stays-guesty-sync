@@ -323,6 +323,10 @@
   justify-content: space-between;
 }
 
+.cc-revamp-drawer .cc-revamp-brand {
+  color: var(--revamp-ink);
+}
+
 .cc-revamp-menu-button--close {
   display: inline-flex;
   color: var(--revamp-ink);
@@ -581,7 +585,7 @@
 }
 
 .cc-revamp-review-rail {
-  /* scrollbar-width: none; */
+  grid-auto-columns: minmax(360px, 34%);
 }
 
 .cc-revamp-review-rail::-webkit-scrollbar {
@@ -1006,6 +1010,8 @@
 }
 
 .cc-revamp-standard h2 {
+  display: flex;
+  flex-direction: column;
   max-width: 640px;
   margin-bottom: 76px;
 }
@@ -1023,14 +1029,14 @@
 
 .cc-revamp-standard-item {
   display: grid;
-  grid-template-columns: 54px minmax(0, 1fr);
-  gap: 22px;
+  grid-template-columns: 70px minmax(0, 1fr);
+  gap: 26px;
 }
 
 .cc-revamp-standard-item > div {
   display: grid;
-  width: 50px;
-  height: 50px;
+  width: 64px;
+  height: 64px;
   place-items: center;
   border: 1px solid rgba(244, 239, 229, 0.22);
   border-radius: 50%;
@@ -1038,8 +1044,8 @@
 }
 
 .cc-revamp-standard-item svg {
-  width: 23px;
-  height: 23px;
+  width: 31px;
+  height: 31px;
 }
 
 .cc-revamp-standard-item h3 {
@@ -1668,7 +1674,7 @@
   }
 
   .cc-revamp-review-rail {
-    grid-auto-columns: minmax(232px, 66vw);
+    grid-auto-columns: minmax(280px, 78vw);
   }
 
   .cc-revamp-review {
@@ -1692,13 +1698,18 @@
   }
 
   .cc-revamp-standard-item {
-    grid-template-columns: 46px minmax(0, 1fr);
-    gap: 14px;
+    grid-template-columns: 58px minmax(0, 1fr);
+    gap: 18px;
   }
 
   .cc-revamp-standard-item > div {
-    width: 42px;
-    height: 42px;
+    width: 52px;
+    height: 52px;
+  }
+
+  .cc-revamp-standard-item svg {
+    width: 27px;
+    height: 27px;
   }
 
   .cc-revamp-standard-item h3 {

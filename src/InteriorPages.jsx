@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   CcWatermark,
   DEFAULT_EXACT_IMAGES,
@@ -173,6 +173,13 @@ const EXPERIENCES = [
     copy: "Reservations, recommendations, and special occasions, arranged by us.",
     status: "now",
   },
+];
+
+const CONTACT_REASONS = [
+  "Planning a stay",
+  "Current guest",
+  "Trip planning / recommendations",
+  "Something else",
 ];
 
 const destinationHref = (links, slug) =>
@@ -592,6 +599,7 @@ export const JournalPage = ({ mountNode }) => {
 
 export const ContactPage = ({ mountNode }) => {
   const { links } = useMountData(mountNode);
+  const reasonRef = useRef(null);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -605,6 +613,7 @@ export const ContactPage = ({ mountNode }) => {
     success: false,
     error: "",
   });
+  const [reasonOpen, setReasonOpen] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -616,6 +625,24 @@ export const ContactPage = ({ mountNode }) => {
     }
   }, []);
 
+  useEffect(() => {
+    const closeReason = (event) => {
+      if (reasonRef.current && !reasonRef.current.contains(event.target)) {
+        setReasonOpen(false);
+      }
+    };
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") setReasonOpen(false);
+    };
+
+    document.addEventListener("mousedown", closeReason);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("mousedown", closeReason);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, []);
+
   const updateField = (event) => {
     const { name, value } = event.target;
     setForm((current) => ({ ...current, [name]: value }));
@@ -623,6 +650,15 @@ export const ContactPage = ({ mountNode }) => {
 
   const submit = async (event) => {
     event.preventDefault();
+
+    if (!form.reason) {
+      setStatus({
+        loading: false,
+        success: false,
+        error: "Please choose a reason for your message.",
+      });
+      return;
+    }
 
     if (!event.currentTarget.checkValidity()) {
       event.currentTarget.reportValidity();
@@ -722,23 +758,65 @@ export const ContactPage = ({ mountNode }) => {
                     autoComplete="tel"
                   />
                 </label>
-                <label className="cc-exact-f-field">
+                <div
+                  className="cc-exact-f-field cc-exact-reason-field"
+                  ref={reasonRef}
+                >
                   <span>Reason</span>
-                  <select
-                    name="reason"
-                    value={form.reason}
-                    onChange={updateField}
-                    required
+                  <input type="hidden" name="reason" value={form.reason} />
+                  <button
+                    type="button"
+                    className={`cc-exact-reason-trigger ${
+                      reasonOpen ? "is-open" : ""
+                    }`}
+                    onClick={() => setReasonOpen((open) => !open)}
+                    aria-haspopup="listbox"
+                    aria-expanded={reasonOpen}
                   >
-                    <option value="">Choose one</option>
-                    <option>Booking question</option>
-                    <option>Trip planning / recommendations</option>
-                    <option>Existing reservation</option>
-                    <option>Partner with us</option>
-                    <option>Press / collaboration</option>
-                    <option>Something else</option>
-                  </select>
-                </label>
+                    <span className={form.reason ? "" : "is-placeholder"}>
+                      {form.reason || "Choose one"}
+                    </span>
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="m6 9 6 6 6-6" />
+                    </svg>
+                  </button>
+                  <div
+                    className={`cc-exact-reason-menu ${
+                      reasonOpen ? "is-open" : ""
+                    }`}
+                    role="listbox"
+                  >
+                    {CONTACT_REASONS.map((reason) => (
+                      <button
+                        type="button"
+                        className={`cc-exact-reason-option ${
+                          form.reason === reason ? "is-selected" : ""
+                        }`}
+                        role="option"
+                        aria-selected={form.reason === reason}
+                        key={reason}
+                        onClick={() => {
+                          setForm((current) => ({
+                            ...current,
+                            reason,
+                          }));
+                          setReasonOpen(false);
+                          setStatus((current) => ({
+                            ...current,
+                            error: "",
+                          }));
+                        }}
+                      >
+                        <span className="cc-exact-reason-check">
+                          <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M5 12l4 4L19 6" />
+                          </svg>
+                        </span>
+                        <span>{reason}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
 
               <label className="cc-exact-f-field">
