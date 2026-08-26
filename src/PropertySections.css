@@ -442,8 +442,24 @@
 }
 
 .cc-property-full-amenities p span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
   color: #51758f;
-  font-weight: 600;
+}
+
+.cc-property-full-amenities p span svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .cc-property-full-outline {

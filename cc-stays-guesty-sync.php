@@ -2372,8 +2372,8 @@ class CC_Stays_Guesty_Sync
                             <h2>What this stay offers</h2>
                             <div>
                                 <?php foreach (array_slice($amenities, 0, 10) as $amenity): ?>
-                                    <p><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
-                                                stroke-linecap="round">
+                                    <p><span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                                 <path d="M5 12l4 4L19 6"></path>
                                             </svg></span><?php echo esc_html($amenity); ?></p>
                                 <?php endforeach; ?>
