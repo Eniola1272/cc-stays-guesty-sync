@@ -262,13 +262,13 @@
 
 .cc-property-full-residence strong {
   color: #242019;
-  font: 600 19px/1.25 var(--revamp-sans);
+  font: 600 16px/1.25 var(--revamp-sans);
 }
 
 .cc-property-full-residence span {
   margin-top: 5px;
   color: rgba(32, 29, 23, 0.58);
-  font-size: 16px;
+  font-size: 13px;
 }
 
 .cc-property-full-about h2,
@@ -371,13 +371,13 @@
 .cc-property-full-highlights h3 {
   margin: 2px 0 10px;
   color: #242019;
-  font: 600 18px/1.35 var(--revamp-sans);
+  font: 600 16px/1.35 var(--revamp-sans);
 }
 
 .cc-property-full-highlights p {
   margin: 0;
   color: rgba(32, 29, 23, 0.58);
-  font-size: 14px;
+  font-size: 14px !important;
   line-height: 1.62;
 }
 
@@ -1149,7 +1149,7 @@
   .cc-property-full-location h2,
   .cc-property-full-rules h2,
   .cc-property-full-reviews h2 {
-    font-size: 38px;
+    font-size: 22px;
   }
 
   .cc-property-full-highlights,

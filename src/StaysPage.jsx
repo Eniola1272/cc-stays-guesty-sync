@@ -216,7 +216,7 @@ const SearchBar = ({ properties, links, onGuestFilter }) => {
         <span>Check out</span>
         <input type="date" value={checkOut} min={checkIn || todayISO()} onChange={(event) => setCheckOut(event.target.value)} />
       </label>
-      <div className="cc-exact-search-field">
+      <div className="cc-exact-search-field cc-exact-field-who">
         <span>Who</span>
         <button type="button" className="cc-exact-guest-display" onClick={() => setOpen((value) => !value)}>
           {guests} guest{guests > 1 ? "s" : ""}
