@@ -251,7 +251,11 @@
   align-items: center;
   gap: 8px;
   min-height: 40px;
+  padding: 0;
+  border: 0;
+  background: transparent;
   color: #242019;
+  cursor: pointer;
   font: 600 15px/1 var(--revamp-sans);
 }
 

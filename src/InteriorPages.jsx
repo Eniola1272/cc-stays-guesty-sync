@@ -856,11 +856,10 @@ export const ContactPage = ({ mountNode }) => {
 
           <aside className="cc-exact-contact-aside">
             <div className="cc-exact-concierge-box">
-              <ExactKick>Concierge</ExactKick>
-              <h2>Need help choosing?</h2>
+              <h2>Planning something?</h2>
               <p>
-                Tell us who&apos;s coming, the kind of trip you want, and what
-                matters most. We&apos;ll help match you with the right stay.
+                Looking for a recommendation, celebrating something special, or
+                just not sure where to start? Tell us what you have in mind.
               </p>
             </div>
             <div className="cc-partner-box">

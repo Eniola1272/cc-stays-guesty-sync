@@ -1751,6 +1751,11 @@ class CC_Stays_Guesty_Sync
         return '<script>(function(){if(window.ccPropertyReadMoreReady)return;window.ccPropertyReadMoreReady=true;function refresh(){document.querySelectorAll(".cc-property-read-more").forEach(function(root){var copy=root.querySelector(".cc-property-read-more-copy");var button=root.querySelector(".cc-property-read-more-toggle");if(!copy||!button)return;button.hidden=copy.scrollHeight<=copy.clientHeight+2;});}document.addEventListener("click",function(event){var button=event.target.closest(".cc-property-read-more-toggle");if(!button)return;var root=button.closest(".cc-property-read-more");if(!root)return;var expanded=root.getAttribute("data-expanded")==="true";root.setAttribute("data-expanded",expanded?"false":"true");button.setAttribute("aria-expanded",expanded?"false":"true");button.textContent=expanded?"Show more →":"Show less";});if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",refresh);}else{requestAnimationFrame(refresh);}window.addEventListener("resize",refresh);})();</script>';
     }
 
+    private function property_share_script()
+    {
+        return '<script>(function(){if(window.ccPropertyShareReady)return;window.ccPropertyShareReady=true;function copy(text){if(navigator.clipboard&&window.isSecureContext){return navigator.clipboard.writeText(text);}var area=document.createElement("textarea");area.value=text;area.setAttribute("readonly","");area.style.position="fixed";area.style.top="-9999px";document.body.appendChild(area);area.select();try{document.execCommand("copy");}finally{document.body.removeChild(area);}return Promise.resolve();}function copied(trigger){var original=trigger.getAttribute("data-share-label")||trigger.textContent||"Share";trigger.setAttribute("data-share-label",original);trigger.textContent="Copied";clearTimeout(trigger._ccShareTimer);trigger._ccShareTimer=setTimeout(function(){trigger.textContent=original;},1800);}document.addEventListener("click",function(event){var trigger=event.target.closest("[data-property-share]");if(!trigger)return;event.preventDefault();var title=trigger.getAttribute("data-share-title")||document.title;var url=trigger.getAttribute("data-share-url")||window.location.href;var text=trigger.getAttribute("data-share-text")||title;if(navigator.share){navigator.share({title:title,text:text,url:url}).catch(function(error){if(error&&error.name==="AbortError")return;copy(url).then(function(){copied(trigger);});});return;}copy(url).then(function(){copied(trigger);});});})();</script>';
+    }
+
     private function property_promise_modal()
     {
         ob_start();
@@ -2386,7 +2391,10 @@ class CC_Stays_Guesty_Sync
                                 <?php endif; ?>
                             </p>
                         </div>
-                        <a class="cc-property-share-link" href="<?php echo esc_url($property['url']); ?>">Share</a>
+                        <button class="cc-property-share-link" type="button" data-property-share
+                            data-share-title="<?php echo esc_attr($property['title']); ?>"
+                            data-share-text="<?php echo esc_attr('Take a look at ' . $property['title'] . ' by CC Stays.'); ?>"
+                            data-share-url="<?php echo esc_url($property['url']); ?>">Share</button>
                     </section>
 
                     <section class="cc-property-full-gallery" aria-label="<?php echo esc_attr($property['title']); ?> photos">
@@ -2551,6 +2559,7 @@ class CC_Stays_Guesty_Sync
                 </div>
             </main>
             <?php echo $this->render_property_full_footer($links); ?>
+            <?php echo $this->property_share_script(); ?>
         </div>
         <?php
         return ob_get_clean();

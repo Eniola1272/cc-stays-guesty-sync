@@ -1663,7 +1663,7 @@
 
   .cc-revamp-review-score strong {
     position: relative;
-    width: 122px;
+    width: 160px;
     padding-right: 20px;
     border-right: 1px solid var(--revamp-line);
     font-size: 66px;
