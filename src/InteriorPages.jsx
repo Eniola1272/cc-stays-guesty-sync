@@ -762,7 +762,7 @@ export const ContactPage = ({ mountNode }) => {
                   className="cc-exact-f-field cc-exact-reason-field"
                   ref={reasonRef}
                 >
-                  <span>Reason</span>
+                  <span>How can we help?</span>
                   <input type="hidden" name="reason" value={form.reason} />
                   <button
                     type="button"

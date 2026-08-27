@@ -5,7 +5,16 @@ import "react-datepicker/dist/react-datepicker.css";
 import "./BookingWidget.css";
 
 const CalendarIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.6"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
     <line x1="16" y1="2" x2="16" y2="6" />
     <line x1="8" y1="2" x2="8" y2="6" />
@@ -14,27 +23,60 @@ const CalendarIcon = () => (
 );
 
 const UserIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.6"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
     <circle cx="12" cy="7" r="4"></circle>
   </svg>
 );
 
 const ChevronDownIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    width="14"
+    height="14"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <polyline points="6 9 12 15 18 9"></polyline>
   </svg>
 );
 
 const CloseIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <line x1="18" y1="6" x2="6" y2="18" />
     <line x1="6" y1="6" x2="18" y2="18" />
   </svg>
 );
 
 const fmtDate = (d) =>
-  d ? d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : null;
+  d
+    ? d.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    : null;
 
 const fmtShort = (d) =>
   d ? d.toLocaleDateString("en-US", { month: "short", day: "numeric" }) : null;
@@ -46,16 +88,26 @@ const toMoneyNumber = (value) => {
     return Number.isFinite(parsed) ? parsed : 0;
   }
   if (value && typeof value === "object") {
-    return toMoneyNumber(value.amount ?? value.value ?? value.total ?? value.totalPrice);
+    return toMoneyNumber(
+      value.amount ?? value.value ?? value.total ?? value.totalPrice,
+    );
   }
   return 0;
 };
 
 const getItemAmount = (item) =>
-  toMoneyNumber(item?.amount ?? item?.total ?? item?.totalPrice ?? item?.price ?? item?.value);
+  toMoneyNumber(
+    item?.amount ??
+      item?.total ??
+      item?.totalPrice ??
+      item?.price ??
+      item?.value,
+  );
 
 const getItemLabel = (item) =>
-  String(item?.title ?? item?.name ?? item?.type ?? item?.description ?? "").toLowerCase();
+  String(
+    item?.title ?? item?.name ?? item?.type ?? item?.description ?? "",
+  ).toLowerCase();
 
 const getQuoteCharges = (quote) => {
   const total = toMoneyNumber(quote?.totalPrice);
@@ -71,9 +123,18 @@ const getQuoteCharges = (quote) => {
 
     if (label.includes("tax") || label.includes("vat")) {
       taxes += amount;
-    } else if (label.includes("fee") || label.includes("clean") || label.includes("service")) {
+    } else if (
+      label.includes("fee") ||
+      label.includes("clean") ||
+      label.includes("service")
+    ) {
       fees += amount;
-    } else if (label.includes("night") || label.includes("rent") || label.includes("accommodation") || label.includes("fare")) {
+    } else if (
+      label.includes("night") ||
+      label.includes("rent") ||
+      label.includes("accommodation") ||
+      label.includes("fare")
+    ) {
       subtotal += amount;
     }
   });
@@ -92,12 +153,26 @@ const getQuoteCharges = (quote) => {
 // ── Shared booking form content (used in both desktop card and mobile drawer) ──
 const BookingFormContent = ({
   // state
-  dateRange, guests, isCalendarOpen, isGuestOpen, quote, loading, error,
-  blockedDates, nightlyRate, minNights,
+  dateRange,
+  guests,
+  isCalendarOpen,
+  isGuestOpen,
+  quote,
+  loading,
+  error,
+  blockedDates,
+  nightlyRate,
+  minNights,
   // setters / handlers
-  setIsCalendarOpen, setIsGuestOpen, setDateRange, setGuests,
-  setQuote, setError,
-  handleDateChange, fetchQuote, handleReserveClick,
+  setIsCalendarOpen,
+  setIsGuestOpen,
+  setDateRange,
+  setGuests,
+  setQuote,
+  setError,
+  handleDateChange,
+  fetchQuote,
+  handleReserveClick,
   // layout variant
   mobileDrawer,
   drawerOpen,
@@ -125,7 +200,9 @@ const BookingFormContent = ({
       {!mobileDrawer && (
         <div className="cc-booking-header">
           <h2 className="cc-booking-price-line">
-            {nightlyRate ? `From $${nightlyRate} avg / night` : "Check availability"}
+            {nightlyRate
+              ? `From $${nightlyRate} avg / night`
+              : "Check availability"}
           </h2>
           <p className="cc-booking-min-stay">
             Minimum stay: {minNights} night{minNights !== "1" ? "s" : ""}
@@ -134,12 +211,20 @@ const BookingFormContent = ({
       )}
 
       {/* ── Check-in / Check-out Fields ── */}
-      <div className={`cc-date-fields ${mobileDrawer ? "cc-date-fields--drawer" : ""}`} ref={calendarRef}>
+      <div
+        className={`cc-date-fields ${
+          mobileDrawer ? "cc-date-fields--drawer" : ""
+        }`}
+        ref={calendarRef}
+      >
         {/* Fields row — always a horizontal pair */}
         <div className="cc-date-fields-row">
           <div
             className={`cc-date-field ${isCalendarOpen ? "active" : ""}`}
-            onClick={() => { setIsGuestOpen(false); setIsCalendarOpen(!isCalendarOpen); }}
+            onClick={() => {
+              setIsGuestOpen(false);
+              setIsCalendarOpen(!isCalendarOpen);
+            }}
           >
             <span className="cc-date-field-label">CHECK-IN</span>
             <div className="cc-date-field-value">
@@ -152,7 +237,10 @@ const BookingFormContent = ({
           <div className="cc-date-field-divider" />
           <div
             className={`cc-date-field ${isCalendarOpen ? "active" : ""}`}
-            onClick={() => { setIsGuestOpen(false); setIsCalendarOpen(!isCalendarOpen); }}
+            onClick={() => {
+              setIsGuestOpen(false);
+              setIsCalendarOpen(!isCalendarOpen);
+            }}
           >
             <span className="cc-date-field-label">CHECK-OUT</span>
             <div className="cc-date-field-value">
@@ -166,7 +254,11 @@ const BookingFormContent = ({
 
         {/* Calendar: dropdown on desktop, full-width block below fields on mobile */}
         {isCalendarOpen && (
-          <div className={mobileDrawer ? "cc-calendar-inline" : "cc-calendar-dropdown"}>
+          <div
+            className={
+              mobileDrawer ? "cc-calendar-inline" : "cc-calendar-dropdown"
+            }
+          >
             <DatePicker
               selectsRange
               inline
@@ -178,11 +270,15 @@ const BookingFormContent = ({
               calendarClassName="cc-search-calendar cc-widget-calendar"
             />
             {(startDate || endDate) && (
-              <button type="button" className="cc-clear-dates" onClick={() => {
-                setDateRange([null, null]);
-                setQuote(null);
-                setError(null);
-              }}>
+              <button
+                type="button"
+                className="cc-clear-dates"
+                onClick={() => {
+                  setDateRange([null, null]);
+                  setQuote(null);
+                  setError(null);
+                }}
+              >
                 Clear dates
               </button>
             )}
@@ -194,10 +290,17 @@ const BookingFormContent = ({
       <div className="cc-guest-select-container" ref={guestRef}>
         <div
           className={`cc-guest-select-wrapper ${isGuestOpen ? "active" : ""}`}
-          onClick={() => { setIsCalendarOpen(false); setIsGuestOpen(!isGuestOpen); }}
+          onClick={() => {
+            setIsCalendarOpen(false);
+            setIsGuestOpen(!isGuestOpen);
+          }}
         >
-          <span className="cc-input-icon"><UserIcon /></span>
-          <div className={`cc-guest-select-value ${guests > 0 ? "selected" : ""}`}>
+          <span className="cc-input-icon">
+            <UserIcon />
+          </span>
+          <div
+            className={`cc-guest-select-value ${guests > 0 ? "selected" : ""}`}
+          >
             {guests > 0 ? `${guests} Guest${guests > 1 ? "s" : ""}` : "Guests"}
           </div>
           <span className={`cc-guest-chevron ${isGuestOpen ? "open" : ""}`}>
@@ -206,32 +309,62 @@ const BookingFormContent = ({
         </div>
 
         {isGuestOpen && (
-          <div className="cc-dropdown-menu cc-guest-stepper-menu" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="cc-dropdown-menu cc-guest-stepper-menu"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="cc-guest-stepper-row">
               <div className="cc-guest-stepper-info">
                 <span className="cc-guest-stepper-title">Guests</span>
-                <span className="cc-guest-stepper-sub">Adults &amp; children</span>
+                <span className="cc-guest-stepper-sub">
+                  Adults &amp; children
+                </span>
               </div>
               <div className="cc-guest-stepper-controls">
-                <button type="button" className="cc-stepper-btn" onClick={() => setGuests(Math.max(1, guests - 1))} disabled={guests <= 1}>−</button>
+                <button
+                  type="button"
+                  className="cc-stepper-btn"
+                  onClick={() => setGuests(Math.max(1, guests - 1))}
+                  disabled={guests <= 1}
+                >
+                  −
+                </button>
                 <span className="cc-stepper-count">{guests || 0}</span>
-                <button type="button" className="cc-stepper-btn" onClick={() => setGuests((guests || 0) + 1)}>+</button>
+                <button
+                  type="button"
+                  className="cc-stepper-btn"
+                  onClick={() => setGuests((guests || 0) + 1)}
+                >
+                  +
+                </button>
               </div>
             </div>
-            <button type="button" className="cc-guest-stepper-done" onClick={() => setIsGuestOpen(false)}>Done</button>
+            <button
+              type="button"
+              className="cc-guest-stepper-done"
+              onClick={() => setIsGuestOpen(false)}
+            >
+              Done
+            </button>
           </div>
         )}
       </div>
 
       {/* ── CTA ── */}
-      <button className="cc-btn-primary" onClick={fetchQuote} disabled={loading}>
+      <button
+        className="cc-btn-primary"
+        onClick={fetchQuote}
+        disabled={loading}
+      >
         {loading ? "Checking..." : "Check Availability"}
       </button>
 
       {/* ── Messages ── */}
       <div className="cc-message-area">
         {error && <div className="cc-error-message">{error}</div>}
-        {loading && !error && <div className="cc-loading-message">Calculating your stay...</div>}
+        {loading && !error && (
+          <div className="cc-loading-message">Calculating your stay...</div>
+        )}
       </div>
 
       {/* ── Quote Result ── */}
@@ -241,7 +374,9 @@ const BookingFormContent = ({
             <span>Total</span>
             <strong>${quote.totalPrice}</strong>
           </div>
-          <button onClick={handleReserveClick} className="cc-btn-reserve">Reserve Now</button>
+          <button onClick={handleReserveClick} className="cc-btn-reserve">
+            Reserve Now
+          </button>
         </div>
       )}
     </>
@@ -251,8 +386,15 @@ const BookingFormContent = ({
 // ── Main component ──
 const BookingWidget = () => {
   const mountNode = document.getElementById("cc-stays-react-booking");
-  const listingId = mountNode ? mountNode.getAttribute("data-listing-id") : null;
-  const nightlyRate = mountNode ? mountNode.getAttribute("data-nightly-rate") : null;
+  const listingId = mountNode
+    ? mountNode.getAttribute("data-listing-id")
+    : null;
+  const nightlyRate = mountNode
+    ? mountNode.getAttribute("data-nightly-rate")
+    : null;
+  const propertyRating = mountNode
+    ? mountNode.getAttribute("data-rating")
+    : null;
   const minNights = mountNode ? mountNode.getAttribute("data-min-nights") : "2";
 
   // Shared state
@@ -283,7 +425,7 @@ const BookingWidget = () => {
             data.blockedDates.map((s) => {
               const [y, m, d] = s.split("-").map(Number);
               return new Date(y, m - 1, d);
-            })
+            }),
           );
         }
       })
@@ -308,7 +450,9 @@ const BookingWidget = () => {
     } else {
       document.body.style.overflow = "";
     }
-    return () => { document.body.style.overflow = ""; };
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [isDrawerOpen]);
 
   const handleDateChange = (update) => {
@@ -342,7 +486,9 @@ const BookingWidget = () => {
       });
       const data = await response.json();
       if (!response.ok)
-        throw new Error(data.message || "These dates are currently unavailable.");
+        throw new Error(
+          data.message || "These dates are currently unavailable.",
+        );
       if (data.available === false) {
         setError(data.message || "These dates are not available.");
         setQuote(data);
@@ -382,27 +528,50 @@ const BookingWidget = () => {
 
   // Shared props passed to both instances
   const sharedProps = {
-    dateRange, guests, isCalendarOpen, isGuestOpen, quote, loading, error,
-    blockedDates, nightlyRate, minNights,
-    setIsCalendarOpen, setIsGuestOpen, setDateRange, setGuests,
-    setQuote, setError,
-    handleDateChange, fetchQuote, handleReserveClick,
+    dateRange,
+    guests,
+    isCalendarOpen,
+    isGuestOpen,
+    quote,
+    loading,
+    error,
+    blockedDates,
+    nightlyRate,
+    minNights,
+    setIsCalendarOpen,
+    setIsGuestOpen,
+    setDateRange,
+    setGuests,
+    setQuote,
+    setError,
+    handleDateChange,
+    fetchQuote,
+    handleReserveClick,
   };
 
   if (!listingId)
     return <div className="cc-booking-widget">Error: Missing Property ID</div>;
 
   // Summary label for the mobile bar
-  const barLabel = startDate && endDate
-    ? `${fmtShort(startDate)} – ${fmtShort(endDate)}${guests > 0 ? ` · ${guests} guest${guests > 1 ? "s" : ""}` : ""}`
-    : "Add dates";
-  const barSub = nightlyRate ? `from $${nightlyRate} / night` : "Check availability";
+  const barLabel =
+    startDate && endDate
+      ? `${fmtShort(startDate)} – ${fmtShort(endDate)}${
+          guests > 0 ? ` · ${guests} guest${guests > 1 ? "s" : ""}` : ""
+        }`
+      : "Add dates";
+  const barSub = nightlyRate
+    ? `from $${nightlyRate} / night`
+    : "Check availability";
 
   return (
     <>
       {/* ── Desktop card (hidden on mobile via CSS) ── */}
       <div className="cc-booking-widget cc-booking-widget--desktop">
-        <BookingFormContent {...sharedProps} mobileDrawer={false} drawerOpen={false} />
+        <BookingFormContent
+          {...sharedProps}
+          mobileDrawer={false}
+          drawerOpen={false}
+        />
       </div>
 
       {/* ── Mobile: fixed bottom bar + slide-up drawer (portal to body) ── */}
@@ -416,15 +585,33 @@ const BookingWidget = () => {
               aria-label="Open booking panel"
               onClick={() => setIsDrawerOpen(true)}
             >
-              <span className="cc-mobile-bar-label">{barLabel}</span>
-              <span className="cc-mobile-bar-sub">{barSub}</span>
+              <span className="cc-mobile-bar-price-line">
+                {nightlyRate ? (
+                  <>
+                    <strong>${nightlyRate}</strong>
+                    <span>/ night</span>
+                  </>
+                ) : (
+                  <strong>{barSub}</strong>
+                )}
+                {propertyRating && (
+                  <>
+                    <span className="cc-mobile-bar-divider">·</span>
+                    <span className="cc-mobile-bar-star">★</span>
+                    <span>{propertyRating}</span>
+                  </>
+                )}
+              </span>
+              {startDate && endDate && (
+                <span className="cc-mobile-bar-sub">{barLabel}</span>
+              )}
             </button>
             <button
               className="cc-mobile-bar-btn"
               type="button"
               onClick={() => setIsDrawerOpen(true)}
             >
-              {startDate && endDate ? "Reserve" : "Select dates"}
+              {startDate && endDate ? "Reserve" : "Check availability"}
             </button>
           </div>
 
@@ -434,11 +621,22 @@ const BookingWidget = () => {
           )}
 
           {/* Slide-up drawer */}
-          <div className={`cc-mobile-drawer ${isDrawerOpen ? "cc-mobile-drawer--open" : ""}`} role="dialog" aria-modal="true" aria-label="Booking">
+          <div
+            className={`cc-mobile-drawer ${
+              isDrawerOpen ? "cc-mobile-drawer--open" : ""
+            }`}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Booking"
+          >
             {/* Drag handle */}
             <div className="cc-drawer-handle-row">
               <div className="cc-drawer-handle" />
-              <button className="cc-drawer-close" onClick={closeDrawer} aria-label="Close">
+              <button
+                className="cc-drawer-close"
+                onClick={closeDrawer}
+                aria-label="Close"
+              >
                 <CloseIcon />
               </button>
             </div>
@@ -452,11 +650,15 @@ const BookingWidget = () => {
             </div>
 
             <div className="cc-drawer-body">
-              <BookingFormContent {...sharedProps} mobileDrawer={true} drawerOpen={isDrawerOpen} />
+              <BookingFormContent
+                {...sharedProps}
+                mobileDrawer={true}
+                drawerOpen={isDrawerOpen}
+              />
             </div>
           </div>
         </>,
-        document.body
+        document.body,
       )}
     </>
   );

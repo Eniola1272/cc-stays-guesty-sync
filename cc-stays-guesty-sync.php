@@ -804,9 +804,11 @@ class CC_Stays_Guesty_Sync
         // Fetch the property's nightly rate and min stay from post meta
         $nightly_rate = get_post_meta($post_id, 'nightly_rate', true) ?: '';
         $min_nights = get_post_meta($post_id, 'min_nights', true) ?: '2';
+        $review_fallback = $this->property_review_fallback($post_id, get_the_title($post_id));
+        $rating = $this->cc_get_meta_first($post_id, ['cc_property_rating', 'rating', 'review_rating'], $review_fallback['rating']);
 
         // Output the div for React to mount to, passing the Guesty ID and pricing data
-        return '<div id="cc-stays-react-booking" data-listing-id="' . esc_attr($guesty_id) . '" data-nightly-rate="' . esc_attr($nightly_rate) . '" data-min-nights="' . esc_attr($min_nights) . '"></div>';
+        return '<div id="cc-stays-react-booking" data-listing-id="' . esc_attr($guesty_id) . '" data-nightly-rate="' . esc_attr($nightly_rate) . '" data-min-nights="' . esc_attr($min_nights) . '" data-rating="' . esc_attr($rating) . '"></div>';
     }
 
     /**
@@ -1464,6 +1466,10 @@ class CC_Stays_Guesty_Sync
                 $value = $value ?: ($row['description'] ?? $row['text'] ?? $row['content'] ?? '');
             } elseif ($column === 'icon') {
                 $value = $value ?: ($row['icon_name'] ?? $row['icon_slug'] ?? '');
+            } elseif ($column === 'name') {
+                $value = $value ?: ($row['place'] ?? $row['label'] ?? $row['title'] ?? '');
+            } elseif ($column === 'time') {
+                $value = $value ?: ($row['drive_time'] ?? $row['duration'] ?? $row['minutes'] ?? '');
             }
 
             if (is_array($value)) {
@@ -1654,6 +1660,263 @@ class CC_Stays_Guesty_Sync
         return $rooms ?: $fallback;
     }
 
+    private function property_things_to_know_fallback($post_id, $title = '')
+    {
+        $fallbacks = [
+            'bamboo-bliss' => [
+                'rules' => [
+                    'Check-in after 4:00 PM',
+                    'Checkout by 10:00 AM',
+                    'Maximum 8 guests',
+                    'No pets',
+                    'No smoking',
+                    'No parties or events',
+                    'Pool heating available on request (cooler months)',
+                ],
+                'safety' => [
+                    'Pool without lifeguard; children supervised at all times',
+                    'Exterior security cameras on property',
+                    'Smoke & carbon monoxide alarms installed',
+                ],
+                'cancellation' => 'Full refund up to 30 days before check-in. 50% refund up to 14 days before check-in.',
+            ],
+            'hidden-waters' => [
+                'rules' => [
+                    'Check-in after 4:00 PM',
+                    'Checkout by 10:00 AM',
+                    'Maximum 8 guests',
+                    'No smoking',
+                    'No parties or events',
+                ],
+                'safety' => [
+                    'Waterfront property; supervise children',
+                    'Pool without lifeguard',
+                    'Smoke & CO alarms installed',
+                ],
+                'cancellation' => 'Full refund up to 30 days before check-in. 50% refund up to 14 days before check-in.',
+            ],
+            'villa-banana' => [
+                'rules' => [
+                    'Check-in after 4:00 PM',
+                    'Checkout by 10:00 AM',
+                    'Maximum 6 guests',
+                    'No smoking',
+                    'No parties or events',
+                ],
+                'safety' => [
+                    'Pool without lifeguard',
+                    'Smoke & CO alarms installed',
+                ],
+                'cancellation' => 'Full refund up to 30 days before check-in. 50% refund up to 14 days before check-in.',
+            ],
+            'manatee-manors' => [
+                'rules' => [
+                    'Check-in after 4:00 PM',
+                    'Checkout by 10:00 AM',
+                    'Maximum 8 guests',
+                    'No smoking',
+                    'No parties or events',
+                ],
+                'safety' => [
+                    'Pool without lifeguard',
+                    'Smoke & CO alarms installed',
+                ],
+                'cancellation' => 'Full refund up to 30 days before check-in. 50% refund up to 14 days before check-in.',
+            ],
+        ];
+
+        $candidates = array_filter([
+            get_post_field('post_name', $post_id),
+            sanitize_title($this->property_short_title($title)),
+            sanitize_title($title),
+        ]);
+
+        foreach ($candidates as $candidate) {
+            if (isset($fallbacks[$candidate])) {
+                return $fallbacks[$candidate];
+            }
+        }
+
+        foreach ($fallbacks as $slug => $fallback) {
+            foreach ($candidates as $candidate) {
+                if (strpos($candidate, $slug) !== false || strpos($slug, $candidate) !== false) {
+                    return $fallback;
+                }
+            }
+        }
+
+        return [
+            'rules' => ['Check-in after 4:00 PM', 'Checkout by 10:00 AM', 'No smoking'],
+            'safety' => ['Smoke & CO alarms installed'],
+            'cancellation' => 'Cancellation terms are shown during checkout before you request to book.',
+        ];
+    }
+
+    private function property_location_fallback($post_id, $title = '')
+    {
+        $fallbacks = [
+            'bamboo-bliss' => [
+                'note' => 'Bamboo Bliss sits on a quiet residential street in central Fort Lauderdale, about a ten-minute walk to Riverland Woods Park, with quick access to major roadways for events at the Hard Rock, cruise departures, and day trips to Miami.',
+                'nearby' => [
+                    ['name' => 'Seminole Hard Rock Hotel & Casino', 'time' => '7 min'],
+                    ['name' => 'DRV PNK Stadium', 'time' => '10 min'],
+                    ['name' => 'Fort Lauderdale-Hollywood Airport', 'time' => '10 min'],
+                    ['name' => 'Downtown & Las Olas Boulevard', 'time' => '15 min'],
+                    ['name' => 'Fort Lauderdale Beach', 'time' => '15-20 min'],
+                    ['name' => 'Port Everglades Cruise Terminal', 'time' => '15 min'],
+                ],
+            ],
+            'hidden-waters' => [
+                'note' => 'Hidden Waters is tucked into the North Georgia mountains near Blue Ridge, with a private pond setting, forest views, and easy access to town, scenic drives, wineries, trails, and lake days.',
+                'nearby' => [
+                    ['name' => 'Downtown Blue Ridge', 'time' => '12 min'],
+                    ['name' => 'Lake Blue Ridge Marina', 'time' => '18 min'],
+                    ['name' => 'Mercier Orchards', 'time' => '15 min'],
+                    ['name' => 'Aska Adventure Area', 'time' => '25 min'],
+                    ['name' => 'Blue Ridge Scenic Railway', 'time' => '12 min'],
+                    ['name' => 'Morganton Point Recreation Area', 'time' => '16 min'],
+                ],
+            ],
+            'villa-banana' => [
+                'note' => 'Villa Banana places you in Wilton Manors, close to dining, nightlife, beaches, and central Fort Lauderdale, with an easy route to the airport and South Florida day trips.',
+                'nearby' => [
+                    ['name' => 'Wilton Drive', 'time' => '5 min'],
+                    ['name' => 'Fort Lauderdale Beach', 'time' => '15 min'],
+                    ['name' => 'Las Olas Boulevard', 'time' => '15 min'],
+                    ['name' => 'Fort Lauderdale-Hollywood Airport', 'time' => '20 min'],
+                    ['name' => 'Downtown Fort Lauderdale', 'time' => '12 min'],
+                    ['name' => 'Port Everglades Cruise Terminal', 'time' => '18 min'],
+                ],
+            ],
+            'manatee-manors' => [
+                'note' => 'Manatee Manors keeps you close to Wilton Manors dining and Fort Lauderdale beaches while still feeling tucked into a quiet residential pocket made for easy, relaxed days.',
+                'nearby' => [
+                    ['name' => 'Wilton Drive', 'time' => '4 min'],
+                    ['name' => 'Fort Lauderdale Beach', 'time' => '14 min'],
+                    ['name' => 'Las Olas Boulevard', 'time' => '15 min'],
+                    ['name' => 'Fort Lauderdale-Hollywood Airport', 'time' => '20 min'],
+                    ['name' => 'Downtown Fort Lauderdale', 'time' => '12 min'],
+                    ['name' => 'Oakland Park', 'time' => '7 min'],
+                ],
+            ],
+        ];
+
+        $candidates = array_filter([
+            get_post_field('post_name', $post_id),
+            sanitize_title($this->property_short_title($title)),
+            sanitize_title($title),
+        ]);
+
+        foreach ($candidates as $candidate) {
+            if (isset($fallbacks[$candidate])) {
+                return $fallbacks[$candidate];
+            }
+        }
+
+        foreach ($fallbacks as $slug => $fallback) {
+            foreach ($candidates as $candidate) {
+                if (strpos($candidate, $slug) !== false || strpos($slug, $candidate) !== false) {
+                    return $fallback;
+                }
+            }
+        }
+
+        return [
+            'note' => '',
+            'nearby' => [],
+        ];
+    }
+
+    private function property_matches_slug($post_id, $title, $slug)
+    {
+        $candidates = array_filter([
+            get_post_field('post_name', $post_id),
+            sanitize_title($this->property_short_title($title)),
+            sanitize_title($title),
+        ]);
+
+        foreach ($candidates as $candidate) {
+            if ($candidate === $slug || strpos($candidate, $slug) !== false || strpos($slug, $candidate) !== false) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function property_license_fallback($post_id, $title = '')
+    {
+        return $this->property_matches_slug($post_id, $title, 'bamboo-bliss') ? 'VR-24020013' : '';
+    }
+
+    private function property_review_fallback($post_id, $title = '')
+    {
+        $fallbacks = [
+            'bamboo-bliss' => [
+                'rating' => '4.99',
+                'review_count' => 103,
+                'reviews' => [
+                    ['name' => 'Airbnb guest', 'date' => '2026', 'quote' => 'The heated pool and backyard felt like our own private resort.', 'rating' => '5'],
+                    ['name' => 'Airbnb guest', 'date' => '2026', 'quote' => 'This place in one phrase: breathtaking.', 'rating' => '5'],
+                    ['name' => 'Airbnb guest', 'date' => '2026', 'quote' => 'Divine. Everything from the beds to the pool to the patio. They truly thought of everything.', 'rating' => '5'],
+                    ['name' => 'Airbnb guest', 'date' => '2026', 'quote' => 'Our best and favorite rental so far.', 'rating' => '5'],
+                    ['name' => 'Elena', 'date' => 'April 2026', 'quote' => "We've stayed in a lot of vacation homes. This is the first one that actually felt designed. Every detail was considered.", 'rating' => '5'],
+                ],
+            ],
+            'hidden-waters' => [
+                'rating' => '4.97',
+                'review_count' => 96,
+                'reviews' => [
+                    ['name' => 'Marcus', 'date' => 'June 2026', 'quote' => 'Coffee on the dock every morning. The house was spotless, the beds were legitimately hotel-quality, and check-in took thirty seconds.', 'rating' => '5'],
+                    ['name' => 'Chris', 'date' => 'March 2026', 'quote' => 'Quiet, private, and genuinely comfortable. We asked for a late checkout and they made it work without any fuss.', 'rating' => '5'],
+                    ['name' => 'Airbnb guest', 'date' => '2026', 'quote' => 'The waterfront setting made the whole trip feel slower and easier.', 'rating' => '5'],
+                    ['name' => 'Airbnb guest', 'date' => '2026', 'quote' => 'Clean, calm, and close to everything we needed.', 'rating' => '5'],
+                ],
+            ],
+            'villa-banana' => [
+                'rating' => '',
+                'review_count' => 0,
+                'reviews' => [],
+            ],
+            'manatee-manors' => [
+                'rating' => '4.96',
+                'review_count' => 88,
+                'reviews' => [
+                    ['name' => 'Jordan', 'date' => 'July 2026', 'quote' => "Perfect location. We walked everywhere. It felt more like staying at a friend's beautiful house than a rental.", 'rating' => '5'],
+                    ['name' => 'Airbnb guest', 'date' => '2026', 'quote' => 'The location made the trip simple, and the pool was exactly what we wanted after dinner.', 'rating' => '5'],
+                    ['name' => 'Airbnb guest', 'date' => '2026', 'quote' => 'Comfortable, clean, and easy to settle into.', 'rating' => '5'],
+                    ['name' => 'Airbnb guest', 'date' => '2026', 'quote' => 'A great Wilton Manors stay with everything close by.', 'rating' => '5'],
+                ],
+            ],
+        ];
+
+        $candidates = array_filter([
+            get_post_field('post_name', $post_id),
+            sanitize_title($this->property_short_title($title)),
+            sanitize_title($title),
+        ]);
+
+        foreach ($candidates as $candidate) {
+            if (isset($fallbacks[$candidate])) {
+                return $fallbacks[$candidate];
+            }
+        }
+
+        foreach ($fallbacks as $slug => $fallback) {
+            foreach ($candidates as $candidate) {
+                if (strpos($candidate, $slug) !== false || strpos($slug, $candidate) !== false) {
+                    return $fallback;
+                }
+            }
+        }
+
+        return [
+            'rating' => '',
+            'review_count' => 0,
+            'reviews' => [],
+        ];
+    }
+
     private function get_property_section_data($post_id)
     {
         if (!$post_id || get_post_type($post_id) !== 'properties') {
@@ -1661,8 +1924,12 @@ class CC_Stays_Guesty_Sync
         }
 
         $bedrooms = (int) (get_post_meta($post_id, 'bedrooms', true) ?: 1);
+        $title = get_the_title($post_id);
         $description = trim(wp_strip_all_tags(get_post_field('post_content', $post_id)));
-        $reviews = $this->cc_get_meta_rows($post_id, ['cc_property_reviews', 'property_reviews'], [], ['name', 'date', 'quote', 'rating']);
+        $things_to_know = $this->property_things_to_know_fallback($post_id, $title);
+        $location_fallback = $this->property_location_fallback($post_id, $title);
+        $review_fallback = $this->property_review_fallback($post_id, $title);
+        $reviews = $this->cc_get_meta_rows($post_id, ['cc_property_reviews', 'property_reviews'], $review_fallback['reviews'], ['name', 'date', 'quote', 'rating']);
         $fallback_highlights = [
             ['title' => 'Designed for the stay', 'copy' => 'Spaces arranged for settling in, gathering, and unwinding.', 'icon' => 'sparkle'],
             ['title' => 'Ready when you arrive', 'copy' => 'Smooth check-in, clear instructions, and essentials in place.', 'icon' => 'key'],
@@ -1675,7 +1942,7 @@ class CC_Stays_Guesty_Sync
 
         return [
             'id' => $post_id,
-            'title' => get_the_title($post_id),
+            'title' => $title,
             'url' => get_permalink($post_id),
             'listing_id' => get_post_meta($post_id, 'guesty_listing_id', true),
             'city' => get_post_meta($post_id, 'location_city', true) ?: '',
@@ -1691,19 +1958,21 @@ class CC_Stays_Guesty_Sync
             'bathrooms' => get_post_meta($post_id, 'bathrooms', true) ?: 1,
             'nightly_rate' => get_post_meta($post_id, 'nightly_rate', true) ?: '',
             'min_nights' => get_post_meta($post_id, 'min_nights', true) ?: '2',
-            'rating' => $this->cc_get_meta_first($post_id, ['cc_property_rating', 'rating', 'review_rating'], ''),
-            'review_count' => (int) ($this->cc_get_meta_first($post_id, ['cc_property_review_count', 'review_count'], count($reviews)) ?: count($reviews)),
+            'rating' => $this->cc_get_meta_first($post_id, ['cc_property_rating', 'rating', 'review_rating'], $review_fallback['rating']),
+            'review_count' => (int) ($this->cc_get_meta_first($post_id, ['cc_property_review_count', 'review_count'], ($review_fallback['review_count'] ?: count($reviews))) ?: count($reviews)),
             'highlights' => $this->cc_get_meta_rows($post_id, ['cc_property_highlights', 'property_highlights'], $fallback_highlights, ['title', 'copy', 'icon']),
             'sleeping' => $this->cc_get_property_sleeping_rows($post_id, $bedrooms, $fallback_sleeping),
             'reviews' => $reviews,
             'lat' => floatval(get_post_meta($post_id, 'latitude', true)),
             'lng' => floatval(get_post_meta($post_id, 'longitude', true)),
             'location_blurb' => $this->cc_get_meta_first($post_id, ['cc_property_location_blurb', 'property_location_blurb'], 'The exact address is shared after booking.'),
+            'location_note' => $this->cc_get_meta_first($post_id, ['cc_property_location_note', 'property_location_note', 'location_note'], $location_fallback['note']),
+            'nearby_places' => $this->cc_get_meta_rows($post_id, ['cc_property_nearby_places', 'property_nearby_places', 'nearby_places'], $location_fallback['nearby'], ['name', 'time']),
             'location_notes' => $this->cc_get_meta_rows($post_id, ['cc_property_location_notes', 'property_location_notes'], [], ['title', 'detail']),
-            'rules' => $this->cc_get_meta_array($post_id, ['cc_property_rules', 'property_rules'], ['Check-in after 4:00 PM', 'Checkout before 10:00 AM', 'No smoking']),
-            'safety' => $this->cc_get_meta_array($post_id, ['cc_property_safety', 'property_safety'], ['Smoke alarm', 'Carbon monoxide alarm']),
-            'cancellation' => $this->cc_get_meta_first($post_id, ['cc_property_cancellation', 'property_cancellation'], 'Cancellation terms are shown during checkout before you request to book.'),
-            'license' => $this->cc_get_meta_first($post_id, ['cc_property_license', 'property_license'], ''),
+            'rules' => $this->cc_get_meta_array($post_id, ['cc_property_rules', 'property_rules'], $things_to_know['rules']),
+            'safety' => $this->cc_get_meta_array($post_id, ['cc_property_safety', 'property_safety'], $things_to_know['safety']),
+            'cancellation' => $this->cc_get_meta_first($post_id, ['cc_property_cancellation', 'property_cancellation'], $things_to_know['cancellation']),
+            'license' => $this->cc_get_meta_first($post_id, ['cc_property_license', 'property_license'], $this->property_license_fallback($post_id, $title)),
         ];
     }
 
@@ -1790,6 +2059,44 @@ class CC_Stays_Guesty_Sync
             </div>
         </div>
         <script>(function () { if (window.ccPropertyPromiseReady) return; window.ccPropertyPromiseReady = true; var lastTrigger = null; function modal() { return document.querySelector("[data-promise-modal]"); } function open(trigger) { var root = modal(); if (!root) return; lastTrigger = trigger; root.hidden = false; document.documentElement.classList.add("cc-property-promise-open"); var close = root.querySelector("[data-promise-close]"); if (close) close.focus(); } function close() { var root = modal(); if (!root || root.hidden) return; root.hidden = true; document.documentElement.classList.remove("cc-property-promise-open"); if (lastTrigger && lastTrigger.focus) lastTrigger.focus(); } document.addEventListener("click", function (event) { var opener = event.target.closest("[data-promise-open]"); if (opener) { event.preventDefault(); open(opener); return; } if (event.target.closest("[data-promise-close]")) { event.preventDefault(); close(); } }); document.addEventListener("keydown", function (event) { if (event.key === "Escape") close(); }); })();</script>
+        <?php
+        return ob_get_clean();
+    }
+
+    private function property_reviews_modal($property)
+    {
+        $reviews = $property['reviews'] ?? [];
+        if (empty($reviews)) {
+            return '';
+        }
+
+        $review_count = !empty($property['review_count']) ? (int) $property['review_count'] : count($reviews);
+        $rating_label = !empty($property['rating']) ? $property['rating'] . ' · ' . $review_count . ' reviews' : $review_count . ' reviews';
+
+        ob_start();
+        ?>
+        <div class="cc-property-reviews-modal" data-reviews-modal hidden>
+            <div class="cc-property-reviews-backdrop" data-reviews-close></div>
+            <div class="panel" role="dialog" aria-modal="true" aria-labelledby="cc-property-reviews-title">
+                <button class="modal-close" type="button" data-reviews-close aria-label="Close reviews">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+                        aria-hidden="true">
+                        <path d="M5 5l14 14M19 5L5 19"></path>
+                    </svg>
+                </button>
+                <h3 id="cc-property-reviews-title"><span>★</span> <?php echo esc_html($rating_label); ?></h3>
+                <div class="cc-property-reviews-modal-list">
+                    <?php foreach ($reviews as $review): ?>
+                        <article>
+                            <span>★★★★★</span>
+                            <p>“<?php echo esc_html($review['quote'] ?? ''); ?>”</p>
+                            <strong><?php echo esc_html(!empty($review['name']) ? $review['name'] : 'Airbnb guest'); ?></strong><?php if (!empty($review['date'])): ?><small> · <?php echo esc_html($review['date']); ?></small><?php endif; ?>
+                        </article>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
+        <script>(function () { if (window.ccPropertyReviewsReady) return; window.ccPropertyReviewsReady = true; var lastTrigger = null; function scopedModal(trigger) { var scope = trigger && trigger.closest ? trigger.closest("[data-reviews-scope]") : null; return scope ? scope.querySelector("[data-reviews-modal]") : document.querySelector("[data-reviews-modal]"); } function open(trigger) { var root = scopedModal(trigger); if (!root) return; lastTrigger = trigger; root.hidden = false; document.documentElement.classList.add("cc-property-reviews-open"); var close = root.querySelector("[data-reviews-close]"); if (close) close.focus(); } function close() { var root = document.querySelector("[data-reviews-modal]:not([hidden])"); if (!root) return; root.hidden = true; document.documentElement.classList.remove("cc-property-reviews-open"); if (lastTrigger && lastTrigger.focus) lastTrigger.focus(); } document.addEventListener("click", function (event) { var opener = event.target.closest("[data-reviews-open]"); if (opener) { event.preventDefault(); open(opener); return; } if (event.target.closest("[data-reviews-close]")) { event.preventDefault(); close(); } }); document.addEventListener("keydown", function (event) { if (event.key === "Escape") close(); }); })();</script>
         <?php
         return ob_get_clean();
     }
@@ -2044,7 +2351,7 @@ class CC_Stays_Guesty_Sync
 
         ob_start();
         ?>
-        <section class="cc-property-section-shell cc-property-reviews-section">
+        <section class="cc-property-section-shell cc-property-reviews-section" data-reviews-scope>
             <p class="cc-property-eyebrow">What guests say</p>
             <h2><?php echo $property['rating'] ? esc_html($property['rating']) . ' guest rating' : 'Guest reviews'; ?></h2>
             <?php if ($property['review_count']): ?>
@@ -2059,6 +2366,11 @@ class CC_Stays_Guesty_Sync
                     </article>
                 <?php endforeach; ?>
             </div>
+            <?php if (!empty($property['reviews'])): ?>
+                <button class="cc-property-full-outline cc-property-reviews-open-button" type="button" data-reviews-open>Show all
+                    reviews</button>
+                <?php echo $this->property_reviews_modal($property); ?>
+            <?php endif; ?>
         </section>
         <?php
         return ob_get_clean();
@@ -2084,6 +2396,7 @@ class CC_Stays_Guesty_Sync
                 <?php else: ?>
                     <span>Map location coming soon.</span>
                 <?php endif; ?>
+                <?php echo $this->property_map_marker(); ?>
             </div>
         </section>
         <?php
@@ -2130,6 +2443,11 @@ class CC_Stays_Guesty_Sync
     private function property_cc_logo_svg($class = '')
     {
         return '<svg class="' . esc_attr($class) . '" viewBox="0 0 460.33 460.33" fill="currentColor" aria-hidden="true"><path d="M354.66,304.51c21.89-.15,42.7-7.56,56.13-21.08v-6.35c-12.63,16.1-32.99,22.89-56.14,22.89-35.22,0-64.26-34.04-65.07-69.11-.8-34.41,22.78-69.86,65.07-70.54,30.07-.49,50.51,13.23,56.14,31.57v-19.04c-13.95-12.2-34.84-17.03-56.14-17.03-55.12,0-81.78,36.97-81.6,73.97.18,37.52,27.94,75.1,81.61,74.71Z"/><path d="M187.28,283.43v-6.35c-12.63,16.1-32.99,22.89-56.14,22.89-35.22,0-64.26-34.04-65.07-69.11-.8-34.41,22.78-69.86,65.07-70.54,30.07-.49,50.51,13.23,56.14,31.57v-19.04c-13.95-12.2-34.84-17.03-56.14-17.03-55.12,0-81.78,36.97-81.6,73.97.18,37.52,27.94,75.1,81.61,74.71,21.89-.15,42.7-7.56,56.13-21.08Z"/><path d="M230.17,460.33c127.12,0,230.17-103.05,230.17-230.17S357.28,0,230.17,0,0,103.05,0,230.17s103.05,230.17,230.17,230.17ZM6.88,236.09C3.78,110.09,104.2,22.46,225.81,20.58c120.4-1.86,223.48,79.19,227.72,202.49,2.9,84.3-43.16,159.37-120.93,194.77-69.16,31.49-149.87,29.26-216.19-5.65C49.74,377.08,8.73,311,6.88,236.09Z"/><rect x="227.11" y="138.6" width="6.1" height="183.13"/></svg>';
+    }
+
+    private function property_map_marker()
+    {
+        return '<div class="cc-property-map-marker" aria-hidden="true"><span class="ring"></span><span class="core">' . $this->property_cc_logo_svg() . '</span></div>';
     }
 
     private function get_property_flat_amenities($post_id)
@@ -2385,7 +2703,7 @@ class CC_Stays_Guesty_Sync
                             <p>
                                 <?php echo $this->property_location_label($property); ?>
                                 <?php if ($property['rating']): ?>
-                                    <span>★
+                                    <span><span class="cc-property-rating-star">★</span>
                                         <?php echo esc_html($property['rating']); ?>
                                         <?php echo $property['review_count'] ? ' · ' . esc_html($property['review_count']) . ' reviews' : ''; ?></span>
                                 <?php endif; ?>
@@ -2426,6 +2744,10 @@ class CC_Stays_Guesty_Sync
                                 <div><strong>A CC Stays Residence</strong><span>Selected for comfort, character, and the way it
                                         feels to actually stay there.</span></div>
                             </div>
+                            <?php if (!empty($property['license']) && $this->property_matches_slug($property['id'], $property['title'], 'bamboo-bliss')): ?>
+                                <p class="cc-property-full-license">Licensed vacation rental ·
+                                    <?php echo esc_html($property['license']); ?></p>
+                            <?php endif; ?>
                         </section>
 
                         <section class="cc-property-full-section cc-property-full-about">
@@ -2482,17 +2804,22 @@ class CC_Stays_Guesty_Sync
                         </section>
 
                         <?php if (!empty($property['reviews']) || $property['rating']): ?>
-                            <section class="cc-property-full-section cc-property-full-reviews">
-                                <h2><?php echo $property['rating'] ? '★ ' . esc_html($property['rating']) . ($property['review_count'] ? ' · ' . esc_html($property['review_count']) . ' reviews' : '') : 'Guest reviews'; ?>
+                            <section class="cc-property-full-section cc-property-full-reviews" data-reviews-scope>
+                                <h2><?php echo $property['rating'] ? '<span>★</span> ' . esc_html($property['rating']) . ($property['review_count'] ? ' · ' . esc_html($property['review_count']) . ' reviews' : '') : 'Guest reviews'; ?>
                                 </h2>
-                                <div>
+                                <div class="cc-property-full-review-grid">
                                     <?php foreach (array_slice($property['reviews'], 0, 4) as $review): ?>
                                         <article><span>★★★★★</span>
                                             <p>“<?php echo esc_html($review['quote'] ?? ''); ?>”</p>
-                                            <strong><?php echo esc_html($review['name'] ?? 'Guest'); ?></strong><small><?php echo esc_html($review['date'] ?? $property['title']); ?></small>
+                                            <strong><?php echo esc_html(!empty($review['name']) ? $review['name'] : 'Airbnb guest'); ?></strong><?php if (!empty($review['date'])): ?><small> · <?php echo esc_html($review['date']); ?></small><?php endif; ?>
                                         </article>
                                     <?php endforeach; ?>
                                 </div>
+                                <?php if (!empty($property['reviews'])): ?>
+                                    <button class="cc-property-full-outline cc-property-reviews-open-button" type="button"
+                                        data-reviews-open>Show all reviews</button>
+                                    <?php echo $this->property_reviews_modal($property); ?>
+                                <?php endif; ?>
                             </section>
                         <?php endif; ?>
 
@@ -2512,8 +2839,30 @@ class CC_Stays_Guesty_Sync
                                 <?php else: ?>
                                     <span>Map location coming soon.</span>
                                 <?php endif; ?>
+                                <?php echo $this->property_map_marker(); ?>
                             </div>
                             <p><?php echo esc_html($property['location_blurb']); ?></p>
+                            <?php if (!empty($property['location_note'])): ?>
+                                <p class="cc-property-location-note"><?php echo esc_html($property['location_note']); ?></p>
+                            <?php endif; ?>
+                            <?php if (!empty($property['nearby_places'])): ?>
+                                <div class="cc-property-nearby-list">
+                                    <?php foreach ($property['nearby_places'] as $place): ?>
+                                        <?php
+                                        $place_name = trim((string) ($place['name'] ?? ''));
+                                        $place_time = trim((string) ($place['time'] ?? ''));
+                                        if ($place_name === '' && $place_time === '') {
+                                            continue;
+                                        }
+                                        ?>
+                                        <div class="cc-property-nearby-row">
+                                            <span><?php echo esc_html($place_name); ?></span>
+                                            <i aria-hidden="true"></i>
+                                            <strong><?php echo esc_html($place_time); ?></strong>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php endif; ?>
                         </section>
 
                         <section class="cc-property-full-section cc-property-full-concierge">

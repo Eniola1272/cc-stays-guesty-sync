@@ -356,7 +356,7 @@
   display: flex;
   align-items: center;
   padding: 0 14px;
-  background-color: rgba(255, 250, 241, .72);
+  background-color: rgba(255, 250, 241, 0.72);
   cursor: pointer;
   box-sizing: border-box;
   transition: border-color 0.15s;
@@ -738,7 +738,9 @@
 
 .cc-searchbar-pill {
   display: grid;
-  grid-template-columns: minmax(0, 0.95fr) 1px minmax(0, 0.95fr) 1px minmax(0, 0.9fr) auto 1px minmax(0, 1.15fr);
+  grid-template-columns:
+    minmax(0, 0.95fr) 1px minmax(0, 0.95fr) 1px minmax(0, 0.9fr)
+    auto 1px minmax(0, 1.15fr);
   align-items: center;
   background: rgba(255, 255, 255, 0.965);
   border-radius: 2px;
@@ -975,8 +977,11 @@
 }
 
 .cc-checkout-summary-image--empty {
-  background:
-    linear-gradient(135deg, rgba(59, 82, 64, 0.16), rgba(255, 255, 255, 0.6)),
+  background: linear-gradient(
+      135deg,
+      rgba(59, 82, 64, 0.16),
+      rgba(255, 255, 255, 0.6)
+    ),
     #eef1ed;
 }
 
@@ -1569,7 +1574,7 @@
     inset-inline: 0;
     bottom: 0;
     z-index: 1000;
-    background: #fff;
+    background: #f4f2ed;
     border-top: 1px solid #e8e8e8;
     padding: 20px 20px max(20px, env(safe-area-inset-bottom, 20px));
     gap: 16px;
@@ -1598,6 +1603,36 @@
     text-overflow: ellipsis;
   }
 
+  .cc-mobile-bar-price-line {
+    display: flex;
+    align-items: baseline;
+    min-width: 0;
+    color: var(--revamp-ink);
+    font-size: 16px;
+    line-height: 1.1;
+    white-space: nowrap;
+  }
+
+  .cc-mobile-bar-price-line strong {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--revamp-ink);
+  }
+
+  .cc-mobile-bar-price-line span {
+    color: rgba(35, 32, 25, 0.72);
+    font-weight: 400;
+    font-size: 13.6px;
+  }
+
+  .cc-mobile-bar-divider {
+    margin: 0 2px 0 4px;
+  }
+
+  .cc-mobile-bar-price-line .cc-mobile-bar-star {
+    color: #bd8b21;
+  }
+
   .cc-mobile-bar-sub {
     font-size: 13px;
     color: #717171;
@@ -1614,7 +1649,6 @@
     font-size: 12px;
     font-weight: 500;
     letter-spacing: 0.14em;
-    text-transform: uppercase;
     cursor: pointer;
     font-family: var(--cc-font-primary);
     white-space: nowrap;
@@ -1755,6 +1789,14 @@
 
   .cc-mobile-bar-label {
     font-size: 14px;
+  }
+
+  .cc-mobile-bar-price-line {
+    font-size: 14px;
+  }
+
+  .cc-mobile-bar-price-line strong {
+    font-size: 17px;
   }
 
   .cc-mobile-bar-btn {
