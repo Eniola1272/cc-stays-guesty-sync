@@ -259,6 +259,10 @@
   font: 600 15px/1 var(--revamp-sans);
 }
 
+.cc-property-share-link:hover {
+  background: transparent !important;
+}
+
 .cc-property-share-link::before {
   content: "";
   width: 18px;
