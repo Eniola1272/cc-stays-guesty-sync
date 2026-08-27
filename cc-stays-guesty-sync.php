@@ -43,6 +43,10 @@ class CC_Stays_Guesty_Sync
         // Register the Global Search Bar shortcode
         add_shortcode('cc_stays_search_bar', [$this, 'render_search_bar_widget']);
 
+        // Register standalone layout shortcodes
+        add_shortcode('cc_stays_header', [$this, 'render_header_widget']);
+        add_shortcode('cc_stays_footer', [$this, 'render_footer_widget']);
+
         // Register the homepage body sections shortcode
         add_shortcode('cc_stays_homepage', [$this, 'render_homepage_sections_widget']);
         add_shortcode('cc_stays_homepage_sections', [$this, 'render_homepage_sections_widget']);
@@ -889,6 +893,8 @@ class CC_Stays_Guesty_Sync
                 has_shortcode($post->post_content, 'cc_stays_homepage_sections') ||
                 has_shortcode($post->post_content, 'cc_stays_homepage_coastal') ||
                 has_shortcode($post->post_content, 'cc_stays_homepage_revamp') ||
+                has_shortcode($post->post_content, 'cc_stays_header') ||
+                has_shortcode($post->post_content, 'cc_stays_footer') ||
                 has_shortcode($post->post_content, 'cc_stays_archive') ||
                 has_shortcode($post->post_content, 'cc_stays_amenities') ||
                 has_shortcode($post->post_content, 'cc_stays_about') ||
@@ -1087,6 +1093,24 @@ class CC_Stays_Guesty_Sync
     public function render_search_bar_widget()
     {
         return '<div id="cc-stays-react-search-bar"></div>';
+    }
+
+    public function render_header_widget($atts = [])
+    {
+        $links = $this->get_revamp_links($atts, 'cc_stays_header');
+        $atts = shortcode_atts([
+            'solid' => 'true',
+        ], $atts, 'cc_stays_header');
+        $solid = in_array(strtolower((string) $atts['solid']), ['0', 'false', 'no'], true) ? 'false' : 'true';
+
+        return '<div class="cc-stays-react-header" data-solid="' . esc_attr($solid) . '" data-links="' . esc_attr(wp_json_encode($links)) . '"></div>';
+    }
+
+    public function render_footer_widget($atts = [])
+    {
+        $links = $this->get_revamp_links($atts, 'cc_stays_footer');
+
+        return '<div class="cc-stays-react-footer" data-links="' . esc_attr(wp_json_encode($links)) . '"></div>';
     }
 
     public function render_homepage_sections_widget($atts = [])
@@ -1719,12 +1743,12 @@ class CC_Stays_Guesty_Sync
             return '';
         }
 
-        return '<div class="cc-property-read-more" data-expanded="false"><div class="cc-property-read-more-copy">' . wp_kses_post(wpautop($content)) . '</div><button type="button" class="cc-property-read-more-toggle" aria-expanded="false">Read more →</button></div>' . $this->property_read_more_script();
+        return '<div class="cc-property-read-more" data-expanded="false"><div class="cc-property-read-more-copy">' . wp_kses_post(wpautop($content)) . '</div><button type="button" class="cc-property-read-more-toggle" aria-expanded="false">Show more →</button></div>' . $this->property_read_more_script();
     }
 
     private function property_read_more_script()
     {
-        return '<script>(function(){if(window.ccPropertyReadMoreReady)return;window.ccPropertyReadMoreReady=true;function refresh(){document.querySelectorAll(".cc-property-read-more").forEach(function(root){var copy=root.querySelector(".cc-property-read-more-copy");var button=root.querySelector(".cc-property-read-more-toggle");if(!copy||!button)return;button.hidden=copy.scrollHeight<=copy.clientHeight+2;});}document.addEventListener("click",function(event){var button=event.target.closest(".cc-property-read-more-toggle");if(!button)return;var root=button.closest(".cc-property-read-more");if(!root)return;var expanded=root.getAttribute("data-expanded")==="true";root.setAttribute("data-expanded",expanded?"false":"true");button.setAttribute("aria-expanded",expanded?"false":"true");button.textContent=expanded?"Read more →":"Show less";});if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",refresh);}else{requestAnimationFrame(refresh);}window.addEventListener("resize",refresh);})();</script>';
+        return '<script>(function(){if(window.ccPropertyReadMoreReady)return;window.ccPropertyReadMoreReady=true;function refresh(){document.querySelectorAll(".cc-property-read-more").forEach(function(root){var copy=root.querySelector(".cc-property-read-more-copy");var button=root.querySelector(".cc-property-read-more-toggle");if(!copy||!button)return;button.hidden=copy.scrollHeight<=copy.clientHeight+2;});}document.addEventListener("click",function(event){var button=event.target.closest(".cc-property-read-more-toggle");if(!button)return;var root=button.closest(".cc-property-read-more");if(!root)return;var expanded=root.getAttribute("data-expanded")==="true";root.setAttribute("data-expanded",expanded?"false":"true");button.setAttribute("aria-expanded",expanded?"false":"true");button.textContent=expanded?"Show more →":"Show less";});if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",refresh);}else{requestAnimationFrame(refresh);}window.addEventListener("resize",refresh);})();</script>';
     }
 
     private function property_promise_modal()
@@ -2245,8 +2269,7 @@ class CC_Stays_Guesty_Sync
                     <a class="muted" href="<?php echo esc_url($links['owners']); ?>">Owners ↗</a>
                 </nav>
                 <button class="cc-property-menu-btn" type="button" data-property-menu-open aria-label="Open menu">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
-                        stroke-linecap="round">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
                         <path d="M3 7h18M3 12h18M3 17h18"></path>
                     </svg>
                 </button>
@@ -2259,8 +2282,7 @@ class CC_Stays_Guesty_Sync
                     <span>CC Stays</span>
                 </a>
                 <button class="cc-property-menu-btn" type="button" data-property-menu-close aria-label="Close menu">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
-                        stroke-linecap="round">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
                         <path d="M5 5l14 14M19 5L5 19"></path>
                     </svg>
                 </button>
@@ -2359,7 +2381,8 @@ class CC_Stays_Guesty_Sync
                                 <?php echo $this->property_location_label($property); ?>
                                 <?php if ($property['rating']): ?>
                                     <span>★
-                                        <?php echo esc_html($property['rating']); ?>            <?php echo $property['review_count'] ? ' · ' . esc_html($property['review_count']) . ' reviews' : ''; ?></span>
+                                        <?php echo esc_html($property['rating']); ?>
+                                        <?php echo $property['review_count'] ? ' · ' . esc_html($property['review_count']) . ' reviews' : ''; ?></span>
                                 <?php endif; ?>
                             </p>
                         </div>
@@ -2374,7 +2397,8 @@ class CC_Stays_Guesty_Sync
                                     loading="<?php echo $index === 0 ? 'eager' : 'lazy'; ?>">
                             </a>
                         <?php endforeach; ?>
-                        <a class="cc-property-full-gallery-button" href="<?php echo esc_url($property['gallery_page']); ?>">Show all
+                        <a class="cc-property-full-gallery-button" href="<?php echo esc_url($property['gallery_page']); ?>">Show
+                            all
                             photos</a>
                     </section>
                 </div>
@@ -2387,7 +2411,8 @@ class CC_Stays_Guesty_Sync
                             <p><?php echo $this->property_stat_label($property['guests'], 'guest'); ?> ·
                                 <?php echo $this->property_stat_label($property['bedrooms'], 'bedroom'); ?> ·
                                 <?php echo $this->property_stat_label($property['beds'], 'bed'); ?> ·
-                                <?php echo $this->property_stat_label($property['bathrooms'], 'bath'); ?></p>
+                                <?php echo $this->property_stat_label($property['bathrooms'], 'bath'); ?>
+                            </p>
                             <div class="cc-property-full-residence">
                                 <?php echo $this->property_cc_logo_svg(); ?>
                                 <div><strong>A CC Stays Residence</strong><span>Selected for comfort, character, and the way it
@@ -2437,7 +2462,8 @@ class CC_Stays_Guesty_Sync
                             <div>
                                 <?php foreach (array_slice($amenities, 0, 10) as $amenity): ?>
                                     <p><span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"
+                                                aria-hidden="true">
                                                 <path d="M5 12l4 4L19 6"></path>
                                             </svg></span><?php echo esc_html($amenity); ?></p>
                                 <?php endforeach; ?>

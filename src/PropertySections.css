@@ -215,7 +215,7 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: 32px;
-  padding: clamp(72px, 8vw, 130px) 0 34px;
+  padding: 60px 0 34px;
 }
 
 .cc-property-full-hero h1,
@@ -945,6 +945,7 @@
   background: #fffaf1;
   box-shadow: 0 28px 90px rgba(32, 29, 23, 0.28);
   color: #242019;
+  transform: translate(55%);
 }
 
 .cc-property-amenities-modal .modal-close {
@@ -1092,8 +1093,9 @@
 
 .cc-property-full-footer a,
 .cc-property-full-footer-bottom {
-  color: rgba(247, 241, 230, 0.65);
+  color: rgba(247, 241, 230, 0.65) !important;
   font-size: 16px;
+  text-decoration: none !important;
 }
 
 .cc-property-full-footer-bottom {
@@ -1328,6 +1330,7 @@
     max-height: calc(100vh - 36px);
     padding: 34px 24px 28px;
     border-radius: 16px;
+    transform: translate(0, 10px);
   }
 
   .cc-property-promise-modal h3 {

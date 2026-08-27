@@ -10,7 +10,21 @@ import HomePageSections from "./HomePageSections";
 import HomePageCoastal from "./HomePageCoastal";
 import HomePageRevamp from "./HomePageRevamp";
 import { AboutPage, ContactPage, DestinationsPage, ExperiencesPage, JournalPage } from "./InteriorPages";
+import { DEFAULT_EXACT_LINKS, ExactFooter, ExactHeader } from "./ExactLayout";
 import "./PropertySections.css";
+
+const readExactLinks = (mountNode) => {
+  if (!mountNode?.dataset?.links) return DEFAULT_EXACT_LINKS;
+
+  try {
+    return {
+      ...DEFAULT_EXACT_LINKS,
+      ...JSON.parse(mountNode.dataset.links),
+    };
+  } catch {
+    return DEFAULT_EXACT_LINKS;
+  }
+};
 
 // Wait for the DOM to load
 document.addEventListener("DOMContentLoaded", () => {
@@ -103,5 +117,17 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll('.cc-stays-react-experiences').forEach((experiencesMount) => {
       const experiencesRoot = createRoot(experiencesMount);
       experiencesRoot.render(<ExperiencesPage mountNode={experiencesMount} />);
+  });
+
+  // 15. Mount Standalone Header
+  document.querySelectorAll('.cc-stays-react-header').forEach((headerMount) => {
+      const headerRoot = createRoot(headerMount);
+      headerRoot.render(<ExactHeader links={readExactLinks(headerMount)} solid={headerMount.dataset.solid !== "false"} />);
+  });
+
+  // 16. Mount Standalone Footer
+  document.querySelectorAll('.cc-stays-react-footer').forEach((footerMount) => {
+      const footerRoot = createRoot(footerMount);
+      footerRoot.render(<ExactFooter links={readExactLinks(footerMount)} />);
   });
 });

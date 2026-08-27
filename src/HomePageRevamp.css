@@ -127,8 +127,13 @@
   transition: transform 0.22s ease;
 }
 
+.cc-revamp-text-link:hover {
+  color: var(--revamp-blue);
+}
+
 .cc-revamp-text-link:hover span {
   transform: translateX(4px);
+  color: var(--revamp-blue);
 }
 
 .cc-revamp-watermark {
