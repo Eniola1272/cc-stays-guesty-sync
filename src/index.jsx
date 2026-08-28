@@ -9,6 +9,7 @@ import AmenitiesSection from "./AmenitiesSection";
 import HomePageSections from "./HomePageSections";
 import HomePageCoastal from "./HomePageCoastal";
 import HomePageRevamp from "./HomePageRevamp";
+import PropertyMap from "./PropertyMap";
 import { AboutPage, ContactPage, DestinationsPage, ExperiencesPage, JournalPage } from "./InteriorPages";
 import { DEFAULT_EXACT_LINKS, ExactFooter, ExactHeader } from "./ExactLayout";
 import "./PropertySections.css";
@@ -129,5 +130,11 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll('.cc-stays-react-footer').forEach((footerMount) => {
       const footerRoot = createRoot(footerMount);
       footerRoot.render(<ExactFooter links={readExactLinks(footerMount)} />);
+  });
+
+  // 17. Mount Single Property Maps
+  document.querySelectorAll('.cc-stays-property-map').forEach((mapMount) => {
+      const mapRoot = createRoot(mapMount);
+      mapRoot.render(<PropertyMap mountNode={mapMount} />);
   });
 });

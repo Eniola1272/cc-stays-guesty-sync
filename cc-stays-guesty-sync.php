@@ -1067,28 +1067,11 @@ class CC_Stays_Guesty_Sync
             return '<p class="cc-listing-map-empty">Map location currently unavailable.</p>';
         }
 
-        $delta = 0.012;
-        $bbox = implode(',', [
-            $lng - $delta,
-            $lat - $delta,
-            $lng + $delta,
-            $lat + $delta,
-        ]);
-        $src = add_query_arg([
-            'bbox' => $bbox,
-            'layer' => 'mapnik',
-            'marker' => $lat . ',' . $lng,
-        ], 'https://www.openstreetmap.org/export/embed.html');
-        $link = add_query_arg([
-            'mlat' => $lat,
-            'mlon' => $lng,
-        ], 'https://www.openstreetmap.org/') . '#map=15/' . $lat . '/' . $lng;
-
         return sprintf(
-            '<div class="cc-listing-map-embed" style="position:relative;overflow:hidden;width:100%%;height:min(460px,70vh);border-radius:8px;background:#ede7db;"><iframe title="%s map" src="%s" width="100%%" height="100%%" loading="lazy" referrerpolicy="no-referrer-when-downgrade" style="position:absolute;inset:0;width:100%%;height:100%%;border:0;"></iframe></div><p class="cc-listing-map-link" style="margin-top:10px;"><a href="%s" target="_blank" rel="noopener">Open map</a></p>',
-            esc_attr(get_the_title($post_id)),
-            esc_url($src),
-            esc_url($link)
+            '<div class="cc-listing-map-embed cc-property-map-box"><div class="cc-stays-property-map" data-lat="%s" data-lng="%s" data-title="%s"></div></div>',
+            esc_attr($lat),
+            esc_attr($lng),
+            esc_attr(get_the_title($post_id))
         );
     }
 
@@ -1584,6 +1567,10 @@ class CC_Stays_Guesty_Sync
 
         if ($acf_url && filter_var($acf_url, FILTER_VALIDATE_URL)) {
             return esc_url_raw($acf_url);
+        }
+
+        if (is_string($acf_url) && $acf_url && str_starts_with($acf_url, '/')) {
+            return esc_url_raw(home_url($acf_url));
         }
 
         $slug = sanitize_title($this->property_short_title($title));
@@ -2101,6 +2088,41 @@ class CC_Stays_Guesty_Sync
         return ob_get_clean();
     }
 
+    private function property_gallery_modal($property)
+    {
+        $gallery_page = $property['gallery_page'] ?? '';
+        if (!$gallery_page) {
+            return '';
+        }
+
+        $title = $this->property_short_title($property['title'] ?? 'Photos');
+        $title_id = 'cc-property-gallery-title-' . (int) ($property['id'] ?? 0);
+
+        ob_start();
+        ?>
+        <div class="cc-property-gallery-modal" data-gallery-modal data-gallery-src="<?php echo esc_url($gallery_page); ?>"
+            hidden>
+            <div class="cc-property-gallery-backdrop" data-gallery-close></div>
+            <div class="panel" role="dialog" aria-modal="true" aria-labelledby="<?php echo esc_attr($title_id); ?>">
+                <button class="modal-close" type="button" data-gallery-close aria-label="Close photos">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+                        aria-hidden="true">
+                        <path d="M5 5l14 14M19 5L5 19"></path>
+                    </svg>
+                </button>
+                <h3 id="<?php echo esc_attr($title_id); ?>"><?php echo esc_html($title); ?></h3>
+                <div class="cc-property-gallery-frame-wrap">
+                    <iframe src="<?php echo esc_url($gallery_page); ?>" data-gallery-frame
+                        title="<?php echo esc_attr($title . ' photo gallery'); ?>" loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </div>
+        </div>
+        <script>(function () { if (window.ccPropertyGalleryModalReady) return; window.ccPropertyGalleryModalReady = true; var lastTrigger = null; function closest(target, selector) { return target && target.closest ? target.closest(selector) : null; } function scopedModal(trigger) { var scope = trigger && trigger.closest ? trigger.closest("[data-gallery-scope]") : null; if (scope) { var modal = scope.querySelector("[data-gallery-modal]"); if (modal) return modal; var next = scope.nextElementSibling; while (next) { if (next.matches && next.matches("[data-gallery-modal]")) return next; next = next.nextElementSibling; } } return document.querySelector("[data-gallery-modal]"); } function open(trigger) { var root = scopedModal(trigger); if (!root) return; var src = trigger.getAttribute("data-gallery-src") || root.getAttribute("data-gallery-src"); var frame = root.querySelector("[data-gallery-frame]"); lastTrigger = trigger; if (frame && src && frame.getAttribute("src") !== src) frame.setAttribute("src", src); root.hidden = false; document.documentElement.classList.add("cc-property-gallery-open"); var close = root.querySelector("[data-gallery-close]"); if (close) close.focus(); } function close() { var root = document.querySelector("[data-gallery-modal]:not([hidden])"); if (!root) return; root.hidden = true; document.documentElement.classList.remove("cc-property-gallery-open"); if (lastTrigger && lastTrigger.focus) lastTrigger.focus(); } document.addEventListener("click", function (event) { var opener = closest(event.target, "[data-gallery-open]"); if (opener) { event.preventDefault(); event.stopPropagation(); open(opener); return false; } if (closest(event.target, "[data-gallery-close]")) { event.preventDefault(); event.stopPropagation(); close(); return false; } }, true); document.addEventListener("keydown", function (event) { if (event.key === "Escape") close(); }); })();</script>
+        <?php
+        return ob_get_clean();
+    }
+
     private function property_icon_svg($name = 'sparkle')
     {
         $icons = [
@@ -2220,7 +2242,7 @@ class CC_Stays_Guesty_Sync
 
         ob_start();
         ?>
-        <section class="cc-property-section-shell">
+        <section class="cc-property-section-shell" data-gallery-scope>
             <div class="cc-property-gallery-grid">
                 <?php foreach ($visible as $index => $image): ?>
                     <a class="<?php echo $index === 0 ? 'primary' : ''; ?>" href="<?php echo esc_url($image); ?>" target="_blank"
@@ -2228,8 +2250,10 @@ class CC_Stays_Guesty_Sync
                         <img src="<?php echo esc_url($image); ?>" alt="" loading="<?php echo $index === 0 ? 'eager' : 'lazy'; ?>">
                     </a>
                 <?php endforeach; ?>
-                <a class="cc-property-gallery-button" href="<?php echo esc_url($property['gallery_page']); ?>">Show photos</a>
+                <button class="cc-property-gallery-button" type="button" data-gallery-open
+                    data-gallery-src="<?php echo esc_url($property['gallery_page']); ?>">Show all photos</button>
             </div>
+            <?php echo $this->property_gallery_modal($property); ?>
         </section>
         <?php
         return ob_get_clean();
@@ -2383,21 +2407,12 @@ class CC_Stays_Guesty_Sync
             return $this->property_missing_shortcode_message();
         }
 
-        $map_src = ($property['lat'] && $property['lng']) ? 'https://maps.google.com/maps?q=' . rawurlencode($property['lat'] . ',' . $property['lng']) . '&z=13&output=embed' : '';
         ob_start();
         ?>
         <section class="cc-property-section-shell cc-property-location-section">
             <h2>Where you'll be</h2>
             <p><?php echo esc_html($property['location_blurb']); ?></p>
-            <div class="cc-property-map-box">
-                <?php if ($map_src): ?>
-                    <iframe title="<?php echo esc_attr($property['title']); ?> map" src="<?php echo esc_url($map_src); ?>"
-                        loading="lazy"></iframe>
-                <?php else: ?>
-                    <span>Map location coming soon.</span>
-                <?php endif; ?>
-                <?php echo $this->property_map_marker(); ?>
-            </div>
+            <?php echo $this->property_leaflet_map_markup($property, 'cc-property-map-box'); ?>
         </section>
         <?php
         return ob_get_clean();
@@ -2448,6 +2463,21 @@ class CC_Stays_Guesty_Sync
     private function property_map_marker()
     {
         return '<div class="cc-property-map-marker" aria-hidden="true"><span class="ring"></span><span class="core">' . $this->property_cc_logo_svg() . '</span></div>';
+    }
+
+    private function property_leaflet_map_markup($property, $class)
+    {
+        if (empty($property['lat']) || empty($property['lng'])) {
+            return '<div class="' . esc_attr($class) . '"><span>Map location coming soon.</span></div>';
+        }
+
+        return sprintf(
+            '<div class="%1$s"><div class="cc-stays-property-map" data-lat="%2$s" data-lng="%3$s" data-title="%4$s"></div></div>',
+            esc_attr($class),
+            esc_attr($property['lat']),
+            esc_attr($property['lng']),
+            esc_attr($property['title'] ?? 'CC Stays')
+        );
     }
 
     private function get_property_flat_amenities($post_id)
@@ -2627,9 +2657,43 @@ class CC_Stays_Guesty_Sync
         return ob_get_clean();
     }
 
+    private function render_property_full_subnav($has_reviews = true)
+    {
+        $items = [
+            'ov' => 'Overview',
+            'sleep' => 'Sleep',
+            'amen' => 'Amenities',
+        ];
+
+        if ($has_reviews) {
+            $items['revs'] = 'Reviews';
+        }
+
+        $items['loc'] = 'Location';
+        $items['ttk'] = 'Things to know';
+
+        ob_start();
+        ?>
+        <div class="cc-property-stay-subnav stay-subnav" id="stay-subnav" aria-label="Sections" data-property-subnav
+            aria-hidden="true">
+            <div class="sn-in">
+                <?php foreach ($items as $id => $label): ?>
+                    <a href="#<?php echo esc_attr($id); ?>" data-sn><?php echo esc_html($label); ?></a>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?php
+        return ob_get_clean();
+    }
+
     private function property_mobile_menu_script()
     {
         return '<script>(function(){if(window.ccPropertyMobileMenuReady)return;window.ccPropertyMobileMenuReady=true;function getDrawer(){return document.querySelector("[data-property-drawer]");}function openDrawer(){var drawer=getDrawer();if(!drawer)return;drawer.classList.add("open");drawer.setAttribute("aria-hidden","false");document.documentElement.classList.add("cc-property-menu-open");}function closeDrawer(){var drawer=getDrawer();if(!drawer)return;drawer.classList.remove("open");drawer.setAttribute("aria-hidden","true");document.documentElement.classList.remove("cc-property-menu-open");}document.addEventListener("click",function(event){if(event.target.closest("[data-property-menu-open]")){event.preventDefault();openDrawer();return;}if(event.target.closest("[data-property-menu-close]")){closeDrawer();}});document.addEventListener("keydown",function(event){if(event.key==="Escape")closeDrawer();});})();</script>';
+    }
+
+    private function property_subnav_script()
+    {
+        return '<script>(function(){if(window.ccPropertySubnavReady)return;window.ccPropertySubnavReady=true;var ids=["ov","sleep","amen","revs","loc","ttk"];function ready(fn){if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",fn);}else{fn();}}ready(function(){var subnav=document.querySelector("[data-property-subnav]");var header=document.querySelector(".cc-property-full-nav");var start=document.getElementById("ov");if(!subnav||!start)return;var links=Array.prototype.slice.call(subnav.querySelectorAll("[data-sn]"));var targets=ids.map(function(id){return document.getElementById(id);}).filter(Boolean);function metrics(){var headerBottom=header?Math.max(0,header.getBoundingClientRect().bottom):0;var subnavHeight=subnav.offsetHeight||0;document.documentElement.style.setProperty("--cc-property-subnav-top",headerBottom+"px");return{headerBottom:headerBottom,subnavHeight:subnavHeight};}function setActive(metricsValue){var line=metricsValue.headerBottom+metricsValue.subnavHeight+24;var active=targets[0];targets.forEach(function(target){if(target.getBoundingClientRect().top<=line){active=target;}});links.forEach(function(link){var isActive=active&&link.getAttribute("href")==="#"+active.id;link.classList.toggle("active",!!isActive);});if(active){var activeLink=null;links.some(function(link){if(link.getAttribute("href")==="#"+active.id){activeLink=link;return true;}return false;});if(activeLink&&subnav.classList.contains("show")){activeLink.scrollIntoView({inline:"nearest",block:"nearest"});}}}function update(){var m=metrics();var shouldShow=start.getBoundingClientRect().top<=m.headerBottom+2;subnav.classList.toggle("show",shouldShow);subnav.setAttribute("aria-hidden",shouldShow?"false":"true");if(shouldShow){setActive(m);}}links.forEach(function(link){link.addEventListener("click",function(event){var hash=link.getAttribute("href");var target=hash?document.querySelector(hash):null;if(!target)return;event.preventDefault();var m=metrics();var top=window.pageYOffset+target.getBoundingClientRect().top-m.headerBottom-m.subnavHeight+2;window.scrollTo({top:Math.max(0,top),behavior:"smooth"});if(history.replaceState){history.replaceState(null,"",hash);}});});window.addEventListener("scroll",update,{passive:true});window.addEventListener("resize",update);update();requestAnimationFrame(update);});})();</script>';
     }
 
     private function render_property_full_footer($links)
@@ -2688,13 +2752,13 @@ class CC_Stays_Guesty_Sync
         $amenities = $this->get_property_flat_amenities($property['id']);
         $amenity_groups = $this->get_property_grouped_amenities($property['id']);
         $rate = $property['nightly_rate'] ? '$' . esc_html(number_format((float) $property['nightly_rate'])) : '';
-        $map_src = ($property['lat'] && $property['lng']) ? 'https://maps.google.com/maps?q=' . rawurlencode($property['lat'] . ',' . $property['lng']) . '&z=13&output=embed' : '';
         $concierge_url = add_query_arg('reason', 'concierge', $links['contact']);
 
         ob_start();
         ?>
         <div class="cc-property-composed-page cc-property-full-page">
             <?php echo $this->render_property_full_header($links); ?>
+            <?php echo $this->render_property_full_subnav(!empty($property['reviews']) || $property['rating']); ?>
             <main>
                 <div class="cc-property-full-wrap">
                     <section class="cc-property-full-hero">
@@ -2715,18 +2779,20 @@ class CC_Stays_Guesty_Sync
                             data-share-url="<?php echo esc_url($property['url']); ?>">Share</button>
                     </section>
 
-                    <section class="cc-property-full-gallery" aria-label="<?php echo esc_attr($property['title']); ?> photos">
-                        <?php foreach ($visible_images as $index => $image): ?>
-                            <a class="<?php echo $index === 0 ? 'primary' : ''; ?>" href="<?php echo esc_url($image); ?>"
-                                target="_blank" rel="noopener">
-                                <img src="<?php echo esc_url($image); ?>" alt=""
-                                    loading="<?php echo $index === 0 ? 'eager' : 'lazy'; ?>">
-                            </a>
-                        <?php endforeach; ?>
-                        <a class="cc-property-full-gallery-button" href="<?php echo esc_url($property['gallery_page']); ?>">Show
-                            all
-                            photos</a>
-                    </section>
+                    <div data-gallery-scope>
+                        <section class="cc-property-full-gallery" aria-label="<?php echo esc_attr($property['title']); ?> photos">
+                            <?php foreach ($visible_images as $index => $image): ?>
+                                <a class="<?php echo $index === 0 ? 'primary' : ''; ?>" href="<?php echo esc_url($image); ?>"
+                                    target="_blank" rel="noopener">
+                                    <img src="<?php echo esc_url($image); ?>" alt=""
+                                        loading="<?php echo $index === 0 ? 'eager' : 'lazy'; ?>">
+                                </a>
+                            <?php endforeach; ?>
+                            <button class="cc-property-full-gallery-button" type="button" data-gallery-open
+                                data-gallery-src="<?php echo esc_url($property['gallery_page']); ?>">Show all photos</button>
+                        </section>
+                        <?php echo $this->property_gallery_modal($property); ?>
+                    </div>
                 </div>
 
                 <div class="cc-property-full-wrap cc-property-full-layout">
@@ -2750,7 +2816,7 @@ class CC_Stays_Guesty_Sync
                             <?php endif; ?>
                         </section>
 
-                        <section class="cc-property-full-section cc-property-full-about">
+                        <section class="cc-property-full-section cc-property-full-about" id="ov">
                             <h2>About this stay</h2>
                             <?php echo $this->render_property_read_more($property['intro']); ?>
                         </section>
@@ -2769,7 +2835,7 @@ class CC_Stays_Guesty_Sync
                             </div>
                         </section>
 
-                        <section class="cc-property-full-section cc-property-full-sleep">
+                        <section class="cc-property-full-section cc-property-full-sleep" id="sleep">
                             <h2>Where you'll sleep</h2>
                             <div class="cc-property-full-sleep-rail">
                                 <?php foreach ($property['sleeping'] as $room): ?>
@@ -2787,7 +2853,7 @@ class CC_Stays_Guesty_Sync
                             </div>
                         </section>
 
-                        <section class="cc-property-full-section cc-property-full-amenities">
+                        <section class="cc-property-full-section cc-property-full-amenities" id="amen">
                             <h2>What this stay offers</h2>
                             <div>
                                 <?php foreach (array_slice($amenities, 0, 10) as $amenity): ?>
@@ -2804,7 +2870,7 @@ class CC_Stays_Guesty_Sync
                         </section>
 
                         <?php if (!empty($property['reviews']) || $property['rating']): ?>
-                            <section class="cc-property-full-section cc-property-full-reviews" data-reviews-scope>
+                            <section class="cc-property-full-section cc-property-full-reviews" id="revs" data-reviews-scope>
                                 <h2><?php echo $property['rating'] ? '<span>★</span> ' . esc_html($property['rating']) . ($property['review_count'] ? ' · ' . esc_html($property['review_count']) . ' reviews' : '') : 'Guest reviews'; ?>
                                 </h2>
                                 <div class="cc-property-full-review-grid">
@@ -2829,18 +2895,10 @@ class CC_Stays_Guesty_Sync
                             <a href="#cc-property-promise-title" data-promise-open>Read more <span>→</span></a>
                         </section>
 
-                        <section class="cc-property-full-section cc-property-full-location">
+                        <section class="cc-property-full-section cc-property-full-location" id="loc">
                             <h2>Where you'll be</h2>
                             <strong><?php echo $this->property_location_label($property); ?></strong>
-                            <div class="cc-property-full-map">
-                                <?php if ($map_src): ?>
-                                    <iframe title="<?php echo esc_attr($property['title']); ?> map"
-                                        src="<?php echo esc_url($map_src); ?>" loading="lazy"></iframe>
-                                <?php else: ?>
-                                    <span>Map location coming soon.</span>
-                                <?php endif; ?>
-                                <?php echo $this->property_map_marker(); ?>
-                            </div>
+                            <?php echo $this->property_leaflet_map_markup($property, 'cc-property-full-map'); ?>
                             <p><?php echo esc_html($property['location_blurb']); ?></p>
                             <?php if (!empty($property['location_note'])): ?>
                                 <p class="cc-property-location-note"><?php echo esc_html($property['location_note']); ?></p>
@@ -2872,7 +2930,7 @@ class CC_Stays_Guesty_Sync
                             <a class="btn-text" href="<?php echo esc_url($concierge_url); ?>">Ask CC Stays <span>→</span></a>
                         </section>
 
-                        <section class="cc-property-full-section cc-property-full-rules">
+                        <section class="cc-property-full-section cc-property-full-rules" id="ttk">
                             <h2>Things to know</h2>
                             <div>
                                 <article>
@@ -2909,6 +2967,7 @@ class CC_Stays_Guesty_Sync
             </main>
             <?php echo $this->render_property_full_footer($links); ?>
             <?php echo $this->property_share_script(); ?>
+            <?php echo $this->property_subnav_script(); ?>
         </div>
         <?php
         return ob_get_clean();

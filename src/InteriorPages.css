@@ -71,7 +71,6 @@
 }
 
 .cc-exact-section-tight {
-  padding-top: clamp(3.5rem, 8vw, 6.5rem);
   padding-bottom: clamp(3.5rem, 8vw, 6.5rem);
 }
 
