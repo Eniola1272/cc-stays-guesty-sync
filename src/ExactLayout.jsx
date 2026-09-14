@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 export const DEFAULT_EXACT_LINKS = {
   home: "/",
@@ -167,11 +167,30 @@ export const ExactFooter = ({ links = DEFAULT_EXACT_LINKS }) => (
 );
 
 export const ExactMedia = ({ src, className = "", priority = false }) => {
+  const videoRef = useRef(null);
+  const startVideo = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.defaultMuted = true;
+    video.muted = true;
+    video.playsInline = true;
+    video.setAttribute("muted", "");
+    video.setAttribute("playsinline", "");
+    video.setAttribute("webkit-playsinline", "");
+    const playback = video.play();
+    if (playback?.catch) playback.catch(() => {});
+  };
+
+  useEffect(() => {
+    startVideo();
+  }, [src]);
+
   if (!src) return null;
+
   return (
     <div className={`cc-exact-media ${className}`}>
       {isVideoSource(src) ? (
-        <video src={src} autoPlay muted loop playsInline preload={priority ? "auto" : "metadata"} />
+        <video ref={videoRef} src={src} autoPlay defaultMuted muted loop playsInline preload={priority ? "auto" : "metadata"} onCanPlay={startVideo} />
       ) : (
         <img src={src} alt="" loading={priority ? "eager" : "lazy"} fetchPriority={priority ? "high" : undefined} />
       )}

@@ -1,3 +1,17 @@
+.cc-exact-interior .cc-rv {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.8s cubic-bezier(0.22, 0.61, 0.25, 1),
+    transform 0.8s cubic-bezier(0.22, 0.61, 0.25, 1);
+  transition-delay: var(--cc-rv-delay, 0ms);
+}
+
+.cc-exact-interior .cc-rv.is-inview {
+  opacity: 1;
+  transform: none;
+}
+
 .cc-exact-interior .cc-exact-lede {
   max-width: 34em;
   color: var(--ink-soft);
@@ -531,6 +545,7 @@
 
 .cc-exact-reason-menu.is-open {
   display: grid;
+  animation: ccInteriorPopIn 0.22s cubic-bezier(0.22, 0.61, 0.25, 1) both;
 }
 
 .cc-exact-reason-option {
@@ -617,6 +632,18 @@
   font-family: var(--sans);
   font-size: 1rem;
   line-height: 1.7;
+}
+
+@keyframes ccInteriorPopIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .cc-exact-form-ok .cc-exact-serif {
@@ -749,4 +776,12 @@
 
 .cc-partner-box .cc-btn-text {
   margin-top: 1.4rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-exact-interior .cc-rv,
+  .cc-exact-reason-menu.is-open {
+    animation: none !important;
+    transition: none !important;
+  }
 }

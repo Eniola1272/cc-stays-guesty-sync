@@ -7,6 +7,7 @@ import {
   ExactHeader,
   ExactKick,
 } from "./ExactLayout";
+import { initScrollReveals } from "./motion";
 import "./InteriorPages.css";
 
 const readMountData = (mountNode) => {
@@ -46,6 +47,13 @@ const useMountData = (mountNode) => {
   }, [mountNode]);
 
   return data;
+};
+
+const useScrollReveals = (ref) => {
+  useEffect(() => {
+    if (!ref.current) return undefined;
+    return initScrollReveals(ref.current);
+  }, [ref]);
 };
 
 const DESTINATIONS = [
@@ -234,6 +242,8 @@ const ExperienceIcon = ({ name }) => {
 
 export const DestinationsPage = ({ mountNode }) => {
   const { links } = useMountData(mountNode);
+  const pageRef = useRef(null);
+  useScrollReveals(pageRef);
   const groups = [
     {
       title: "Greater Fort Lauderdale",
@@ -246,9 +256,9 @@ export const DestinationsPage = ({ mountNode }) => {
   ];
 
   return (
-    <main className="cc-exact cc-exact-interior">
+    <main ref={pageRef} className="cc-exact cc-exact-interior">
       <ExactHeader links={links} />
-      <div className="cc-exact-page-pad cc-exact-dest-hero">
+      <div className="cc-exact-page-pad cc-exact-dest-hero cc-rv">
         <div className="cc-exact-wrap cc-exact-dest-wrap cc-exact-dest-intro">
           <ExactKick>Destinations</ExactKick>
           <h1>
@@ -264,7 +274,7 @@ export const DestinationsPage = ({ mountNode }) => {
       <section className="cc-exact-section cc-exact-section-tight">
         <div className="cc-exact-wrap cc-exact-dest-wrap">
           {groups.map((group) => (
-            <div className="cc-exact-dest-group" key={group.region}>
+            <div className="cc-exact-dest-group cc-rv" key={group.region}>
               <ExactKick>{group.title}</ExactKick>
               <div className="cc-exact-dest-grid">
                 {DESTINATIONS.filter(
@@ -297,7 +307,7 @@ export const DestinationsPage = ({ mountNode }) => {
         </div>
       </section>
 
-      <section className="cc-exact-section cc-exact-cream2 cc-exact-dest-cta">
+      <section className="cc-exact-section cc-exact-cream2 cc-exact-dest-cta cc-rv">
         <div className="cc-exact-wrap cc-exact-centered">
           <ExactKick center>Experiences</ExactKick>
           <h2>
@@ -318,11 +328,13 @@ export const DestinationsPage = ({ mountNode }) => {
 
 export const ExperiencesPage = ({ mountNode }) => {
   const { links } = useMountData(mountNode);
+  const pageRef = useRef(null);
+  useScrollReveals(pageRef);
 
   return (
-    <main className="cc-exact cc-exact-interior">
+    <main ref={pageRef} className="cc-exact cc-exact-interior">
       <ExactHeader links={links} />
-      <div className="cc-exact-page-pad cc-exact-exp-hero">
+      <div className="cc-exact-page-pad cc-exact-exp-hero cc-rv">
         <div className="cc-exact-wrap cc-exact-dest-intro">
           <ExactKick>Experiences</ExactKick>
           <h1>
@@ -339,7 +351,7 @@ export const ExperiencesPage = ({ mountNode }) => {
         <div className="cc-exact-wrap">
           <div className="cc-exact-exp-grid">
             {EXPERIENCES.map((experience) => (
-              <article className="cc-exact-exp-card" key={experience.title}>
+              <article className="cc-exact-exp-card cc-rv" key={experience.title}>
                 <span className="cc-exact-exp-icon">
                   <ExperienceIcon name={experience.icon} />
                 </span>
@@ -364,7 +376,7 @@ export const ExperiencesPage = ({ mountNode }) => {
         </div>
       </section>
 
-      <section className="cc-exact-section cc-exact-cream2">
+      <section className="cc-exact-section cc-exact-cream2 cc-rv">
         <div className="cc-exact-wrap cc-exact-centered">
           <ExactKick center>In the meantime</ExactKick>
           <h2>
@@ -389,11 +401,13 @@ export const ExperiencesPage = ({ mountNode }) => {
 
 export const AboutPage = ({ mountNode }) => {
   const { links } = useMountData(mountNode);
+  const pageRef = useRef(null);
+  useScrollReveals(pageRef);
 
   return (
-    <main className="cc-exact cc-exact-interior">
+    <main ref={pageRef} className="cc-exact cc-exact-interior">
       <ExactHeader links={links} />
-      <div className="cc-exact-page-pad cc-exact-about-hero">
+      <div className="cc-exact-page-pad cc-exact-about-hero cc-rv">
         <div className="cc-exact-wrap cc-exact-about-hero-copy">
           <ExactKick>About CC Stays</ExactKick>
           <h1>
@@ -408,7 +422,7 @@ export const AboutPage = ({ mountNode }) => {
         </div>
       </div>
 
-      <section className="cc-exact-letter-sec cc-exact-on-dark">
+      <section className="cc-exact-letter-sec cc-exact-on-dark cc-rv">
         <div className="cc-exact-wrap">
           <div className="cc-exact-letter">
             <CcWatermark className="cc-exact-letter-stamp" />
@@ -435,7 +449,7 @@ export const AboutPage = ({ mountNode }) => {
         </div>
       </section>
 
-      <section className="cc-exact-section">
+      <section className="cc-exact-section cc-rv">
         <div className="cc-exact-wrap">
           <div className="cc-exact-build-kick">
             <ExactKick>What We&apos;re Building</ExactKick>
@@ -466,7 +480,7 @@ export const AboutPage = ({ mountNode }) => {
         </div>
       </section>
 
-      <section className="cc-exact-section cc-exact-cream2">
+      <section className="cc-exact-section cc-exact-cream2 cc-rv">
         <div className="cc-exact-wrap cc-exact-centered">
           <ExactKick center>White-Glove Concierge</ExactKick>
           <h2>
@@ -482,7 +496,7 @@ export const AboutPage = ({ mountNode }) => {
         </div>
       </section>
 
-      <section className="cc-exact-close-spread">
+      <section className="cc-exact-close-spread cc-rv">
         <div className="cc-exact-wrap cc-exact-centered">
           <h2>
             Different places.
@@ -505,6 +519,8 @@ export const AboutPage = ({ mountNode }) => {
 
 export const JournalPage = ({ mountNode }) => {
   const { links } = useMountData(mountNode);
+  const pageRef = useRef(null);
+  useScrollReveals(pageRef);
   const [status, setStatus] = useState({
     loading: false,
     message: "",
@@ -554,9 +570,9 @@ export const JournalPage = ({ mountNode }) => {
   };
 
   return (
-    <main className="cc-exact cc-exact-interior">
+    <main ref={pageRef} className="cc-exact cc-exact-interior">
       <ExactHeader links={links} />
-      <div className="cc-exact-page-pad cc-exact-journal-hero">
+      <div className="cc-exact-page-pad cc-exact-journal-hero cc-rv">
         <div className="cc-exact-wrap cc-exact-centered">
           <ExactKick center>The Journal</ExactKick>
           <h1>
@@ -599,7 +615,9 @@ export const JournalPage = ({ mountNode }) => {
 
 export const ContactPage = ({ mountNode }) => {
   const { links } = useMountData(mountNode);
+  const pageRef = useRef(null);
   const reasonRef = useRef(null);
+  useScrollReveals(pageRef);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -698,9 +716,9 @@ export const ContactPage = ({ mountNode }) => {
   };
 
   return (
-    <main className="cc-exact cc-exact-interior">
+    <main ref={pageRef} className="cc-exact cc-exact-interior">
       <ExactHeader links={links} />
-      <div className="cc-exact-page-pad cc-exact-contact-hero">
+      <div className="cc-exact-page-pad cc-exact-contact-hero cc-rv">
         <div className="cc-exact-wrap cc-exact-contact-intro">
           <ExactKick>Contact CC Stays</ExactKick>
           <h1>
@@ -713,7 +731,7 @@ export const ContactPage = ({ mountNode }) => {
         </div>
       </div>
 
-      <section className="cc-exact-section cc-exact-contact-section">
+      <section className="cc-exact-section cc-exact-contact-section cc-rv">
         <div className="cc-exact-wrap cc-exact-contact-grid">
           {status.success ? (
             <div className="cc-exact-form-ok">

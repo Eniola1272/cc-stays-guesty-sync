@@ -19,6 +19,7 @@
   --revamp-r-md: 12px;
   --revamp-r-lg: 18px;
   --revamp-shadow: 0 10px 30px -12px rgba(35, 32, 25, 0.18);
+  --revamp-ease: cubic-bezier(0.22, 0.61, 0.25, 1);
   overflow: clip;
   background: var(--revamp-cream);
   color: var(--revamp-ink);
@@ -48,6 +49,20 @@
 .cc-revamp img {
   display: block;
   max-width: 100%;
+}
+
+.cc-revamp .cc-rv {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.82s var(--revamp-ease),
+    transform 0.82s var(--revamp-ease);
+  transition-delay: var(--cc-rv-delay, 0ms);
+}
+
+.cc-revamp .cc-rv.is-inview {
+  opacity: 1;
+  transform: none;
 }
 
 .cc-revamp-wrap {
@@ -528,6 +543,8 @@
   border-radius: var(--revamp-r-md);
   background: var(--revamp-paper);
   box-shadow: var(--revamp-shadow);
+  transform-origin: top right;
+  animation: ccRevampPopIn 0.22s var(--revamp-ease) both;
 }
 
 .cc-revamp-guest-pop p {
@@ -629,7 +646,9 @@
   width: 100%;
   height: calc(100% - var(--revamp-gallery-tray));
   object-fit: cover;
-  transition: transform 0.6s ease;
+  transform-origin: center;
+  transition: transform 0.8s var(--revamp-ease);
+  will-change: transform;
 }
 
 .cc-revamp-card:hover .cc-revamp-gallery img {
@@ -667,13 +686,21 @@
   opacity: 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
   transform: translateY(-50%);
-  transition: opacity 0.2s ease;
+  transition:
+    opacity 0.2s var(--revamp-ease),
+    transform 0.2s var(--revamp-ease),
+    box-shadow 0.2s var(--revamp-ease);
   appearance: none;
   aspect-ratio: 1 / 1;
 }
 
 .cc-revamp-gallery:hover .cc-revamp-gallery-arrow {
   opacity: 1;
+}
+
+.cc-revamp-gallery-arrow:hover {
+  transform: translateY(-50%) scale(1.04);
+  box-shadow: 0 14px 30px rgba(35, 32, 25, 0.18);
 }
 
 .cc-revamp-gallery-arrow--prev {
@@ -1787,4 +1814,26 @@
 
 .border-radius-18 {
   border-radius: 18px !important;
+}
+
+@keyframes ccRevampPopIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-revamp .cc-rv,
+  .cc-revamp-guest-pop,
+  .cc-revamp-gallery img,
+  .cc-revamp-gallery-arrow {
+    animation: none !important;
+    transition: none !important;
+  }
 }

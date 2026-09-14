@@ -2012,6 +2012,11 @@ class CC_Stays_Guesty_Sync
         return '<script>(function(){if(window.ccPropertyShareReady)return;window.ccPropertyShareReady=true;function copy(text){if(navigator.clipboard&&window.isSecureContext){return navigator.clipboard.writeText(text);}var area=document.createElement("textarea");area.value=text;area.setAttribute("readonly","");area.style.position="fixed";area.style.top="-9999px";document.body.appendChild(area);area.select();try{document.execCommand("copy");}finally{document.body.removeChild(area);}return Promise.resolve();}function copied(trigger){var original=trigger.getAttribute("data-share-label")||trigger.textContent||"Share";trigger.setAttribute("data-share-label",original);trigger.textContent="Copied";clearTimeout(trigger._ccShareTimer);trigger._ccShareTimer=setTimeout(function(){trigger.textContent=original;},1800);}document.addEventListener("click",function(event){var trigger=event.target.closest("[data-property-share]");if(!trigger)return;event.preventDefault();var title=trigger.getAttribute("data-share-title")||document.title;var url=trigger.getAttribute("data-share-url")||window.location.href;var text=trigger.getAttribute("data-share-text")||title;if(navigator.share){navigator.share({title:title,text:text,url:url}).catch(function(error){if(error&&error.name==="AbortError")return;copy(url).then(function(){copied(trigger);});});return;}copy(url).then(function(){copied(trigger);});});})();</script>';
     }
 
+    private function property_motion_script()
+    {
+        return '<script>(function(){if(window.ccPropertyMotionReady)return;window.ccPropertyMotionReady=true;window.ccPropertyShowModal=function(root,openClass,focusSelector){if(!root)return;clearTimeout(root._ccMotionTimer);root.hidden=false;if(openClass)document.documentElement.classList.add(openClass);requestAnimationFrame(function(){root.classList.add("is-open");});var close=focusSelector?root.querySelector(focusSelector):null;if(close)setTimeout(function(){close.focus();},30);};window.ccPropertyHideModal=function(root,openClass,lastTrigger){if(!root)return;root.classList.remove("is-open");if(openClass)document.documentElement.classList.remove(openClass);clearTimeout(root._ccMotionTimer);root._ccMotionTimer=setTimeout(function(){if(!root.classList.contains("is-open"))root.hidden=true;},320);if(lastTrigger&&lastTrigger.focus)setTimeout(function(){lastTrigger.focus();},340);};var items=[].slice.call(document.querySelectorAll(".cc-property-full-page .cc-rv"));var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;if(reduce||!("IntersectionObserver" in window)){items.forEach(function(el){el.classList.add("is-inview");});return;}var io=new IntersectionObserver(function(entries){entries.forEach(function(entry){if(!entry.isIntersecting)return;entry.target.classList.add("is-inview");io.unobserve(entry.target);});},{threshold:.12,rootMargin:"0px 0px -6% 0px"});items.forEach(function(el,index){if(!el.style.getPropertyValue("--cc-rv-delay"))el.style.setProperty("--cc-rv-delay",Math.min(index*45,180)+"ms");io.observe(el);});})();</script>';
+    }
+
     private function property_promise_modal()
     {
         ob_start();
@@ -2045,7 +2050,7 @@ class CC_Stays_Guesty_Sync
                 </div>
             </div>
         </div>
-        <script>(function () { if (window.ccPropertyPromiseReady) return; window.ccPropertyPromiseReady = true; var lastTrigger = null; function modal() { return document.querySelector("[data-promise-modal]"); } function open(trigger) { var root = modal(); if (!root) return; lastTrigger = trigger; root.hidden = false; document.documentElement.classList.add("cc-property-promise-open"); var close = root.querySelector("[data-promise-close]"); if (close) close.focus(); } function close() { var root = modal(); if (!root || root.hidden) return; root.hidden = true; document.documentElement.classList.remove("cc-property-promise-open"); if (lastTrigger && lastTrigger.focus) lastTrigger.focus(); } document.addEventListener("click", function (event) { var opener = event.target.closest("[data-promise-open]"); if (opener) { event.preventDefault(); open(opener); return; } if (event.target.closest("[data-promise-close]")) { event.preventDefault(); close(); } }); document.addEventListener("keydown", function (event) { if (event.key === "Escape") close(); }); })();</script>
+        <script>(function () { if (window.ccPropertyPromiseReady) return; window.ccPropertyPromiseReady = true; var lastTrigger = null; function modal() { return document.querySelector("[data-promise-modal]"); } function open(trigger) { var root = modal(); if (!root) return; lastTrigger = trigger; if (window.ccPropertyShowModal) { window.ccPropertyShowModal(root, "cc-property-promise-open", "[data-promise-close]"); return; } root.hidden = false; root.classList.add("is-open"); document.documentElement.classList.add("cc-property-promise-open"); var close = root.querySelector("[data-promise-close]"); if (close) close.focus(); } function close() { var root = modal(); if (!root || (root.hidden && !root.classList.contains("is-open"))) return; if (window.ccPropertyHideModal) { window.ccPropertyHideModal(root, "cc-property-promise-open", lastTrigger); return; } root.classList.remove("is-open"); root.hidden = true; document.documentElement.classList.remove("cc-property-promise-open"); if (lastTrigger && lastTrigger.focus) lastTrigger.focus(); } document.addEventListener("click", function (event) { var opener = event.target.closest("[data-promise-open]"); if (opener) { event.preventDefault(); open(opener); return; } if (event.target.closest("[data-promise-close]")) { event.preventDefault(); close(); } }); document.addEventListener("keydown", function (event) { if (event.key === "Escape") close(); }); })();</script>
         <?php
         return ob_get_clean();
     }
@@ -2083,7 +2088,7 @@ class CC_Stays_Guesty_Sync
                 </div>
             </div>
         </div>
-        <script>(function () { if (window.ccPropertyReviewsReady) return; window.ccPropertyReviewsReady = true; var lastTrigger = null; function scopedModal(trigger) { var scope = trigger && trigger.closest ? trigger.closest("[data-reviews-scope]") : null; return scope ? scope.querySelector("[data-reviews-modal]") : document.querySelector("[data-reviews-modal]"); } function open(trigger) { var root = scopedModal(trigger); if (!root) return; lastTrigger = trigger; root.hidden = false; document.documentElement.classList.add("cc-property-reviews-open"); var close = root.querySelector("[data-reviews-close]"); if (close) close.focus(); } function close() { var root = document.querySelector("[data-reviews-modal]:not([hidden])"); if (!root) return; root.hidden = true; document.documentElement.classList.remove("cc-property-reviews-open"); if (lastTrigger && lastTrigger.focus) lastTrigger.focus(); } document.addEventListener("click", function (event) { var opener = event.target.closest("[data-reviews-open]"); if (opener) { event.preventDefault(); open(opener); return; } if (event.target.closest("[data-reviews-close]")) { event.preventDefault(); close(); } }); document.addEventListener("keydown", function (event) { if (event.key === "Escape") close(); }); })();</script>
+        <script>(function () { if (window.ccPropertyReviewsReady) return; window.ccPropertyReviewsReady = true; var lastTrigger = null; function scopedModal(trigger) { var scope = trigger && trigger.closest ? trigger.closest("[data-reviews-scope]") : null; return scope ? scope.querySelector("[data-reviews-modal]") : document.querySelector("[data-reviews-modal]"); } function open(trigger) { var root = scopedModal(trigger); if (!root) return; lastTrigger = trigger; if (window.ccPropertyShowModal) { window.ccPropertyShowModal(root, "cc-property-reviews-open", "[data-reviews-close]"); return; } root.hidden = false; root.classList.add("is-open"); document.documentElement.classList.add("cc-property-reviews-open"); var close = root.querySelector("[data-reviews-close]"); if (close) close.focus(); } function close() { var root = document.querySelector("[data-reviews-modal].is-open, [data-reviews-modal]:not([hidden])"); if (!root) return; if (window.ccPropertyHideModal) { window.ccPropertyHideModal(root, "cc-property-reviews-open", lastTrigger); return; } root.classList.remove("is-open"); root.hidden = true; document.documentElement.classList.remove("cc-property-reviews-open"); if (lastTrigger && lastTrigger.focus) lastTrigger.focus(); } document.addEventListener("click", function (event) { var opener = event.target.closest("[data-reviews-open]"); if (opener) { event.preventDefault(); open(opener); return; } if (event.target.closest("[data-reviews-close]")) { event.preventDefault(); close(); } }); document.addEventListener("keydown", function (event) { if (event.key === "Escape") close(); }); })();</script>
         <?php
         return ob_get_clean();
     }
@@ -2118,7 +2123,7 @@ class CC_Stays_Guesty_Sync
                 </div>
             </div>
         </div>
-        <script>(function () { if (window.ccPropertyGalleryModalReady) return; window.ccPropertyGalleryModalReady = true; var lastTrigger = null; function closest(target, selector) { return target && target.closest ? target.closest(selector) : null; } function scopedModal(trigger) { var scope = trigger && trigger.closest ? trigger.closest("[data-gallery-scope]") : null; if (scope) { var modal = scope.querySelector("[data-gallery-modal]"); if (modal) return modal; var next = scope.nextElementSibling; while (next) { if (next.matches && next.matches("[data-gallery-modal]")) return next; next = next.nextElementSibling; } } return document.querySelector("[data-gallery-modal]"); } function open(trigger) { var root = scopedModal(trigger); if (!root) return; var src = trigger.getAttribute("data-gallery-src") || root.getAttribute("data-gallery-src"); var frame = root.querySelector("[data-gallery-frame]"); lastTrigger = trigger; if (frame && src && frame.getAttribute("src") !== src) frame.setAttribute("src", src); root.hidden = false; document.documentElement.classList.add("cc-property-gallery-open"); var close = root.querySelector("[data-gallery-close]"); if (close) close.focus(); } function close() { var root = document.querySelector("[data-gallery-modal]:not([hidden])"); if (!root) return; root.hidden = true; document.documentElement.classList.remove("cc-property-gallery-open"); if (lastTrigger && lastTrigger.focus) lastTrigger.focus(); } document.addEventListener("click", function (event) { var opener = closest(event.target, "[data-gallery-open]"); if (opener) { event.preventDefault(); event.stopPropagation(); open(opener); return false; } if (closest(event.target, "[data-gallery-close]")) { event.preventDefault(); event.stopPropagation(); close(); return false; } }, true); document.addEventListener("keydown", function (event) { if (event.key === "Escape") close(); }); })();</script>
+        <script>(function () { if (window.ccPropertyGalleryModalReady) return; window.ccPropertyGalleryModalReady = true; var lastTrigger = null; function closest(target, selector) { return target && target.closest ? target.closest(selector) : null; } function scopedModal(trigger) { var scope = trigger && trigger.closest ? trigger.closest("[data-gallery-scope]") : null; if (scope) { var modal = scope.querySelector("[data-gallery-modal]"); if (modal) return modal; var next = scope.nextElementSibling; while (next) { if (next.matches && next.matches("[data-gallery-modal]")) return next; next = next.nextElementSibling; } } return document.querySelector("[data-gallery-modal]"); } function open(trigger) { var root = scopedModal(trigger); if (!root) return; var src = trigger.getAttribute("data-gallery-src") || root.getAttribute("data-gallery-src"); var frame = root.querySelector("[data-gallery-frame]"); lastTrigger = trigger; if (frame && src && frame.getAttribute("src") !== src) frame.setAttribute("src", src); if (window.ccPropertyShowModal) { window.ccPropertyShowModal(root, "cc-property-gallery-open", "[data-gallery-close]"); return; } root.hidden = false; root.classList.add("is-open"); document.documentElement.classList.add("cc-property-gallery-open"); var close = root.querySelector("[data-gallery-close]"); if (close) close.focus(); } function close() { var root = document.querySelector("[data-gallery-modal].is-open, [data-gallery-modal]:not([hidden])"); if (!root) return; if (window.ccPropertyHideModal) { window.ccPropertyHideModal(root, "cc-property-gallery-open", lastTrigger); return; } root.classList.remove("is-open"); root.hidden = true; document.documentElement.classList.remove("cc-property-gallery-open"); if (lastTrigger && lastTrigger.focus) lastTrigger.focus(); } document.addEventListener("click", function (event) { var opener = closest(event.target, "[data-gallery-open]"); if (opener) { event.preventDefault(); event.stopPropagation(); open(opener); return false; } if (closest(event.target, "[data-gallery-close]")) { event.preventDefault(); event.stopPropagation(); close(); return false; } }, true); document.addEventListener("keydown", function (event) { if (event.key === "Escape") close(); }); })();</script>
         <?php
         return ob_get_clean();
     }
@@ -2599,7 +2604,7 @@ class CC_Stays_Guesty_Sync
                 </div>
             </div>
         </div>
-        <script>(function () { if (window.ccPropertyAmenitiesReady) return; window.ccPropertyAmenitiesReady = true; var lastTrigger = null; function modal() { return document.querySelector("[data-amenities-modal]"); } function open(trigger) { var root = modal(); if (!root) return; lastTrigger = trigger; root.hidden = false; document.documentElement.classList.add("cc-property-amenities-open"); var close = root.querySelector("[data-amenities-close]"); if (close) close.focus(); } function close() { var root = modal(); if (!root || root.hidden) return; root.hidden = true; document.documentElement.classList.remove("cc-property-amenities-open"); if (lastTrigger && lastTrigger.focus) lastTrigger.focus(); } document.addEventListener("click", function (event) { var opener = event.target.closest("[data-amenities-open]"); if (opener) { event.preventDefault(); open(opener); return; } if (event.target.closest("[data-amenities-close]")) { event.preventDefault(); close(); } }); document.addEventListener("keydown", function (event) { if (event.key === "Escape") close(); }); })();</script>
+        <script>(function () { if (window.ccPropertyAmenitiesReady) return; window.ccPropertyAmenitiesReady = true; var lastTrigger = null; function modal() { return document.querySelector("[data-amenities-modal]"); } function open(trigger) { var root = modal(); if (!root) return; lastTrigger = trigger; if (window.ccPropertyShowModal) { window.ccPropertyShowModal(root, "cc-property-amenities-open", "[data-amenities-close]"); return; } root.hidden = false; root.classList.add("is-open"); document.documentElement.classList.add("cc-property-amenities-open"); var close = root.querySelector("[data-amenities-close]"); if (close) close.focus(); } function close() { var root = modal(); if (!root || (root.hidden && !root.classList.contains("is-open"))) return; if (window.ccPropertyHideModal) { window.ccPropertyHideModal(root, "cc-property-amenities-open", lastTrigger); return; } root.classList.remove("is-open"); root.hidden = true; document.documentElement.classList.remove("cc-property-amenities-open"); if (lastTrigger && lastTrigger.focus) lastTrigger.focus(); } document.addEventListener("click", function (event) { var opener = event.target.closest("[data-amenities-open]"); if (opener) { event.preventDefault(); open(opener); return; } if (event.target.closest("[data-amenities-close]")) { event.preventDefault(); close(); } }); document.addEventListener("keydown", function (event) { if (event.key === "Escape") close(); }); })();</script>
         <?php
         return ob_get_clean();
     }
@@ -2761,7 +2766,7 @@ class CC_Stays_Guesty_Sync
             <?php echo $this->render_property_full_subnav(!empty($property['reviews']) || $property['rating']); ?>
             <main>
                 <div class="cc-property-full-wrap">
-                    <section class="cc-property-full-hero">
+                    <section class="cc-property-full-hero cc-rv">
                         <div>
                             <h1><?php echo esc_html($this->property_short_title($property['title'])); ?></h1>
                             <p>
@@ -2779,7 +2784,7 @@ class CC_Stays_Guesty_Sync
                             data-share-url="<?php echo esc_url($property['url']); ?>">Share</button>
                     </section>
 
-                    <div data-gallery-scope>
+                    <div class="cc-rv" data-gallery-scope>
                         <section class="cc-property-full-gallery" aria-label="<?php echo esc_attr($property['title']); ?> photos">
                             <?php foreach ($visible_images as $index => $image): ?>
                                 <a class="<?php echo $index === 0 ? 'primary' : ''; ?>" href="<?php echo esc_url($image); ?>"
@@ -2797,7 +2802,7 @@ class CC_Stays_Guesty_Sync
 
                 <div class="cc-property-full-wrap cc-property-full-layout">
                     <div class="cc-property-full-main">
-                        <section class="cc-property-full-section cc-property-full-overview">
+                        <section class="cc-property-full-section cc-property-full-overview cc-rv">
                             <h2><?php echo esc_html($property['subtitle'] ?: $property['title'] . ' · ' . $this->property_location_label($property)); ?>
                             </h2>
                             <p><?php echo $this->property_stat_label($property['guests'], 'guest'); ?> ·
@@ -2816,12 +2821,12 @@ class CC_Stays_Guesty_Sync
                             <?php endif; ?>
                         </section>
 
-                        <section class="cc-property-full-section cc-property-full-about" id="ov">
+                        <section class="cc-property-full-section cc-property-full-about cc-rv" id="ov">
                             <h2>About this stay</h2>
                             <?php echo $this->render_property_read_more($property['intro']); ?>
                         </section>
 
-                        <section class="cc-property-full-section">
+                        <section class="cc-property-full-section cc-rv">
                             <div class="cc-property-full-highlights">
                                 <?php foreach (array_slice($property['highlights'], 0, 3) as $item): ?>
                                     <article>
@@ -2835,7 +2840,7 @@ class CC_Stays_Guesty_Sync
                             </div>
                         </section>
 
-                        <section class="cc-property-full-section cc-property-full-sleep" id="sleep">
+                        <section class="cc-property-full-section cc-property-full-sleep cc-rv" id="sleep">
                             <h2>Where you'll sleep</h2>
                             <div class="cc-property-full-sleep-rail">
                                 <?php foreach ($property['sleeping'] as $room): ?>
@@ -2853,7 +2858,7 @@ class CC_Stays_Guesty_Sync
                             </div>
                         </section>
 
-                        <section class="cc-property-full-section cc-property-full-amenities" id="amen">
+                        <section class="cc-property-full-section cc-property-full-amenities cc-rv" id="amen">
                             <h2>What this stay offers</h2>
                             <div>
                                 <?php foreach (array_slice($amenities, 0, 10) as $amenity): ?>
@@ -2870,7 +2875,7 @@ class CC_Stays_Guesty_Sync
                         </section>
 
                         <?php if (!empty($property['reviews']) || $property['rating']): ?>
-                            <section class="cc-property-full-section cc-property-full-reviews" id="revs" data-reviews-scope>
+                            <section class="cc-property-full-section cc-property-full-reviews cc-rv" id="revs" data-reviews-scope>
                                 <h2><?php echo $property['rating'] ? '<span>★</span> ' . esc_html($property['rating']) . ($property['review_count'] ? ' · ' . esc_html($property['review_count']) . ' reviews' : '') : 'Guest reviews'; ?>
                                 </h2>
                                 <div class="cc-property-full-review-grid">
@@ -2889,13 +2894,13 @@ class CC_Stays_Guesty_Sync
                             </section>
                         <?php endif; ?>
 
-                        <section class="cc-property-full-section cc-property-full-promise">
+                        <section class="cc-property-full-section cc-property-full-promise cc-rv">
                             <h2>The CC Stays Promise</h2>
                             <strong>Book with confidence.</strong>
                             <a href="#cc-property-promise-title" data-promise-open>Read more <span>→</span></a>
                         </section>
 
-                        <section class="cc-property-full-section cc-property-full-location" id="loc">
+                        <section class="cc-property-full-section cc-property-full-location cc-rv" id="loc">
                             <h2>Where you'll be</h2>
                             <strong><?php echo $this->property_location_label($property); ?></strong>
                             <?php echo $this->property_leaflet_map_markup($property, 'cc-property-full-map'); ?>
@@ -2923,14 +2928,14 @@ class CC_Stays_Guesty_Sync
                             <?php endif; ?>
                         </section>
 
-                        <section class="cc-property-full-section cc-property-full-concierge">
+                        <section class="cc-property-full-section cc-property-full-concierge cc-rv">
                             <p class="cc-property-eyebrow">24/7 Concierge</p>
                             <h2>Need something? Ask us.</h2>
                             <p>White-glove help throughout your stay.</p>
                             <a class="btn-text" href="<?php echo esc_url($concierge_url); ?>">Ask CC Stays <span>→</span></a>
                         </section>
 
-                        <section class="cc-property-full-section cc-property-full-rules" id="ttk">
+                        <section class="cc-property-full-section cc-property-full-rules cc-rv" id="ttk">
                             <h2>Things to know</h2>
                             <div>
                                 <article>
@@ -2952,7 +2957,7 @@ class CC_Stays_Guesty_Sync
                         </section>
                     </div>
 
-                    <aside class="cc-property-full-aside">
+                    <aside class="cc-property-full-aside cc-rv">
                         <div class="cc-property-full-book-card">
                             <?php if ($rate): ?>
                                 <h2><?php echo $rate; ?> <span>/ night</span></h2><?php endif; ?>
@@ -2966,6 +2971,7 @@ class CC_Stays_Guesty_Sync
                 </div>
             </main>
             <?php echo $this->render_property_full_footer($links); ?>
+            <?php echo $this->property_motion_script(); ?>
             <?php echo $this->property_share_script(); ?>
             <?php echo $this->property_subnav_script(); ?>
         </div>

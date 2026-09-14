@@ -58,6 +58,20 @@
   max-width: 100%;
 }
 
+.cc-exact .cc-rv {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.8s var(--ease),
+    transform 0.8s var(--ease);
+  transition-delay: var(--cc-rv-delay, 0ms);
+}
+
+.cc-exact .cc-rv.is-inview {
+  opacity: 1;
+  transform: none;
+}
+
 .cc-exact h1,
 .cc-exact h2,
 .cc-exact h3,
@@ -474,6 +488,7 @@
 
 .cc-exact-guest-pop.open {
   display: block;
+  animation: ccExactPopIn 0.22s var(--ease) both;
 }
 
 .cc-exact-stepper {
@@ -583,6 +598,7 @@
 
 .cc-exact-filter-menu.open {
   display: block;
+  animation: ccExactPopIn 0.22s var(--ease) both;
 }
 
 .cc-exact-filter-menu h4 {
@@ -646,7 +662,7 @@
   object-position: center;
   scroll-snap-align: start;
   transform-origin: center center;
-  transition: transform 0.6s var(--ease);
+  transition: transform 0.8s var(--ease);
   will-change: transform;
 }
 
@@ -675,7 +691,10 @@
   line-height: 1;
   opacity: 0;
   translate: 0 -50%;
-  transition: opacity 0.2s;
+  transition:
+    opacity 0.2s var(--ease),
+    transform 0.2s var(--ease),
+    box-shadow 0.2s var(--ease);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
 }
 
@@ -689,6 +708,11 @@
 
 .cc-exact-gal:hover .cc-exact-gal-arrow {
   opacity: 1;
+}
+
+.cc-exact-gal-arrow:hover {
+  transform: scale(1.04);
+  box-shadow: 0 14px 30px rgba(35, 32, 25, 0.18);
 }
 
 .cc-exact-gal-dots {
@@ -1082,5 +1106,28 @@
 
   .cc-exact-foot-bottom {
     display: grid;
+  }
+}
+
+@keyframes ccExactPopIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-exact .cc-rv,
+  .cc-exact-guest-pop.open,
+  .cc-exact-filter-menu.open,
+  .cc-exact-gal-track img,
+  .cc-exact-gal-arrow {
+    animation: none !important;
+    transition: none !important;
   }
 }

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { CcMono } from "./ExactLayout";
+import { initScrollReveals } from "./motion";
 import "./HomePageRevamp.css";
 
 const DEFAULT_LINKS = {
@@ -203,17 +204,41 @@ const ImagePanel = ({
 
   const currentSource = sources[sourceIndex];
   const handleError = () => setSourceIndex((index) => index + 1);
+  const videoRef = useRef(null);
+
+  const startVideo = () => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    // iOS Safari is stricter than desktop device emulation: make the
+    // autoplay requirements true on the element itself before calling play.
+    video.defaultMuted = true;
+    video.muted = true;
+    video.playsInline = true;
+    video.setAttribute("muted", "");
+    video.setAttribute("playsinline", "");
+    video.setAttribute("webkit-playsinline", "");
+    const playback = video.play();
+    if (playback?.catch) playback.catch(() => {});
+  };
+
+  useEffect(() => {
+    startVideo();
+  }, [currentSource]);
 
   return (
     <div className="cc-revamp-hero-media" style={{ aspectRatio: ratio }}>
       {currentSource && isVideoSource(currentSource) ? (
         <video
+          ref={videoRef}
           src={currentSource}
           autoPlay
+          defaultMuted
           muted
           loop
           playsInline
           preload={priority ? "auto" : "metadata"}
+          onCanPlay={startVideo}
           onError={handleError}
         />
       ) : currentSource ? (
@@ -536,6 +561,8 @@ const HomePageRevamp = ({ mountNode }) => {
     }
   }, [mountNode]);
 
+  useEffect(() => initScrollReveals(), []);
+
   const featured = useMemo(
     () =>
       FEATURED_CONFIG.map((config) => {
@@ -670,7 +697,7 @@ const HomePageRevamp = ({ mountNode }) => {
             </a>
           </div>
         </div>
-        <div className="cc-revamp-hero-inner cc-revamp-wrap">
+        <div className="cc-revamp-hero-inner cc-revamp-wrap cc-rv">
           <h1>
             Stay somewhere
             <br />
@@ -690,7 +717,7 @@ const HomePageRevamp = ({ mountNode }) => {
 
       <section className="cc-revamp-section cc-revamp-collection">
         <div className="cc-revamp-wrap">
-          <div className="cc-revamp-section-head">
+          <div className="cc-revamp-section-head cc-rv">
             <div>
               <div className="cc-revamp-eyebrow">The Collection</div>
               <h2>Find your stay.</h2>
@@ -699,7 +726,7 @@ const HomePageRevamp = ({ mountNode }) => {
               View all stays <span>→</span>
             </a>
           </div>
-          <div className="cc-revamp-rail">
+          <div className="cc-revamp-rail cc-rv">
             {featured.map((property) => (
               <PropertyCard property={property} key={property.key} />
             ))}
@@ -716,7 +743,7 @@ const HomePageRevamp = ({ mountNode }) => {
             <span>The standards of a hotel.</span>
           </h2>
 
-          <div className="cc-revamp-story cc-revamp-story--wide">
+          <div className="cc-revamp-story cc-revamp-story--wide cc-rv">
             <div className="cc-revamp-story-copy">
               <div className="cc-revamp-eyebrow2">Designed for the Stay</div>
               <h3>Spaces you settle into.</h3>
@@ -734,7 +761,7 @@ const HomePageRevamp = ({ mountNode }) => {
 
           <div
             id="comfort-everywhere"
-            className="cc-revamp-story cc-revamp-story--arch"
+            className="cc-revamp-story cc-revamp-story--arch cc-rv"
           >
             <div className="cc-revamp-story-copy">
               <div className="cc-revamp-eyebrow2">Comfort, Everywhere</div>
@@ -750,7 +777,7 @@ const HomePageRevamp = ({ mountNode }) => {
             </div>
           </div>
 
-          <div className="cc-revamp-story cc-revamp-story--split">
+          <div className="cc-revamp-story cc-revamp-story--split cc-rv">
             <img
               className="border-radius-18"
               src={images.storyThree}
@@ -772,7 +799,7 @@ const HomePageRevamp = ({ mountNode }) => {
         </div>
       </section>
 
-      <section className="cc-revamp-trip-band">
+      <section className="cc-revamp-trip-band cc-rv">
         <CcWatermark />
         <h2 className="cc-revamp-white-text">
           Sometimes the stay <em>is</em> the trip.
@@ -783,7 +810,7 @@ const HomePageRevamp = ({ mountNode }) => {
       </section>
 
       <section className="cc-revamp-section cc-revamp-reviews">
-        <div className="cc-revamp-wrap">
+        <div className="cc-revamp-wrap cc-rv">
           <div className="cc-revamp-eyebrow">What Guests Say</div>
           <div className="cc-revamp-review-score">
             <strong>
@@ -813,7 +840,7 @@ const HomePageRevamp = ({ mountNode }) => {
       </section>
 
       <section className="cc-revamp-section cc-revamp-standard">
-        <div className="cc-revamp-wrap">
+        <div className="cc-revamp-wrap cc-rv">
           <div className="cc-revamp-eyebrow">The CC Stays Standard</div>
           <h2 className="cc-revamp-white-text">
             Everything you need.
@@ -839,7 +866,7 @@ const HomePageRevamp = ({ mountNode }) => {
         </div>
       </section>
 
-      <section className="cc-revamp-section cc-revamp-final">
+      <section className="cc-revamp-section cc-revamp-final cc-rv">
         <div className="cc-revamp-eyebrow">Book With CC Stays</div>
         <h2>
           Take the trip.
@@ -860,7 +887,7 @@ const HomePageRevamp = ({ mountNode }) => {
 
       <footer className="cc-revamp-footer">
         <div className="cc-revamp-wrap">
-          <div className="cc-revamp-footer-grid">
+          <div className="cc-revamp-footer-grid cc-rv">
             <div>
               <LogoMark logo={images.logo} compact />
               <p>Stay somewhere you&apos;ll remember.</p>
@@ -889,7 +916,7 @@ const HomePageRevamp = ({ mountNode }) => {
               <a href={links.instagram}>Instagram</a>
             </nav>
           </div>
-          <div className="cc-revamp-footer-bottom">
+          <div className="cc-revamp-footer-bottom cc-rv">
             <p>© 2026 CC Stays. All rights reserved.</p>
             <nav>
               <a href={links.privacy}>Privacy</a>

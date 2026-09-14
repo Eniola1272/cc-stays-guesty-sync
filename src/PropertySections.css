@@ -22,7 +22,23 @@
 
 .cc-property-full-page {
   overflow-x: clip;
+  scroll-behavior: smooth;
   background: #f4ecdf;
+  --cc-motion-ease: cubic-bezier(0.22, 0.61, 0.25, 1);
+}
+
+.cc-property-full-page .cc-rv {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.82s var(--cc-motion-ease),
+    transform 0.82s var(--cc-motion-ease);
+  transition-delay: var(--cc-rv-delay, 0ms);
+}
+
+.cc-property-full-page .cc-rv.is-inview {
+  opacity: 1;
+  transform: none;
 }
 
 .cc-property-full-page *,
@@ -1099,6 +1115,12 @@
   display: grid;
   place-items: center;
   padding: 24px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.28s var(--cc-motion-ease),
+    visibility 0.28s var(--cc-motion-ease);
 }
 
 .cc-property-promise-modal[hidden] {
@@ -1109,6 +1131,8 @@
   position: absolute;
   inset: 0;
   background: rgba(35, 32, 25, 0.46);
+  opacity: 0;
+  transition: opacity 0.28s var(--cc-motion-ease);
   backdrop-filter: blur(8px);
 }
 
@@ -1124,6 +1148,11 @@
   background: #fffaf1;
   box-shadow: 0 28px 90px rgba(32, 29, 23, 0.28);
   color: #242019;
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.3s var(--cc-motion-ease),
+    transform 0.3s var(--cc-motion-ease);
 }
 
 .cc-property-promise-modal .modal-close {
@@ -1194,6 +1223,12 @@
   display: grid;
   place-items: center;
   padding: 24px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.28s var(--cc-motion-ease),
+    visibility 0.28s var(--cc-motion-ease);
 }
 
 .cc-property-gallery-modal[hidden] {
@@ -1204,6 +1239,8 @@
   position: absolute;
   inset: 0;
   background: rgba(35, 32, 25, 0.5);
+  opacity: 0;
+  transition: opacity 0.28s var(--cc-motion-ease);
   backdrop-filter: blur(7px);
 }
 
@@ -1221,6 +1258,11 @@
   background: #fffaf1;
   box-shadow: 0 30px 100px rgba(32, 29, 23, 0.32);
   color: #242019;
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.3s var(--cc-motion-ease),
+    transform 0.3s var(--cc-motion-ease);
 }
 
 .cc-property-gallery-modal .modal-close {
@@ -1270,6 +1312,12 @@
   display: grid;
   place-items: center;
   padding: 24px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.28s var(--cc-motion-ease),
+    visibility 0.28s var(--cc-motion-ease);
 }
 
 .cc-property-reviews-modal[hidden] {
@@ -1280,6 +1328,8 @@
   position: absolute;
   inset: 0;
   background: rgba(35, 32, 25, 0.5);
+  opacity: 0;
+  transition: opacity 0.28s var(--cc-motion-ease);
   backdrop-filter: blur(7px);
 }
 
@@ -1295,6 +1345,11 @@
   background: #fffaf1;
   box-shadow: 0 30px 100px rgba(32, 29, 23, 0.32);
   color: #242019;
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.3s var(--cc-motion-ease),
+    transform 0.3s var(--cc-motion-ease);
 }
 
 .cc-property-reviews-modal .modal-close {
@@ -1362,6 +1417,12 @@
   display: grid;
   place-items: center;
   padding: 24px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.28s var(--cc-motion-ease),
+    visibility 0.28s var(--cc-motion-ease);
 }
 
 .cc-property-amenities-modal[hidden] {
@@ -1372,6 +1433,8 @@
   position: absolute;
   inset: 0;
   background: rgba(35, 32, 25, 0.46);
+  opacity: 0;
+  transition: opacity 0.28s var(--cc-motion-ease);
   backdrop-filter: blur(8px);
 }
 
@@ -1387,7 +1450,35 @@
   background: #fffaf1;
   box-shadow: 0 28px 90px rgba(32, 29, 23, 0.28);
   color: #242019;
-  transform: translate(55%);
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.3s var(--cc-motion-ease),
+    transform 0.3s var(--cc-motion-ease);
+}
+
+.cc-property-promise-modal.is-open,
+.cc-property-gallery-modal.is-open,
+.cc-property-reviews-modal.is-open,
+.cc-property-amenities-modal.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.cc-property-promise-modal.is-open .cc-property-promise-backdrop,
+.cc-property-gallery-modal.is-open .cc-property-gallery-backdrop,
+.cc-property-reviews-modal.is-open .cc-property-reviews-backdrop,
+.cc-property-amenities-modal.is-open .cc-property-amenities-backdrop {
+  opacity: 1;
+}
+
+.cc-property-promise-modal.is-open .panel,
+.cc-property-gallery-modal.is-open .panel,
+.cc-property-reviews-modal.is-open .panel,
+.cc-property-amenities-modal.is-open .panel {
+  opacity: 1;
+  transform: none;
 }
 
 .cc-property-amenities-modal .modal-close {
@@ -1465,9 +1556,23 @@
 
 .cc-property-amenities-groups li svg {
   display: block;
-  width: 26px;
-  height: 26px;
+  width: 26px !important;
+  height: 26px !important;
+  max-width: 26px;
+  max-height: 26px;
   stroke-width: 1.55;
+}
+
+.cc-property-full-gallery img,
+.cc-property-gallery-grid img {
+  transform-origin: center;
+  transition: transform 0.8s var(--cc-motion-ease);
+  will-change: transform;
+}
+
+.cc-property-full-gallery a:not(.cc-property-full-gallery-button):hover img,
+.cc-property-gallery-grid a:not(.cc-property-gallery-button):hover img {
+  transform: scale(1.025);
 }
 
 .cc-property-amenities-groups b {
@@ -1807,7 +1912,6 @@
     max-height: calc(100vh - 36px);
     padding: 34px 24px 28px;
     border-radius: 16px;
-    transform: translate(0, 10px);
   }
 
   .cc-property-promise-modal h3 {
@@ -1883,7 +1987,6 @@
     max-height: calc(100vh - 36px);
     padding: 34px 24px 28px;
     border-radius: 16px;
-    transform: translate(0, 10px);
   }
 
   .cc-property-amenities-modal h3 {
@@ -1906,8 +2009,10 @@
   }
 
   .cc-property-amenities-groups li svg {
-    width: 23px;
-    height: 23px;
+    width: 23px !important;
+    height: 23px !important;
+    max-width: 23px;
+    max-height: 23px;
   }
 
   .cc-property-full-footer {
@@ -2389,5 +2494,25 @@
   .cc-property-full-hero p span {
     display: block;
     margin: 8px 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-property-full-page .cc-rv,
+  .cc-property-promise-modal,
+  .cc-property-gallery-modal,
+  .cc-property-reviews-modal,
+  .cc-property-amenities-modal,
+  .cc-property-promise-backdrop,
+  .cc-property-gallery-backdrop,
+  .cc-property-reviews-backdrop,
+  .cc-property-amenities-backdrop,
+  .cc-property-promise-modal .panel,
+  .cc-property-gallery-modal .panel,
+  .cc-property-reviews-modal .panel,
+  .cc-property-amenities-modal .panel,
+  .cc-property-full-gallery img,
+  .cc-property-gallery-grid img {
+    transition: none !important;
   }
 }

@@ -6,6 +6,7 @@ import {
   ExactHeader,
   ExactKick,
 } from "./ExactLayout";
+import { initScrollReveals } from "./motion";
 import "./StaysPage.css";
 
 const FALLBACK_PROPERTIES = [
@@ -402,6 +403,8 @@ const StaysPage = ({ mountNode }) => {
       .catch(() => setSyncedProperties([]));
   }, []);
 
+  useEffect(() => initScrollReveals(), []);
+
   const properties = useMemo(() => {
     const matchedIds = new Set();
     const featured = FALLBACK_PROPERTIES.map((fallback) => {
@@ -459,7 +462,7 @@ const StaysPage = ({ mountNode }) => {
   return (
     <main className="cc-exact cc-exact-stays">
       <ExactHeader links={links} />
-      <div className="cc-exact-page-pad cc-exact-section-tight">
+      <div className="cc-exact-page-pad cc-exact-section-tight cc-rv">
         <div className="cc-exact-wrap">
           <ExactKick>The Collection</ExactKick>
           <div className="cc-exact-stays-head">
@@ -467,7 +470,7 @@ const StaysPage = ({ mountNode }) => {
           </div>
           <SearchBar properties={properties} links={links} onGuestFilter={(guests) => setFilters((current) => ({ ...current, guests }))} />
           <Filters filters={filters} setFilters={setFilters} />
-          <div className="cc-exact-stay-grid">
+          <div className="cc-exact-stay-grid cc-rv">
             {filteredProperties.map((property) => <PropertyCard property={property} key={property.key || property.id || property.title} />)}
           </div>
           {!filteredProperties.length && (
