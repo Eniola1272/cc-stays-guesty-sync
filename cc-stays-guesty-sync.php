@@ -2327,6 +2327,17 @@ class CC_Stays_Guesty_Sync
         return ob_get_clean();
     }
 
+    private function property_sleep_carousel_heading()
+    {
+        return '<div class="cc-property-sleep-heading">
+            <h2>Where you\'ll sleep</h2>
+            <div class="cc-property-sleep-controls" aria-label="Bedroom carousel controls">
+                <button type="button" data-sleep-prev aria-label="Previous bedrooms" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m14 5-7 7 7 7" /></svg></button>
+                <button type="button" data-sleep-next aria-label="Next bedrooms" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m10 5 7 7-7 7" /></svg></button>
+            </div>
+        </div>';
+    }
+
     public function render_property_sleep_section($atts = [])
     {
         $property = $this->get_property_section_data($this->get_shortcode_property_id($atts));
@@ -2336,9 +2347,9 @@ class CC_Stays_Guesty_Sync
 
         ob_start();
         ?>
-        <section class="cc-property-section-shell cc-property-sleep-section">
-            <h2>Where you'll sleep</h2>
-            <div class="cc-property-sleep-rail">
+        <section class="cc-property-section-shell cc-property-sleep-section" data-sleep-carousel>
+            <?php echo $this->property_sleep_carousel_heading(); ?>
+            <div class="cc-property-sleep-rail" data-sleep-rail tabindex="0" role="region" aria-label="Bedrooms">
                 <?php foreach ($property['sleeping'] as $room): ?>
                     <article>
                         <?php if (!empty($room['image'])): ?>
@@ -2615,9 +2626,9 @@ class CC_Stays_Guesty_Sync
         ?>
         <header class="cc-property-full-nav">
             <div class="cc-property-full-wrap cc-property-full-nav-inner">
-                <a class="cc-property-full-brand" href="<?php echo esc_url($links['home']); ?>">
+                <a class="cc-property-full-brand" aria-label="CC Stays home" href="<?php echo esc_url($links['home']); ?>">
                     <?php echo $this->property_cc_logo_svg(); ?>
-                    <span>CC Stays</span>
+                    <span>Stays</span>
                 </a>
                 <nav aria-label="Property page navigation">
                     <a href="<?php echo esc_url($links['stays']); ?>">Stays</a>
@@ -2635,9 +2646,9 @@ class CC_Stays_Guesty_Sync
         </header>
         <div class="cc-property-drawer" data-property-drawer aria-label="Menu" aria-hidden="true">
             <div class="cc-property-drawer-top">
-                <a class="cc-property-full-brand" href="<?php echo esc_url($links['home']); ?>" data-property-menu-close>
+                <a class="cc-property-full-brand" aria-label="CC Stays home" href="<?php echo esc_url($links['home']); ?>" data-property-menu-close>
                     <?php echo $this->property_cc_logo_svg(); ?>
-                    <span>CC Stays</span>
+                    <span>Stays</span>
                 </a>
                 <button class="cc-property-menu-btn" type="button" data-property-menu-close aria-label="Close menu">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
@@ -2840,9 +2851,9 @@ class CC_Stays_Guesty_Sync
                             </div>
                         </section>
 
-                        <section class="cc-property-full-section cc-property-full-sleep cc-rv" id="sleep">
-                            <h2>Where you'll sleep</h2>
-                            <div class="cc-property-full-sleep-rail">
+                        <section class="cc-property-full-section cc-property-full-sleep cc-rv" id="sleep" data-sleep-carousel>
+                            <?php echo $this->property_sleep_carousel_heading(); ?>
+                            <div class="cc-property-full-sleep-rail" data-sleep-rail tabindex="0" role="region" aria-label="Bedrooms">
                                 <?php foreach ($property['sleeping'] as $room): ?>
                                     <article>
                                         <?php if (!empty($room['image'])): ?>

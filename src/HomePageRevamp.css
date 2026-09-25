@@ -925,6 +925,8 @@
   display: grid;
   min-height: 260px;
   place-items: center;
+  align-content: center;
+  gap: 20px;
   overflow: hidden;
   background: var(--revamp-green);
   color: var(--revamp-cream);
@@ -940,6 +942,7 @@
 }
 
 .cc-revamp-trip-band h2 {
+  margin: 0;
   position: relative;
   z-index: 2;
   font-size: clamp(34px, 4vw, 56px);

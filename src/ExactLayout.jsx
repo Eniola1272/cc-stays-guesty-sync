@@ -91,7 +91,7 @@ export const ExactHeader = ({ links = DEFAULT_EXACT_LINKS, solid = true }) => {
         <div className="cc-exact-nav-inner">
           <a className="cc-exact-brand" href={links.home} aria-label="CC Stays home">
             <CcMono />
-            <span>CC&nbsp;Stays</span>
+            <span>Stays</span>
           </a>
           <nav className="cc-exact-nav-links" aria-label="Primary">
             {nav.map(([label, href]) => <a href={href} key={label}>{label}</a>)}
@@ -105,7 +105,7 @@ export const ExactHeader = ({ links = DEFAULT_EXACT_LINKS, solid = true }) => {
         <div className="cc-exact-drawer-top">
           <a className="cc-exact-brand" href={links.home} onClick={() => setOpen(false)} aria-label="CC Stays home">
             <CcMono />
-            <span>CC&nbsp;Stays</span>
+            <span>Stays</span>
           </a>
           <button type="button" className="cc-exact-menu-btn" aria-label="Close menu" onClick={() => setOpen(false)}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M5 5l14 14M19 5L5 19" /></svg>

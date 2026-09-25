@@ -177,7 +177,7 @@ const LogoMark = ({ logo, compact = false }) => (
     ) : (
       <>
         <CcMono />
-        <span>CC Stays</span>
+        <span>Stays</span>
       </>
     )}
   </span>
@@ -622,7 +622,6 @@ const HomePageRevamp = ({ mountNode }) => {
           ratio="21 / 9"
           priority
         />
-        <CcWatermark />
         <header className="cc-revamp-nav">
           <a href={links.home} aria-label="CC Stays home">
             <LogoMark logo={images.logo} />

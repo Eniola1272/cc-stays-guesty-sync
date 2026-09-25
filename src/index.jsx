@@ -10,6 +10,7 @@ import HomePageSections from "./HomePageSections";
 import HomePageCoastal from "./HomePageCoastal";
 import HomePageRevamp from "./HomePageRevamp";
 import PropertyMap from "./PropertyMap";
+import { initSleepCarousels } from "./SleepCarousel";
 import { AboutPage, ContactPage, DestinationsPage, ExperiencesPage, JournalPage } from "./InteriorPages";
 import { DEFAULT_EXACT_LINKS, ExactFooter, ExactHeader } from "./ExactLayout";
 import "./PropertySections.css";
@@ -29,6 +30,8 @@ const readExactLinks = (mountNode) => {
 
 // Wait for the DOM to load
 document.addEventListener("DOMContentLoaded", () => {
+  initSleepCarousels();
+
   // 1. Mount Booking Widget
   const bookingElement = document.getElementById("cc-stays-react-booking");
   if (bookingElement) {
