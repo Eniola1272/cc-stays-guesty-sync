@@ -94,7 +94,7 @@ export const ExactHeader = ({ links = DEFAULT_EXACT_LINKS, solid = true }) => {
             <span>Stays</span>
           </a>
           <nav className="cc-exact-nav-links" aria-label="Primary">
-            {nav.map(([label, href]) => <a href={href} key={label}>{label}</a>)}
+            {nav.map(([label, href]) => <a href={href} key={label}>{label.replace("↗", "").trim()}{label.includes("↗") ? <> { <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true" style={{ display: "inline-block", verticalAlign: "-0.1em" }}><path d="M5 19 19 5M5 5h14v14" /></svg> }</> : null}</a>)}
           </nav>
           <button type="button" className="cc-exact-menu-btn" aria-label="Open menu" onClick={() => setOpen(true)}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M3 7h18M3 12h18M3 17h18" /></svg>
@@ -120,7 +120,7 @@ export const ExactHeader = ({ links = DEFAULT_EXACT_LINKS, solid = true }) => {
               {...(isExternal ? { target: "_blank", rel: "noopener" } : {})}
             >
               {label}
-              {isExternal ? <small>↗</small> : null}
+              {isExternal ? <small><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true" style={{ display: "inline-block", verticalAlign: "-0.1em" }}><path d="M5 19 19 5M5 5h14v14" /></svg></small> : null}
             </a>
           ))}
         </nav>
@@ -151,8 +151,8 @@ export const ExactFooter = ({ links = DEFAULT_EXACT_LINKS }) => (
       </nav>
       <nav>
         <h5>Partners</h5>
-        <a href={links.partner}>Partner With Us ↗</a>
-        <a className="cc-revamp-fade" href={links.owners}>Owners ↗</a>
+        <a href={links.partner}>Partner With Us <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true" style={{ display: "inline-block", verticalAlign: "-0.1em" }}><path d="M5 19 19 5M5 5h14v14" /></svg></a>
+        <a className="cc-revamp-fade" href={links.owners}>Owners <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true" style={{ display: "inline-block", verticalAlign: "-0.1em" }}><path d="M5 19 19 5M5 5h14v14" /></svg></a>
       </nav>
       <nav>
         <h5>Follow</h5>

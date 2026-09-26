@@ -883,7 +883,7 @@ export const ContactPage = ({ mountNode }) => {
             <div className="cc-partner-box">
               <p>Own a property or want to work with CC Stays?</p>
               <a className="cc-exact-btn-text" href={links.partner}>
-                Partner With Us <span>↗</span>
+                Partner With Us <span><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true" style={{ display: "inline-block", verticalAlign: "-0.1em" }}><path d="M5 19 19 5M5 5h14v14" /></svg></span>
               </a>
             </div>
           </aside>

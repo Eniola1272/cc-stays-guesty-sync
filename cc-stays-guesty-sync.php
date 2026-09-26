@@ -2634,8 +2634,8 @@ class CC_Stays_Guesty_Sync
                     <a href="<?php echo esc_url($links['stays']); ?>">Stays</a>
                     <a href="<?php echo esc_url($links['about']); ?>">About Us</a>
                     <a href="<?php echo esc_url($links['contact']); ?>">Contact</a>
-                    <a href="<?php echo esc_url($links['partner']); ?>">Partner With Us ↗</a>
-                    <a class="muted" href="<?php echo esc_url($links['owners']); ?>">Owners ↗</a>
+                    <a href="<?php echo esc_url($links['partner']); ?>">Partner With Us <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" style="display:inline-block;vertical-align:-0.1em"><path d="M5 19 19 5M5 5h14v14" /></svg></a>
+                    <a class="muted" href="<?php echo esc_url($links['owners']); ?>">Owners <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" style="display:inline-block;vertical-align:-0.1em"><path d="M5 19 19 5M5 5h14v14" /></svg></a>
                 </nav>
                 <button class="cc-property-menu-btn" type="button" data-property-menu-open aria-label="Open menu">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
@@ -2661,9 +2661,9 @@ class CC_Stays_Guesty_Sync
                 <a href="<?php echo esc_url($links['about']); ?>" data-property-menu-close>About Us</a>
                 <a href="<?php echo esc_url($links['contact']); ?>" data-property-menu-close>Contact</a>
                 <a href="<?php echo esc_url($links['partner']); ?>" target="_blank" rel="noopener">Partner With Us
-                    <small>↗</small></a>
+                    <small><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" style="display:inline-block;vertical-align:-0.1em"><path d="M5 19 19 5M5 5h14v14" /></svg></small></a>
                 <a href="<?php echo esc_url($links['owners']); ?>" target="_blank" rel="noopener">Owners
-                    <small>↗</small></a>
+                    <small><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" style="display:inline-block;vertical-align:-0.1em"><path d="M5 19 19 5M5 5h14v14" /></svg></small></a>
             </nav>
             <a class="cc-property-drawer-cta" href="<?php echo esc_url($links['stays']); ?>" data-property-menu-close>Find a
                 Stay</a>
@@ -2709,7 +2709,7 @@ class CC_Stays_Guesty_Sync
 
     private function property_subnav_script()
     {
-        return '<script>(function(){if(window.ccPropertySubnavReady)return;window.ccPropertySubnavReady=true;var ids=["ov","sleep","amen","revs","loc","ttk"];function ready(fn){if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",fn);}else{fn();}}ready(function(){var subnav=document.querySelector("[data-property-subnav]");var header=document.querySelector(".cc-property-full-nav");var start=document.getElementById("ov");if(!subnav||!start)return;var links=Array.prototype.slice.call(subnav.querySelectorAll("[data-sn]"));var targets=ids.map(function(id){return document.getElementById(id);}).filter(Boolean);function metrics(){var headerBottom=header?Math.max(0,header.getBoundingClientRect().bottom):0;var subnavHeight=subnav.offsetHeight||0;document.documentElement.style.setProperty("--cc-property-subnav-top",headerBottom+"px");return{headerBottom:headerBottom,subnavHeight:subnavHeight};}function setActive(metricsValue){var line=metricsValue.headerBottom+metricsValue.subnavHeight+24;var active=targets[0];targets.forEach(function(target){if(target.getBoundingClientRect().top<=line){active=target;}});links.forEach(function(link){var isActive=active&&link.getAttribute("href")==="#"+active.id;link.classList.toggle("active",!!isActive);});if(active){var activeLink=null;links.some(function(link){if(link.getAttribute("href")==="#"+active.id){activeLink=link;return true;}return false;});if(activeLink&&subnav.classList.contains("show")){activeLink.scrollIntoView({inline:"nearest",block:"nearest"});}}}function update(){var m=metrics();var shouldShow=start.getBoundingClientRect().top<=m.headerBottom+2;subnav.classList.toggle("show",shouldShow);subnav.setAttribute("aria-hidden",shouldShow?"false":"true");if(shouldShow){setActive(m);}}links.forEach(function(link){link.addEventListener("click",function(event){var hash=link.getAttribute("href");var target=hash?document.querySelector(hash):null;if(!target)return;event.preventDefault();var m=metrics();var top=window.pageYOffset+target.getBoundingClientRect().top-m.headerBottom-m.subnavHeight+2;window.scrollTo({top:Math.max(0,top),behavior:"smooth"});if(history.replaceState){history.replaceState(null,"",hash);}});});window.addEventListener("scroll",update,{passive:true});window.addEventListener("resize",update);update();requestAnimationFrame(update);});})();</script>';
+        return '<script>(function(){if(window.ccPropertySubnavReady)return;window.ccPropertySubnavReady=true;var ids=["ov","sleep","amen","revs","loc","ttk"];function ready(fn){if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",fn);}else{fn();}}ready(function(){var subnav=document.querySelector("[data-property-subnav]");var header=document.querySelector(".cc-property-full-nav");var start=document.getElementById("ov");if(!subnav||!start)return;var links=Array.prototype.slice.call(subnav.querySelectorAll("[data-sn]"));var targets=ids.map(function(id){return document.getElementById(id);}).filter(Boolean);function metrics(){var headerBottom=header?Math.max(0,header.getBoundingClientRect().bottom):0;var subnavHeight=subnav.offsetHeight||0;document.documentElement.style.setProperty("--cc-property-subnav-top",headerBottom+"px");document.documentElement.style.setProperty("--cc-property-subnav-height",subnavHeight+"px");return{headerBottom:headerBottom,subnavHeight:subnavHeight};}function setActive(metricsValue){var line=metricsValue.headerBottom+metricsValue.subnavHeight+24;var active=targets[0];targets.forEach(function(target){if(target.getBoundingClientRect().top<=line){active=target;}});links.forEach(function(link){var isActive=active&&link.getAttribute("href")==="#"+active.id;link.classList.toggle("active",!!isActive);});if(active){var activeLink=null;links.some(function(link){if(link.getAttribute("href")==="#"+active.id){activeLink=link;return true;}return false;});if(activeLink&&subnav.classList.contains("show")){activeLink.scrollIntoView({inline:"nearest",block:"nearest"});}}}function update(){var m=metrics();var shouldShow=start.getBoundingClientRect().top<=m.headerBottom+2;subnav.classList.toggle("show",shouldShow);subnav.setAttribute("aria-hidden",shouldShow?"false":"true");if(shouldShow){setActive(m);}}links.forEach(function(link){link.addEventListener("click",function(event){var hash=link.getAttribute("href");var target=hash?document.querySelector(hash):null;if(!target)return;event.preventDefault();var m=metrics();var top=window.pageYOffset+target.getBoundingClientRect().top-m.headerBottom-m.subnavHeight+2;window.scrollTo({top:Math.max(0,top),behavior:"smooth"});if(history.replaceState){history.replaceState(null,"",hash);}});});window.addEventListener("scroll",update,{passive:true});window.addEventListener("resize",update);update();requestAnimationFrame(update);});})();</script>';
     }
 
     private function render_property_full_footer($links)
@@ -2734,8 +2734,8 @@ class CC_Stays_Guesty_Sync
                         href="<?php echo esc_url($links['contact']); ?>">Contact</a>
                 </nav>
                 <nav>
-                    <h5>Partners</h5><a href="<?php echo esc_url($links['partner']); ?>">Partner With Us ↗</a><a
-                        href="<?php echo esc_url($links['owners']); ?>">Owners ↗</a>
+                    <h5>Partners</h5><a href="<?php echo esc_url($links['partner']); ?>">Partner With Us <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" style="display:inline-block;vertical-align:-0.1em"><path d="M5 19 19 5M5 5h14v14" /></svg></a><a
+                        href="<?php echo esc_url($links['owners']); ?>">Owners <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" style="display:inline-block;vertical-align:-0.1em"><path d="M5 19 19 5M5 5h14v14" /></svg></a>
                 </nav>
                 <nav>
                     <h5>Follow</h5><a href="<?php echo esc_url($links['instagram']); ?>">Instagram</a>
@@ -2777,35 +2777,24 @@ class CC_Stays_Guesty_Sync
             <?php echo $this->render_property_full_subnav(!empty($property['reviews']) || $property['rating']); ?>
             <main>
                 <div class="cc-property-full-wrap">
-                    <section class="cc-property-full-hero cc-rv">
-                        <div>
-                            <h1><?php echo esc_html($this->property_short_title($property['title'])); ?></h1>
-                            <p>
-                                <?php echo $this->property_location_label($property); ?>
-                                <?php if ($property['rating']): ?>
-                                    <span><span class="cc-property-rating-star">★</span>
-                                        <?php echo esc_html($property['rating']); ?>
-                                        <?php echo $property['review_count'] ? ' · ' . esc_html($property['review_count']) . ' reviews' : ''; ?></span>
-                                <?php endif; ?>
-                            </p>
-                        </div>
-                        <button class="cc-property-share-link" type="button" data-property-share
-                            data-share-title="<?php echo esc_attr($property['title']); ?>"
-                            data-share-text="<?php echo esc_attr('Take a look at ' . $property['title'] . ' by CC Stays.'); ?>"
-                            data-share-url="<?php echo esc_url($property['url']); ?>">Share</button>
-                    </section>
-
-                    <div class="cc-rv" data-gallery-scope>
+                    <?php
+                    $last_index = count($visible_images) - 1;
+                    ?>
+                    <div class="cc-rv" data-gallery-scope style="position: relative;">
                         <section class="cc-property-full-gallery" aria-label="<?php echo esc_attr($property['title']); ?> photos">
                             <?php foreach ($visible_images as $index => $image): ?>
-                                <a class="<?php echo $index === 0 ? 'primary' : ''; ?>" href="<?php echo esc_url($image); ?>"
+                                <a class="<?php echo $index === 0 ? 'primary' : ''; ?> <?php echo $index === $last_index ? 'last-slide' : ''; ?>" href="<?php echo esc_url($image); ?>"
                                     target="_blank" rel="noopener">
                                     <img src="<?php echo esc_url($image); ?>" alt=""
                                         loading="<?php echo $index === 0 ? 'eager' : 'lazy'; ?>">
+                                    <?php if ($index === $last_index): ?>
+                                        <div class="cc-property-gallery-last-overlay">
+                                            <button class="cc-property-full-gallery-button" type="button" data-gallery-open
+                                                data-gallery-src="<?php echo esc_url($property['gallery_page']); ?>">Show all photos</button>
+                                        </div>
+                                    <?php endif; ?>
                                 </a>
                             <?php endforeach; ?>
-                            <button class="cc-property-full-gallery-button" type="button" data-gallery-open
-                                data-gallery-src="<?php echo esc_url($property['gallery_page']); ?>">Show all photos</button>
                         </section>
                         <?php echo $this->property_gallery_modal($property); ?>
                     </div>
@@ -2814,17 +2803,34 @@ class CC_Stays_Guesty_Sync
                 <div class="cc-property-full-wrap cc-property-full-layout">
                     <div class="cc-property-full-main">
                         <section class="cc-property-full-section cc-property-full-overview cc-rv">
-                            <h2><?php echo esc_html($property['subtitle'] ?: $property['title'] . ' · ' . $this->property_location_label($property)); ?>
-                            </h2>
-                            <p><?php echo $this->property_stat_label($property['guests'], 'guest'); ?> ·
-                                <?php echo $this->property_stat_label($property['bedrooms'], 'bedroom'); ?> ·
-                                <?php echo $this->property_stat_label($property['beds'], 'bed'); ?> ·
-                                <?php echo $this->property_stat_label($property['bathrooms'], 'bath'); ?>
-                            </p>
+                            <div class="cc-property-overview-header">
+                                <h2><?php echo esc_html($property['subtitle'] ?: $this->property_short_title($property['title'])); ?></h2>
+                                <button class="cc-property-share-link" type="button" data-property-share
+                                    data-share-title="<?php echo esc_attr($property['title']); ?>"
+                                    data-share-text="<?php echo esc_attr('Take a look at ' . $property['title'] . ' by CC Stays.'); ?>"
+                                    data-share-url="<?php echo esc_url($property['url']); ?>">Share</button>
+                            </div>
+                            <div class="cc-property-overview-sub">
+                                <p class="cc-property-location-line"><?php echo $this->property_location_label($property); ?></p>
+                                <p class="cc-property-stats-line"><?php echo $this->property_stat_label($property['guests'], 'guest'); ?> ·
+                                    <?php echo $this->property_stat_label($property['bedrooms'], 'bedroom'); ?> ·
+                                    <?php echo $this->property_stat_label($property['beds'], 'bed'); ?> ·
+                                    <?php echo $this->property_stat_label($property['bathrooms'], 'bath'); ?>
+                                </p>
+                            </div>
                             <div class="cc-property-full-residence">
-                                <?php echo $this->property_cc_logo_svg(); ?>
-                                <div><strong>A CC Stays Residence</strong><span>Selected for comfort, character, and the way it
-                                        feels to actually stay there.</span></div>
+                                <div class="cc-property-residence-main">
+                                    <?php echo $this->property_cc_logo_svg(); ?>
+                                    <div><strong>A CC Stays Residence</strong><span>Selected for comfort, character, and the way it
+                                            feels to actually stay there.</span></div>
+                                </div>
+                                <?php if ($property['rating']): ?>
+                                    <div class="cc-property-residence-rating">
+                                        <span class="cc-property-rating-star">★</span>
+                                        <span class="rating-score"><?php echo esc_html($property['rating']); ?></span>
+                                        <span class="rating-count"><?php echo $property['review_count'] ? '· ' . esc_html($property['review_count']) . ' reviews' : ''; ?></span>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                             <?php if (!empty($property['license']) && $this->property_matches_slug($property['id'], $property['title'], 'bamboo-bliss')): ?>
                                 <p class="cc-property-full-license">Licensed vacation rental ·

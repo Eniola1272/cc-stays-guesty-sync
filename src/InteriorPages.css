@@ -505,12 +505,20 @@
 .cc-exact-reason-trigger:focus,
 .cc-exact-reason-trigger.is-open {
   outline: none;
+  background: var(--blue);
+  color: var(--paper);
   border-color: var(--blue);
   box-shadow: 0 0 0 3px rgba(71, 101, 120, 0.12);
 }
 
 .cc-exact-reason-trigger .is-placeholder {
   color: rgba(87, 82, 74, 0.72);
+}
+
+.cc-exact-reason-trigger:hover .is-placeholder,
+.cc-exact-reason-trigger:focus .is-placeholder,
+.cc-exact-reason-trigger.is-open .is-placeholder {
+  color: var(--paper);
 }
 
 .cc-exact-reason-trigger svg {
