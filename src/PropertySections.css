@@ -222,7 +222,7 @@
 .cc-property-drawer {
   position: fixed;
   inset: 0;
-  z-index: 120;
+  z-index: 9020;
   display: flex;
   visibility: hidden;
   flex-direction: column;
@@ -1220,7 +1220,7 @@
 
 .cc-property-promise-modal .panel {
   position: relative;
-  z-index: 1;
+  z-index: 90;
   width: min(560px, 100%);
   max-height: min(720px, calc(100vh - 48px));
   overflow: auto;
@@ -1328,7 +1328,7 @@
 
 .cc-property-gallery-modal .panel {
   position: relative;
-  z-index: 1;
+  z-index: 90;
   display: flex;
   flex-direction: column;
   gap: 28px;
@@ -1417,7 +1417,7 @@
 
 .cc-property-reviews-modal .panel {
   position: relative;
-  z-index: 1;
+  z-index: 90;
   width: min(1120px, calc(100vw - 48px));
   max-height: min(760px, calc(100vh - 48px));
   overflow: auto;
@@ -1522,7 +1522,7 @@
 
 .cc-property-amenities-modal .panel {
   position: relative;
-  z-index: 1;
+  z-index: 90;
   width: min(720px, 100%);
   max-height: min(780px, calc(100vh - 48px));
   overflow: auto;
@@ -1886,8 +1886,7 @@
     display: none;
   }
 
-  .cc-property-full-gallery
-    a:not(.cc-property-full-gallery-button) {
+  .cc-property-full-gallery a:not(.cc-property-full-gallery-button) {
     display: block !important;
     flex: 0 0 90%;
     width: 90%;

@@ -1652,11 +1652,11 @@
 
   .cc-revamp-arch-media img:last-child {
     right: 14px;
-    bottom: -58px;
+    bottom: -42px;
     left: auto;
-    width: 150px;
-    border-width: 7px;
-    border-radius: 8px;
+    width: min(220px, 54vw);
+    border-width: 6px;
+    border-radius: 12px;
   }
 
   .cc-revamp-story--split {
