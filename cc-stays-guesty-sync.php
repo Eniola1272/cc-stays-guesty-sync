@@ -2014,7 +2014,7 @@ class CC_Stays_Guesty_Sync
 
     private function property_motion_script()
     {
-        return '<script>(function(){if(window.ccPropertyMotionReady)return;window.ccPropertyMotionReady=true;window.ccPropertyShowModal=function(root,openClass,focusSelector){if(!root)return;clearTimeout(root._ccMotionTimer);root.hidden=false;if(openClass)document.documentElement.classList.add(openClass);requestAnimationFrame(function(){root.classList.add("is-open");});var close=focusSelector?root.querySelector(focusSelector):null;if(close)setTimeout(function(){close.focus();},30);};window.ccPropertyHideModal=function(root,openClass,lastTrigger){if(!root)return;root.classList.remove("is-open");if(openClass)document.documentElement.classList.remove(openClass);clearTimeout(root._ccMotionTimer);root._ccMotionTimer=setTimeout(function(){if(!root.classList.contains("is-open"))root.hidden=true;},320);if(lastTrigger&&lastTrigger.focus)setTimeout(function(){lastTrigger.focus();},340);};var items=[].slice.call(document.querySelectorAll(".cc-property-full-page .cc-rv"));var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;if(reduce||!("IntersectionObserver" in window)){items.forEach(function(el){el.classList.add("is-inview");});return;}var io=new IntersectionObserver(function(entries){entries.forEach(function(entry){if(!entry.isIntersecting)return;entry.target.classList.add("is-inview");io.unobserve(entry.target);});},{threshold:.12,rootMargin:"0px 0px -6% 0px"});items.forEach(function(el,index){if(!el.style.getPropertyValue("--cc-rv-delay"))el.style.setProperty("--cc-rv-delay",Math.min(index*45,180)+"ms");io.observe(el);});})();</script>';
+        return '<script>(function(){if(window.ccPropertyMotionReady)return;window.ccPropertyMotionReady=true;window.ccPropertyShowModal=function(root,openClass,focusSelector){if(!root)return;clearTimeout(root._ccMotionTimer);root.hidden=false;if(openClass)document.documentElement.classList.add(openClass);requestAnimationFrame(function(){root.classList.add("is-open");});var close=focusSelector?root.querySelector(".modal-close"+focusSelector+",button"+focusSelector+","+focusSelector):null;if(close&&close.focus)setTimeout(function(){close.focus();},60);};window.ccPropertyHideModal=function(root,openClass,lastTrigger){if(!root)return;root.classList.remove("is-open");if(openClass)document.documentElement.classList.remove(openClass);clearTimeout(root._ccMotionTimer);root._ccMotionTimer=setTimeout(function(){if(!root.classList.contains("is-open"))root.hidden=true;},320);if(lastTrigger&&lastTrigger.focus)setTimeout(function(){lastTrigger.focus();},340);};var items=[].slice.call(document.querySelectorAll(".cc-property-full-page .cc-rv"));var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;if(reduce||!("IntersectionObserver" in window)){items.forEach(function(el){el.classList.add("is-inview");});return;}var io=new IntersectionObserver(function(entries){entries.forEach(function(entry){if(!entry.isIntersecting)return;entry.target.classList.add("is-inview");io.unobserve(entry.target);});},{threshold:.12,rootMargin:"0px 0px -6% 0px"});items.forEach(function(el,index){if(!el.style.getPropertyValue("--cc-rv-delay"))el.style.setProperty("--cc-rv-delay",Math.min(index*45,180)+"ms");io.observe(el);});})();</script>';
     }
 
     private function property_promise_modal()
@@ -2050,7 +2050,7 @@ class CC_Stays_Guesty_Sync
                 </div>
             </div>
         </div>
-        <script>(function () { if (window.ccPropertyPromiseReady) return; window.ccPropertyPromiseReady = true; var lastTrigger = null; function modal() { return document.querySelector("[data-promise-modal]"); } function open(trigger) { var root = modal(); if (!root) return; lastTrigger = trigger; if (window.ccPropertyShowModal) { window.ccPropertyShowModal(root, "cc-property-promise-open", "[data-promise-close]"); return; } root.hidden = false; root.classList.add("is-open"); document.documentElement.classList.add("cc-property-promise-open"); var close = root.querySelector("[data-promise-close]"); if (close) close.focus(); } function close() { var root = modal(); if (!root || (root.hidden && !root.classList.contains("is-open"))) return; if (window.ccPropertyHideModal) { window.ccPropertyHideModal(root, "cc-property-promise-open", lastTrigger); return; } root.classList.remove("is-open"); root.hidden = true; document.documentElement.classList.remove("cc-property-promise-open"); if (lastTrigger && lastTrigger.focus) lastTrigger.focus(); } document.addEventListener("click", function (event) { var opener = event.target.closest("[data-promise-open]"); if (opener) { event.preventDefault(); open(opener); return; } if (event.target.closest("[data-promise-close]")) { event.preventDefault(); close(); } }); document.addEventListener("keydown", function (event) { if (event.key === "Escape") close(); }); })();</script>
+        <script>(function () { if (window.ccPropertyPromiseReady) return; window.ccPropertyPromiseReady = true; var lastTrigger = null; function modal() { return document.querySelector("[data-promise-modal]"); } function open(trigger) { var root = modal(); if (!root) return; lastTrigger = trigger; if (window.ccPropertyShowModal) { window.ccPropertyShowModal(root, "cc-property-promise-open", "[data-promise-close]"); return; } root.hidden = false; root.classList.add("is-open"); document.documentElement.classList.add("cc-property-promise-open"); var btn = root.querySelector(".modal-close"); if (btn) setTimeout(function () { btn.focus(); }, 60); } function close() { var root = modal(); if (!root || (root.hidden && !root.classList.contains("is-open"))) return; if (window.ccPropertyHideModal) { window.ccPropertyHideModal(root, "cc-property-promise-open", lastTrigger); return; } root.classList.remove("is-open"); root.hidden = true; document.documentElement.classList.remove("cc-property-promise-open"); if (lastTrigger && lastTrigger.focus) lastTrigger.focus(); } document.addEventListener("click", function (event) { var opener = event.target.closest("[data-promise-open]"); if (opener) { event.preventDefault(); event.stopPropagation(); open(opener); return; } if (event.target.closest("[data-promise-close]")) { event.preventDefault(); event.stopPropagation(); close(); } }, true); document.addEventListener("keydown", function (event) { if (event.key === "Escape") close(); }); })();</script>
         <?php
         return ob_get_clean();
     }
@@ -2780,7 +2780,8 @@ class CC_Stays_Guesty_Sync
                     <?php
                     $last_index = count($visible_images) - 1;
                     ?>
-                    <div class="cc-rv" data-gallery-scope style="position: relative;">
+                    <div data-gallery-scope>
+                        <div class="cc-property-gallery-shell cc-rv">
                         <section class="cc-property-full-gallery" aria-label="<?php echo esc_attr($property['title']); ?> photos">
                             <?php foreach ($visible_images as $index => $image): ?>
                                 <a class="<?php echo $index === 0 ? 'primary' : ''; ?> <?php echo $index === $last_index ? 'last-slide' : ''; ?>" href="<?php echo esc_url($image); ?>"
@@ -2796,6 +2797,9 @@ class CC_Stays_Guesty_Sync
                                 </a>
                             <?php endforeach; ?>
                         </section>
+                            <button class="cc-desktop-gallery-btn" type="button" data-gallery-open
+                                data-gallery-src="<?php echo esc_url($property['gallery_page']); ?>">Show all photos</button>
+                        </div>
                         <?php echo $this->property_gallery_modal($property); ?>
                     </div>
                 </div>
@@ -2914,7 +2918,7 @@ class CC_Stays_Guesty_Sync
                         <section class="cc-property-full-section cc-property-full-promise cc-rv">
                             <h2>The CC Stays Promise</h2>
                             <strong>Book with confidence.</strong>
-                            <a href="#cc-property-promise-title" data-promise-open>Read more <span>→</span></a>
+                            <button type="button" class="cc-property-promise-btn" data-promise-open>Read more <span>→</span></button>
                         </section>
 
                         <section class="cc-property-full-section cc-property-full-location cc-rv" id="loc">
@@ -2983,10 +2987,10 @@ class CC_Stays_Guesty_Sync
                             <button class="cc-property-book-promise btn-text small" type="button" data-promise-open>The CC
                                 Stays Promise · Book with confidence →</button>
                         </div>
-                        <?php echo $this->property_promise_modal(); ?>
                     </aside>
                 </div>
             </main>
+            <?php echo $this->property_promise_modal(); ?>
             <?php echo $this->render_property_full_footer($links); ?>
             <?php echo $this->property_motion_script(); ?>
             <?php echo $this->property_share_script(); ?>

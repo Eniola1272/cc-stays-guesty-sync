@@ -412,14 +412,16 @@
   object-position: center;
 }
 
-.cc-property-full-gallery a.last-slide {
-  position: relative;
-}
-
 .cc-property-gallery-last-overlay {
   position: absolute;
   inset: 0;
   pointer-events: none;
+  display: none;
+}
+
+/* Hide the embedded overlay button on desktop – the standalone one is used */
+.cc-property-gallery-last-overlay .cc-property-full-gallery-button {
+  display: none;
 }
 
 .cc-property-gallery-count {
@@ -443,6 +445,43 @@
   font: 600 15px/1 var(--revamp-sans);
   cursor: pointer;
   appearance: none;
+  z-index: 2;
+}
+
+/* Keep the desktop control outside the mobile image scroller. */
+.cc-property-gallery-shell {
+  position: relative;
+}
+
+.cc-desktop-gallery-btn {
+  position: absolute;
+  right: 22px;
+  bottom: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 8px;
+  background: #fffaf1;
+  box-shadow: 0 10px 28px rgba(32, 29, 23, 0.18);
+  color: #242019;
+  font: 600 15px/1 var(--revamp-sans);
+  cursor: pointer;
+  appearance: none;
+  pointer-events: auto;
+  z-index: 2;
+}
+
+.cc-desktop-gallery-btn:hover {
+  background: #ebe3d2;
+  color: #242019;
+}
+
+.cc-desktop-gallery-btn:focus-visible {
+  outline: 2px solid #242019;
+  outline-offset: 3px;
 }
 
 .cc-property-full-layout {
@@ -842,10 +881,17 @@
   font: 600 18px/1.35 var(--revamp-sans);
 }
 
-.cc-property-full-promise a {
+.cc-property-full-promise a,
+.cc-property-full-promise button,
+.cc-property-promise-btn {
   display: inline-flex;
   align-items: center;
   margin-top: 16px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
   font: 500 16px/1 var(--revamp-sans);
   text-decoration: underline;
   text-underline-offset: 8px;
@@ -854,7 +900,9 @@
     color 0.3s ease;
 }
 
-.cc-property-full-promise a:hover {
+.cc-property-full-promise a:hover,
+.cc-property-full-promise button:hover,
+.cc-property-promise-btn:hover {
   color: #51758f;
   gap: 0.8em;
 }
@@ -1216,6 +1264,9 @@
   opacity: 0;
   transition: opacity 0.28s var(--cc-motion-ease);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  will-change: opacity;
+  contain: strict;
 }
 
 .cc-property-promise-modal .panel {
@@ -1913,6 +1964,16 @@
     align-items: center;
     justify-content: center;
     pointer-events: none;
+  }
+
+  /* On mobile, show the embedded overlay button */
+  .cc-property-gallery-last-overlay .cc-property-full-gallery-button {
+    display: inline-flex;
+  }
+
+  /* Hide the standalone desktop button on mobile */
+  .cc-desktop-gallery-btn {
+    display: none !important;
   }
 
   .cc-property-full-gallery-button {
